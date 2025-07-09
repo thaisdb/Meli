@@ -1,0 +1,73 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add Product</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!--?php include "header.php"; ?-->
+    <header role="banner"  class="nav-header">
+            <img src="https://http2.mlstatic.com/frontend-assets/ml-web-navigation/ui-navigation/6.6.130/mercadolibre/pt_logo_large_plus@2x.webp">
+    </header>
+    <div class="body-div">
+        <h1>Add a New Product</h1>
+        <form id="productForm">
+            <label for="title">Product Name:</label><br>
+            <input type="text" id="title" name="title" required><br><br>
+
+            <label for="price">Price:</label><br>
+            <input type="number" step="0.01" id="price" name="price" required><br><br>
+
+            <label for="description">Description:</label><br>
+            <input type="text" id="description" name="description" ><br><br>
+
+            <label for="imageUrl">Image Url:</label><br>
+            <input type="text" id="imageUrl" name="imageUrl"><br><br>
+
+            <label for="brand">Brand:</label><br>
+            <input type="text" id="brand" name="brand"><br><br>
+
+            <label for="stock">Stock:</label><br>
+            <input type="number" id="stock" name="stock"><br><br>
+
+            <button type="submit">Add Product</button>
+        </form>
+
+        <div id="result" style="margin-top:20px;"></div>
+    </div>
+    <script>
+        const form = document.getElementById('productForm');
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const product = {
+                title: form.title.value,
+                price: parseFloat(form.price.value),
+                description: form.description.value,
+                imageUrl: form.imageUrl.value,
+                brand: form.brand.value,
+                stock: parseInt(form.stock.value)
+            };
+
+            try {
+                const response = await fetch('/products', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(product)
+                });
+
+                const result = await response.json();
+
+                document.getElementById('result').innerText =
+                    response.ok
+                        ? `✅ Product added: ${JSON.stringify(result)}`
+                        : `❌ Error: ${JSON.stringify(result)}`;
+            } catch (err) {
+                document.getElementById('result').innerText = '❌ Request failed.';
+            }
+        });
+    </script>
+</body>
+</html>
