@@ -1,0 +1,65 @@
+[ {
+  "id" : 2,
+  "title" : "Product 2",
+  "price" : 149.99,
+  "description" : null,
+  "imageUrl" : null,
+  "brand" : null,
+  "stock" : null
+}, {
+  "id" : 5,
+  "title" : "t",
+  "price" : 0.05,
+  "description" : null,
+  "imageUrl" : null,
+  "brand" : null,
+  "stock" : null
+}, {
+  "id" : 6,
+  "title" : "y",
+  "price" : 0.06,
+  "description" : null,
+  "imageUrl" : null,
+  "brand" : null,
+  "stock" : null
+}, {
+  "id" : 7,
+  "title" : "h",
+  "price" : 0.06,
+  "description" : null,
+  "imageUrl" : null,
+  "brand" : null,
+  "stock" : null
+}, {
+  "id" : 8,
+  "title" : "name",
+  "price" : 2.2,
+  "description" : null,
+  "imageUrl" : null,
+  "brand" : null,
+  "stock" : null
+}, {
+  "id" : 9,
+  "title" : "name2",
+  "price" : 2.2,
+  "description" : null,
+  "imageUrl" : null,
+  "brand" : null,
+  "stock" : null
+}, {
+  "id" : 10,
+  "title" : "name3",
+  "price" : 4.2,
+  "description" : "desc",
+  "imageUrl" : null,
+  "brand" : null,
+  "stock" : null
+}, {
+  "id" : 11,
+  "title" : "productname",
+  "price" : 4.2,
+  "description" : "description",
+  "imageUrl" : "url",
+  "brand" : "marca",
+  "stock" : 2
+} ]
