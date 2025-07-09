@@ -1,0 +1,11 @@
+[
+  {
+    "id": 1,
+    "title": "Smartphone XYZ",
+    "price": 1999.99,
+    "description": "Latest 5G smartphone with high-end features",
+    "imageUrl": "https://example.com/image.jpg",
+    "brand": "TechBrand",
+    "stock": 10
+  }
+]

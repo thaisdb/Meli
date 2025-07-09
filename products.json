@@ -1,0 +1,20 @@
+[
+  {
+    "id": 1,
+    "title": "Galaxy S25",
+    "price": 3499.99,
+    "description": "6.7\" AMOLED, 128GB storage, 5G capable.",
+    "imageUrl": "https://example.com/galaxy.jpg",
+    "brand": "Samsung",
+    "stock": 10
+  },
+  {
+    "id": 2,
+    "title": "Dell XPS 13",
+    "price": 6999.00,
+    "description": "13\" InfinityEdge, Intel i7, 16GB RAM, 512GB SSD.",
+    "imageUrl": "https://example.com/xps13.jpg",
+    "brand": "Dell",
+    "stock": 5
+  }
+]
