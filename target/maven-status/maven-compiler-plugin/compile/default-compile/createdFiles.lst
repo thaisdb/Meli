@@ -2,5 +2,4 @@ com\meli\service\ProductService.class
 com\meli\PrototypeApplication.class
 com\meli\model\Product.class
 com\meli\repository\ProductRepository.class
-com\meli\service\ProductService$1.class
 com\meli\controller\ProductController.class
