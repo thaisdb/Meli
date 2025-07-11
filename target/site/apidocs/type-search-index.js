@@ -1,0 +1,1 @@
+typeSearchIndex = [{"l":"All Classes and Interfaces","u":"allclasses-index.html"},{"p":"com.meli.model","l":"Product"},{"p":"com.meli.controller","l":"ProductController"},{"p":"com.meli.repository","l":"ProductRepository"},{"p":"com.meli.service","l":"ProductService"},{"p":"com.meli","l":"PrototypeApplication"}];updateSearchResults();

@@ -1,4 +1,4 @@
-/*
+/**
  * Centralized entry point that handles web requests ans responses
  */
 package com.meli.controller;
@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.meli.model.Product;
@@ -35,9 +36,14 @@ public class ProductController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Product> getProductById(@PathVariable("id") int id) {
+    public ResponseEntity<?> getProductById(@PathVariable("id") int id) {
         Product product = productService.getProductById(id);
-        return (product != null) ? ResponseEntity.ok(product) : ResponseEntity.notFound().build();
+        if (product != null) {
+            return ResponseEntity.ok(product);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                                 .body("Produto com ID " + id + " não foi encontrado.");
+        }
     }
 
     @PostMapping
@@ -46,26 +52,37 @@ public class ProductController {
         return ResponseEntity.status(HttpStatus.CREATED).body(createdProduct);
     }
 
-    /*
+    /**
      * Put method used to update products
+     * 
      * @param id product's unique id
      * @param updatedProduct Product with updated information
-     * @return HTTP response ok if product is succefully updated
-     * @return HTTP response HttpStatus.NOT_FOUND if product id is not found
-     * @throw HttpStatus.INTERNAL_SERVE_ERROR
+     * @return HTTP 200 OK if product is succefully updated,
+     *         400 Not Found if product ID is not found
+     *         or 500 Internal Server Error if product failed to update
      */
     @PutMapping("/{id}")
     public ResponseEntity<String> updateProduct(@PathVariable int id, @RequestBody Product updatedProduct) {
         try {
             boolean updated = productService.updateProduct(id, updatedProduct);
             if (updated) {
-                return ResponseEntity.ok("Product updated successfully.");
+                return ResponseEntity.ok("Produto atualizado com sucesso.");
             } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Product not found.");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("UpdateProduct: Produto não encontrado");
             }
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Put: Failed to update product.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("UpdateProduct: Failed to update product.");
+        }
+    }
+
+    @PutMapping("/products/{id}/buy")
+    public ResponseEntity<?> buyProduct(@PathVariable int id, @RequestParam int quantity) {
+        try {
+            Product updated = productService.buyProduct(id, quantity);
+            return ResponseEntity.ok(updated);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 

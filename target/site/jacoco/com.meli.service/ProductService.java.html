@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pt"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ProductService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Prototype</a> &gt; <a href="index.source.html" class="el_package">com.meli.service</a> &gt; <span class="el_source">ProductService.java</span></div><h1>ProductService.java</h1><pre class="source lang-java linenums">// encapsulates business logic
+// handles loading/saving products
+package com.meli.service;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.stereotype.Service;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import com.meli.model.Product;
+import com.meli.repository.ProductRepository;
+
+@Service
+public class ProductService {
+<span class="nc" id="L20">    private final String DATA_FILE_PATH = &quot;data/products.json&quot;;</span>
+<span class="nc" id="L21">    private List&lt;Product&gt; products = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L22">    private final ObjectMapper mapper = new ObjectMapper();</span>
+
+<span class="nc" id="L24">    public ProductService() {</span>
+<span class="nc" id="L25">        loadProducts();</span>
+<span class="nc" id="L26">    }</span>
+
+    private void loadProducts() {
+<span class="nc" id="L29">        System.out.println(&quot;Trying to load from: &quot; + new File(DATA_FILE_PATH).getAbsolutePath());</span>
+        try {
+<span class="nc" id="L31">            File file = new File(DATA_FILE_PATH);</span>
+<span class="nc bnc" id="L32" title="All 2 branches missed.">            if (file.exists()) {</span>
+<span class="nc" id="L33">                Product[] productArray = mapper.readValue(file, Product[].class);</span>
+<span class="nc" id="L34">                products.clear();</span>
+<span class="nc" id="L35">                products = new ArrayList&lt;&gt;(Arrays.asList(productArray));</span>
+<span class="nc" id="L36">            } else {</span>
+<span class="nc" id="L37">                System.out.println(&quot;No product file found. Starting with empty list.&quot;);</span>
+<span class="nc" id="L38">                products = new ArrayList&lt;&gt;();</span>
+            }
+<span class="nc" id="L40">        } catch (IOException e) {</span>
+<span class="nc" id="L41">            System.err.println(&quot;Failed to load products from file: &quot; + e.getMessage());</span>
+<span class="nc" id="L42">        }</span>
+<span class="nc" id="L43">    }</span>
+
+    private void saveProducts() {
+        try {
+<span class="nc" id="L47">            mapper.writerWithDefaultPrettyPrinter().writeValue(new File(DATA_FILE_PATH), products);</span>
+<span class="nc" id="L48">        } catch (IOException e) {</span>
+<span class="nc" id="L49">            System.err.println(&quot;Failed to save products to file: &quot; + e.getMessage());</span>
+<span class="nc" id="L50">        }</span>
+<span class="nc" id="L51">    }</span>
+
+    public List&lt;Product&gt; getAll() {
+<span class="nc" id="L54">        return products;</span>
+    }
+
+    public Product getProductById(int id) {
+<span class="nc bnc" id="L58" title="All 2 branches missed.">        return products.stream().filter(p -&gt; p.getId() == id).findFirst().orElse(null);</span>
+    }
+
+    public Product addProduct(Product product) {
+        // Auto-generate a new ID (simple version)
+<span class="nc" id="L63">        int newId = products.stream()</span>
+<span class="nc" id="L64">                            .mapToInt(Product::getId)</span>
+<span class="nc" id="L65">                            .max()</span>
+<span class="nc" id="L66">                            .orElse(0) + 1;</span>
+<span class="nc" id="L67">        product.setId(newId);</span>
+
+<span class="nc" id="L69">        products.add(product);</span>
+<span class="nc" id="L70">        saveProducts();</span>
+
+<span class="nc" id="L72">        return product;</span>
+    }
+
+    public void deleteById(int id) {
+<span class="nc bnc" id="L76" title="All 2 branches missed.">        products.removeIf(p -&gt; p.getId() == id);</span>
+<span class="nc" id="L77">        saveProducts();</span>
+<span class="nc" id="L78">    }</span>
+
+    public boolean updateProduct(int id, Product updatedProduct) {
+<span class="nc bnc" id="L81" title="All 2 branches missed.">        for (int i = 0; i &lt; products.size(); i++) {</span>
+<span class="nc bnc" id="L82" title="All 2 branches missed.">            if (products.get(i).getId() == id) {</span>
+<span class="nc" id="L83">                updatedProduct.setId(id); // preserve original ID</span>
+<span class="nc" id="L84">                products.set(i, updatedProduct);</span>
+<span class="nc" id="L85">                saveProducts();</span>
+<span class="nc" id="L86">                return true;</span>
+            }
+        }
+<span class="nc" id="L89">        return false;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

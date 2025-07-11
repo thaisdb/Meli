@@ -1,0 +1,1 @@
+packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"com.meli"},{"l":"com.meli.controller"},{"l":"com.meli.model"},{"l":"com.meli.repository"},{"l":"com.meli.service"}];updateSearchResults();

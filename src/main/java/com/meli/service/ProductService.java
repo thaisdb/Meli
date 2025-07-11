@@ -1,8 +1,5 @@
-// encapsulates business logic
-// handles loading/saving products
 package com.meli.service;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
 
@@ -13,8 +10,11 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.meli.model.Product;
-import com.meli.repository.ProductRepository;
 
+/*
+ * Encapsulates business logic
+ * Handles loading/saving products
+ */
 @Service
 public class ProductService {
     private final String DATA_FILE_PATH = "data/products.json";
@@ -50,16 +50,29 @@ public class ProductService {
         }
     }
 
+    /*
+     * Get list of all products
+     * @return list of products
+     */
     public List<Product> getAll() {
         return products;
     }
 
+    /*
+     * Get product by Id
+     * @param product unique Id
+     * @return product which matches Id
+     */
     public Product getProductById(int id) {
         return products.stream().filter(p -> p.getId() == id).findFirst().orElse(null);
     }
 
+    /*
+     * Create new product generating newId automatically
+     * @param new product to be created
+     * @return created product
+     */
     public Product addProduct(Product product) {
-        // Auto-generate a new ID (simple version)
         int newId = products.stream()
                             .mapToInt(Product::getId)
                             .max()
@@ -72,20 +85,47 @@ public class ProductService {
         return product;
     }
 
+    /*
+     * Search and delete product by id
+     * @param product unique id
+     */
     public void deleteById(int id) {
         products.removeIf(p -> p.getId() == id);
         saveProducts();
     }
 
+    /*
+     * Update product by Id, replacing it with updatedProduct
+     * Preserves original Id and calls saveProducts function
+     * @param product unique Id
+     * @param product updated
+     * @return true if successefully update the product
+     *         false if can't find product
+     */
     public boolean updateProduct(int id, Product updatedProduct) {
         for (int i = 0; i < products.size(); i++) {
             if (products.get(i).getId() == id) {
-                updatedProduct.setId(id); // preserve original ID
+                updatedProduct.setId(id);
                 products.set(i, updatedProduct);
                 saveProducts();
                 return true;
             }
         }
         return false;
+    }
+
+    public Product buyProduct(int id, int quantity) {
+        Product product = getProductById(id); 
+        if (product == null) {
+            throw new IllegalArgumentException("buyProduct: Produto não encontrado");
+        }
+
+        if (quantity <= 0 || quantity > product.getStock()) {
+            throw new IllegalArgumentException("buyProduct: Quantidade inválida: " + quantity);
+        }
+
+        product.setStock(product.getStock() - quantity);
+        saveProducts();
+        return product;
     }
 }

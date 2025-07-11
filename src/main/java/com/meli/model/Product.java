@@ -7,11 +7,19 @@ public class Product {
     private String description;
     private String imageUrl;
     private String brand;
-    private Integer stock;
+    private int stock;
 
     public Product() {}
 
+    /*
+     * Get unique Id used to identify products
+     * @return Id
+     */
     public int getId() { return id; }
+
+    /*
+     * Set unique Id used to identify products
+     */
     public void setId(int id) { this.id = id; }
 
     public String getTitle() { return title; }
@@ -29,6 +37,6 @@ public class Product {
     public String getBrand() { return brand; }
     public void setBrand(String brand) { this.brand = brand; }
 
-    public Integer getStock() { return stock; }
-    public void setStock(Integer stock) { this.stock = stock; }
+    public int getStock() { return stock; }
+    public void setStock(int stock) { this.stock = stock; }
 }
