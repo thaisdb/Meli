@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Edit Product</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      max-width: 600px;
+      margin: auto;
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+    }
+
+    label {
+      margin: 10px 0 5px;
+    }
+
+    input[type="text"],
+    input[type="number"] {
+      padding: 8px;
+      font-size: 16px;
+    }
+
+    button {
+      margin-top: 20px;
+      padding: 10px;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #2980b9;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Edit Product</h1>
+
+  <form id="editForm">
+    <input type="hidden" id="id" name="id">
+
+    <label for="title">Title</label>
+    <input type="text" id="title" name="title">
+
+    <label for="price">Price</label>
+    <input type="number" id="price" name="price" step="0.01">
+
+    <label for="description">Description</label>
+    <input type="text" id="description" name="description">
+
+    <label for="brand">Brand</label>
+    <input type="text" id="brand" name="brand">
+
+    <label for="stock">Stock</label>
+    <input type="number" id="stock" name="stock">
+
+    <button type="submit">Save Changes</button>
+  </form>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const productId = urlParams.get('id');
+
+    // Load product data
+    fetch(`/products/${productId}`)
+      .then(res => {
+        if (!res.ok) {
+          throw new Error("Product not found");
+        }
+        return res.json();
+      })
+      .then(product => {
+        document.getElementById('id').value = product.id;
+        document.getElementById('title').value = product.title || '';
+        document.getElementById('price').value = product.price || '';
+        document.getElementById('description').value = product.description || '';
+        document.getElementById('brand').value = product.brand || '';
+        document.getElementById('stock').value = product.stock || '';
+      })
+      .catch(err => {
+        alert('Error loading product: ' + err.message);
+        window.location.href = '/listProducts.html';
+      });
+
+    // Submit updated product
+    document.getElementById('editForm').addEventListener('submit', function(event) {
+    event.preventDefault(); // Prevent default form reload
+
+    const updatedProduct = {
+        title: document.getElementById('title').value,
+        price: parseFloat(document.getElementById('price').value),
+        description: document.getElementById('description').value,
+        brand: document.getElementById('brand').value,
+        stock: parseInt(document.getElementById('stock').value)
+    };
+
+    fetch(`/products/${productId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedProduct)
+    })
+    .then(response => {
+        if (response.ok) {
+        alert('Product updated!');
+        window.location.href = '/listProducts.html'; // Redirect to product list
+        } else {
+        alert('Failed to update product.');
+        }
+    })
+    .catch(error => {
+        alert('Error updating product: ' + error.message);
+    });
+    });
+  </script>
+
+</body>
+</html>

@@ -9,7 +9,8 @@ public class Product {
     private String brand;
     private Integer stock;
 
-        // Getters and setters (important for Jackson)
+    public Product() {}
+
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
 
@@ -28,6 +29,6 @@ public class Product {
     public String getBrand() { return brand; }
     public void setBrand(String brand) { this.brand = brand; }
 
-    public int getStock() { return stock; }
-    public void setStock(int stock) { this.stock = stock; }
+    public Integer getStock() { return stock; }
+    public void setStock(Integer stock) { this.stock = stock; }
 }
