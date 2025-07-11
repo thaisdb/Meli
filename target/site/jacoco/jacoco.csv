@@ -1,0 +1,6 @@
+GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
+Prototype,com.meli.repository,ProductRepository,3,0,0,0,1,0,1,0,1,0
+Prototype,com.meli,PrototypeApplication,12,0,0,0,4,0,3,0,3,0
+Prototype,com.meli.model,Product,71,0,4,0,20,0,18,0,16,0
+Prototype,com.meli.controller,ProductController,65,0,4,0,20,0,8,0,6,0
+Prototype,com.meli.service,ProductService,180,0,10,0,44,0,15,0,10,0

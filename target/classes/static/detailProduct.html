@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Detalhes do Produto</title>
+  <link rel="stylesheet" type="text/css" href="/css/style.css">
+</head>
+<body>
+  <header>
+    <h1>Detalhes do Produto</h1>
+  </header>
+
+  <div class="product-detail" id="productDetail">
+    <p>Carregando produto...</p>
+  </div>
+
+  <script>
+    function getQueryParam(name) {
+      const params = new URLSearchParams(window.location.search);
+      return params.get(name);
+    }
+
+  const productId = getQueryParam("id");
+  const url = `/products/${productId}`;
+
+  fetch(url)
+    .then(response => {
+      if (!response.ok) throw new Error("Produto não encontrado");
+      return response.json();
+    })
+    .then(product => {
+      const container = document.getElementById("productDetail");
+      const imageUrl = product.imageUrl || 'https://via.placeholder.com/600x400?text=Sem+Imagem';
+
+      container.innerHTML = `
+        <img src="${imageUrl}" alt="${product.title}">
+        <div class="info">
+          <div class="title">${product.title}</div>
+          <div class="price">R$ ${product.price.toFixed(2)}</div>
+          <div class="brand">Marca: ${product.brand || 'Desconhecida'}</div>
+          <div class="description">Descrição: ${product.description || 'Sem descrição disponível.'}</div>
+          <div class="description">Em estoque: <span id="stock">${product.stock}</span></div>
+          <div class="purchase-box">
+            <label for="quantity">Quantity:</label>
+            <input type="number" id="quantity" value="1" min="1" max="${product.stock}"/>
+            <button id="buy-button">Comprar</button>
+          </div>
+          <p id="buy-message" style="color: green;"></p>
+          <a href="/listProducts.html" class="back-link">← Voltar para lista</a>
+        </div>
+      `;
+
+      // Now that button exists, attach event listener
+      document.getElementById('buy-button').addEventListener('click', async () => {
+      const quantity = parseInt(document.getElementById('quantity').value);
+      const resMessage = document.getElementById('buy-message');
+      if (quantity > product.stock || quantity <= 0) {
+        resMessage.textContent = "Quantidade inválida.";
+        resMessage.style.color = "red";
+        return;
+      }
+
+      const updatedProduct = { ...product, stock: product.stock - quantity };
+      const updateRes = await fetch(url, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updatedProduct)
+      });
+
+      if (updateRes.ok) {
+       resMessage.textContent = "Compra realizada com sucesso!";
+       resMessage.style.color = "green";
+       document.getElementById('stock').textContent = updatedProduct.stock;
+       document.getElementById('quantity').max = updatedProduct.stock;
+       product.stock = updatedProduct.stock; // update local copy
+      } else {
+       resMessage.textContent = "Erro ao realizar compra.";
+       resMessage.style.color = "red";
+      }
+      
+     });
+   })
+   .catch(error => {
+     document.getElementById("productDetail").innerHTML = `<p>${error.message}</p>`;
+   });
+
+</script>
+    
+</html>

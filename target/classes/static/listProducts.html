@@ -2,111 +2,56 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Product List</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
-    }
-
-    table {
-      border-collapse: collapse;
-      width: 100%;
-      margin-top: 20px;
-    }
-
-    th, td {
-      padding: 8px 12px;
-      border: 1px solid #ccc;
-      text-align: left;
-    }
-
-    th {
-      background-color: #f4f4f4;
-    }
-
-    button {
-      padding: 4px 10px;
-      background-color: #e74c3c;
-      color: white;
-      border: none;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background-color: #c0392b;
-    }
-  </style>
+  <title>Products - Mercado Livre Style</title>
+  <link rel="stylesheet" type="text/css" href="/css/style.css">
 </head>
 <body>
 
-  <h1>Product List</h1>
-  <table id="productTable">
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>Title</th>
-        <th>Price</th>
-        <th>Description</th>
-        <th>Brand</th>
-        <th>Stock</th>
-        <th>Action</th>
-      </tr>
-    </thead>
-    <tbody>
-      <!-- Product rows go here -->
-    </tbody>
-  </table>
+  <header>
+    <h1>Produtos</h1>
+  </header>
+
+  <div class="container" id="productContainer">
+    <!-- Products will be loaded here -->
+  </div>
 
   <script>
-    function fetchProducts() {
     fetch('/products')
-        .then(response => response.json())
-        .then(products => {
-        const tbody = document.querySelector('#productTable tbody');
-        tbody.innerHTML = ''; // Clear existing rows
-        products.forEach(product => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-            <td>${product.id}</td>
-            <td>${product.title ?? ''}</td>
-            <td>${product.price ?? ''}</td>
-            <td>${product.description ?? ''}</td>
-            <td>${product.brand ?? ''}</td>
-            <td>${product.stock ?? ''}</td>
-            <td>
-                <button onclick="location.href='editProduct.html?id=${product.id}'">Update</button>
-                <button onclick="deleteProduct(${product.id}, this)">Delete</button>
-            </td>
-            `;
-            tbody.appendChild(row);
-        });
-        });
-    }
-
-    function deleteProduct(id, button) {
-      if (!confirm(`Are you sure you want to delete product ID ${id}?`)) return;
-
-      fetch(`/products/${id}`, {
-        method: 'DELETE'
-      })
-      .then(response => {
-        if (response.ok) {
-          // Remove row from table
-          const row = button.closest('tr');
-          row.remove();
-        } else {
-          alert('Failed to delete product.');
+      .then(response => response.json())
+      .then(products => {
+        const container = document.getElementById('productContainer');
+        if (products.length === 0) {
+          container.innerHTML = "<p>No products found.</p>";
+          return;
         }
-      })
-      .catch(error => {
-        console.error('Delete error:', error);
-        alert('Error deleting product.');
-      });
-    }
 
-    // Initial load
-    fetchProducts();
+        products.forEach(product => {
+          const card = document.createElement('div');
+          card.className = 'card';
+
+          const imageUrl = product.imageUrl || '/images/placeholder.png';
+
+          card.innerHTML = `
+            <img src="${imageUrl}" alt="${product.title}">
+            <div class="card-content">
+              <div class="title">
+                <a href="/detailProduct.html?id=${product.id}" style="text-decoration: none; color: inherit;">
+                  ${product.title}
+                </a>
+              </div>
+              <div class="price">R$ ${product.price.toFixed(2)}</div>
+              <div class="brand">Marca: ${product.brand || 'Desconhecida'}</div>
+              <div class="description">${product.description || ''}</div>
+            </div>
+          `;
+
+          container.appendChild(card);
+        });
+      })
+      .catch(err => {
+        console.error(err);
+        document.getElementById('productContainer').innerHTML = "<p>Erro ao carregar produtos.</p>";
+      });
   </script>
 
 </body>
