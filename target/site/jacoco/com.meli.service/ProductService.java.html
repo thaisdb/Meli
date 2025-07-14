@@ -1,8 +1,5 @@
-<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pt"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ProductService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Prototype</a> &gt; <a href="index.source.html" class="el_package">com.meli.service</a> &gt; <span class="el_source">ProductService.java</span></div><h1>ProductService.java</h1><pre class="source lang-java linenums">// encapsulates business logic
-// handles loading/saving products
-package com.meli.service;
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pt"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ProductService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Prototype</a> &gt; <a href="index.source.html" class="el_package">com.meli.service</a> &gt; <span class="el_source">ProductService.java</span></div><h1>ProductService.java</h1><pre class="source lang-java linenums">package com.meli.service;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
 
@@ -13,8 +10,11 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.meli.model.Product;
-import com.meli.repository.ProductRepository;
 
+/*
+ * Encapsulates business logic
+ * Handles loading/saving products
+ */
 @Service
 public class ProductService {
 <span class="nc" id="L20">    private final String DATA_FILE_PATH = &quot;data/products.json&quot;;</span>
@@ -50,43 +50,83 @@ public class ProductService {
 <span class="nc" id="L50">        }</span>
 <span class="nc" id="L51">    }</span>
 
+    /*
+     * Get list of all products
+     * @return list of products
+     */
     public List&lt;Product&gt; getAll() {
-<span class="nc" id="L54">        return products;</span>
+<span class="nc" id="L58">        return products;</span>
     }
 
+    /*
+     * Get product by Id
+     * @param product unique Id
+     * @return product which matches Id
+     */
     public Product getProductById(int id) {
-<span class="nc bnc" id="L58" title="All 2 branches missed.">        return products.stream().filter(p -&gt; p.getId() == id).findFirst().orElse(null);</span>
+<span class="nc bnc" id="L67" title="All 2 branches missed.">        return products.stream().filter(p -&gt; p.getId() == id).findFirst().orElse(null);</span>
     }
 
+    /*
+     * Create new product generating newId automatically
+     * @param new product to be created
+     * @return created product
+     */
     public Product addProduct(Product product) {
-        // Auto-generate a new ID (simple version)
-<span class="nc" id="L63">        int newId = products.stream()</span>
-<span class="nc" id="L64">                            .mapToInt(Product::getId)</span>
-<span class="nc" id="L65">                            .max()</span>
-<span class="nc" id="L66">                            .orElse(0) + 1;</span>
-<span class="nc" id="L67">        product.setId(newId);</span>
+<span class="nc" id="L76">        int newId = products.stream()</span>
+<span class="nc" id="L77">                            .mapToInt(Product::getId)</span>
+<span class="nc" id="L78">                            .max()</span>
+<span class="nc" id="L79">                            .orElse(0) + 1;</span>
+<span class="nc" id="L80">        product.setId(newId);</span>
 
-<span class="nc" id="L69">        products.add(product);</span>
-<span class="nc" id="L70">        saveProducts();</span>
+<span class="nc" id="L82">        products.add(product);</span>
+<span class="nc" id="L83">        saveProducts();</span>
 
-<span class="nc" id="L72">        return product;</span>
+<span class="nc" id="L85">        return product;</span>
     }
 
+    /*
+     * Search and delete product by id
+     * @param product unique id
+     */
     public void deleteById(int id) {
-<span class="nc bnc" id="L76" title="All 2 branches missed.">        products.removeIf(p -&gt; p.getId() == id);</span>
-<span class="nc" id="L77">        saveProducts();</span>
-<span class="nc" id="L78">    }</span>
+<span class="nc bnc" id="L93" title="All 2 branches missed.">        products.removeIf(p -&gt; p.getId() == id);</span>
+<span class="nc" id="L94">        saveProducts();</span>
+<span class="nc" id="L95">    }</span>
 
+    /*
+     * Update product by Id, replacing it with updatedProduct
+     * Preserves original Id and calls saveProducts function
+     * @param product unique Id
+     * @param product updated
+     * @return true if successefully update the product
+     *         false if can't find product
+     */
     public boolean updateProduct(int id, Product updatedProduct) {
-<span class="nc bnc" id="L81" title="All 2 branches missed.">        for (int i = 0; i &lt; products.size(); i++) {</span>
-<span class="nc bnc" id="L82" title="All 2 branches missed.">            if (products.get(i).getId() == id) {</span>
-<span class="nc" id="L83">                updatedProduct.setId(id); // preserve original ID</span>
-<span class="nc" id="L84">                products.set(i, updatedProduct);</span>
-<span class="nc" id="L85">                saveProducts();</span>
-<span class="nc" id="L86">                return true;</span>
+<span class="nc bnc" id="L106" title="All 2 branches missed.">        for (int i = 0; i &lt; products.size(); i++) {</span>
+<span class="nc bnc" id="L107" title="All 2 branches missed.">            if (products.get(i).getId() == id) {</span>
+<span class="nc" id="L108">                updatedProduct.setId(id);</span>
+<span class="nc" id="L109">                products.set(i, updatedProduct);</span>
+<span class="nc" id="L110">                saveProducts();</span>
+<span class="nc" id="L111">                return true;</span>
             }
         }
-<span class="nc" id="L89">        return false;</span>
+<span class="nc" id="L114">        return false;</span>
+    }
+
+    public Product buyProduct(int id, int quantity) {
+<span class="nc" id="L118">        Product product = getProductById(id); </span>
+<span class="nc bnc" id="L119" title="All 2 branches missed.">        if (product == null) {</span>
+<span class="nc" id="L120">            throw new IllegalArgumentException(&quot;buyProduct: Produto não encontrado&quot;);</span>
+        }
+
+<span class="nc bnc" id="L123" title="All 4 branches missed.">        if (quantity &lt;= 0 || quantity &gt; product.getStock()) {</span>
+<span class="nc" id="L124">            throw new IllegalArgumentException(&quot;buyProduct: Quantidade inválida: &quot; + quantity);</span>
+        }
+
+<span class="nc" id="L127">        product.setStock(product.getStock() - quantity);</span>
+<span class="nc" id="L128">        saveProducts();</span>
+<span class="nc" id="L129">        return product;</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

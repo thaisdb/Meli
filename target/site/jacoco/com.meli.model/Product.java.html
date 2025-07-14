@@ -38,21 +38,6 @@ public class Product {
 <span class="nc" id="L38">    public void setBrand(String brand) { this.brand = brand; }</span>
 
 <span class="nc" id="L40">    public int getStock() { return stock; }</span>
-    public void setStock(int stock) {
-<span class="nc bnc" id="L42" title="All 2 branches missed.">        if (stock &lt; 0) {</span>
-            // throw exception
-        }
-<span class="nc" id="L45">        this.stock = stock;</span>
-<span class="nc" id="L46">    }</span>
-
-    public Integer sellProduct(Integer bought) {
-<span class="nc bnc" id="L49" title="All 2 branches missed.">        if (bought &gt; stock) {</span>
-            // throw exception?
-            // display doesnt have in stock message
-        } else {
-<span class="nc" id="L53">            stock -= bought;</span>
-        }
-<span class="nc" id="L55">        return stock;</span>
-    }
+<span class="nc" id="L41">    public void setStock(int stock) { this.stock = stock; }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

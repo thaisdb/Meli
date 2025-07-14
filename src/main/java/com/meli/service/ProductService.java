@@ -12,8 +12,8 @@ import java.util.List;
 import com.meli.model.Product;
 
 /*
- * Encapsulates business logic
- * Handles loading/saving products
+ * Encapsulates business logic related to Product management
+ * Handles loading/saving products via Jackson
  */
 @Service
 public class ProductService {

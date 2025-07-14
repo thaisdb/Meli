@@ -3,7 +3,7 @@
   "title" : "Product 2",
   "price" : 149.99,
   "description" : null,
-  "imageUrl" : "C:\Users\thaisdb\Desktop\Code\prototype\src\main\resources\static\Images\Iphone.jpg",
+  "imageUrl" : null,
   "brand" : null,
   "stock" : 0
 }, {
@@ -37,7 +37,7 @@
   "description" : "desc",
   "imageUrl" : null,
   "brand" : null,
-  "stock" : 190
+  "stock" : 179
 }, {
   "id" : 11,
   "title" : "productname",

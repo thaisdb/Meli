@@ -1,2 +1,8 @@
 com\meli\model\Product.class
+com\meli\model\Seller.class
+com\meli\model\User.class
+com\meli\service\ProductService.class
 com\meli\PrototypeApplication.class
+com\meli\dto\BuyRequestDTO.class
+com\meli\model\Consumer.class
+com\meli\controller\ProductController.class
