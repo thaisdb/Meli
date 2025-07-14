@@ -14,9 +14,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.meli.dto.BuyRequestDTO;
 import com.meli.model.Product;
 import com.meli.service.ProductService;
 
@@ -76,15 +76,25 @@ public class ProductController {
         }
     }
 
-    @PutMapping("/products/{id}/buy")
-    public ResponseEntity<?> buyProduct(@PathVariable int id, @RequestParam int quantity) {
+    /*
+     * Why Post instead of Put:
+     * You're not just updating the product; you're performing a specific action (a "purchase") on it,
+     * which has its own logic and side effects:
+     * You're not replacing the entire product.
+     * The action is contextual: it depends on business logic (stock check, validation).
+     * You’re not sending the whole product, only a quantity — that's not a full update.
+     */
+    @PostMapping("/{id}/buy")
+    public ResponseEntity<?> buyProduct(@PathVariable int id, @RequestBody BuyRequestDTO request) {
         try {
+            int quantity = request.getQuantity();
             Product updated = productService.buyProduct(id, quantity);
             return ResponseEntity.ok(updated);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
 
     @DeleteMapping("/{id}")
     public void deleteProduct(@PathVariable int id) {

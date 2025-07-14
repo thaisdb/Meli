@@ -4,6 +4,7 @@
 package com.meli.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.meli.dto.BuyRequestDTO;
 import com.meli.model.Product;
 import com.meli.service.ProductService;
 
@@ -25,30 +27,30 @@ public class ProductController {
 
     private final ProductService productService;
 
-<span class="nc" id="L28">    public ProductController(ProductService productService) {</span>
-<span class="nc" id="L29">        this.productService = productService;</span>
-<span class="nc" id="L30">    }</span>
+<span class="nc" id="L30">    public ProductController(ProductService productService) {</span>
+<span class="nc" id="L31">        this.productService = productService;</span>
+<span class="nc" id="L32">    }</span>
 
     @GetMapping
     public List&lt;Product&gt; getAllProducts() {
-<span class="nc" id="L34">        return productService.getAll();</span>
+<span class="nc" id="L36">        return productService.getAll();</span>
     }
 
     @GetMapping(&quot;/{id}&quot;)
     public ResponseEntity&lt;?&gt; getProductById(@PathVariable(&quot;id&quot;) int id) {
-<span class="nc" id="L39">        Product product = productService.getProductById(id);</span>
-<span class="nc bnc" id="L40" title="All 2 branches missed.">        if (product != null) {</span>
-<span class="nc" id="L41">            return ResponseEntity.ok(product);</span>
+<span class="nc" id="L41">        Product product = productService.getProductById(id);</span>
+<span class="nc bnc" id="L42" title="All 2 branches missed.">        if (product != null) {</span>
+<span class="nc" id="L43">            return ResponseEntity.ok(product);</span>
         } else {
-<span class="nc" id="L43">            return ResponseEntity.status(HttpStatus.NOT_FOUND)</span>
-<span class="nc" id="L44">                                 .body(&quot;Produto com ID &quot; + id + &quot; não foi encontrado.&quot;);</span>
+<span class="nc" id="L45">            return ResponseEntity.status(HttpStatus.NOT_FOUND)</span>
+<span class="nc" id="L46">                                 .body(&quot;Produto com ID &quot; + id + &quot; não foi encontrado.&quot;);</span>
         }
     }
 
     @PostMapping
     public ResponseEntity&lt;Product&gt; addProduct(@RequestBody Product product) {
-<span class="nc" id="L50">        Product createdProduct = productService.addProduct(product);</span>
-<span class="nc" id="L51">        return ResponseEntity.status(HttpStatus.CREATED).body(createdProduct);</span>
+<span class="nc" id="L52">        Product createdProduct = productService.addProduct(product);</span>
+<span class="nc" id="L53">        return ResponseEntity.status(HttpStatus.CREATED).body(createdProduct);</span>
     }
 
     /**
@@ -63,21 +65,41 @@ public class ProductController {
     @PutMapping(&quot;/{id}&quot;)
     public ResponseEntity&lt;String&gt; updateProduct(@PathVariable int id, @RequestBody Product updatedProduct) {
         try {
-<span class="nc" id="L66">            boolean updated = productService.updateProduct(id, updatedProduct);</span>
-<span class="nc bnc" id="L67" title="All 2 branches missed.">            if (updated) {</span>
-<span class="nc" id="L68">                return ResponseEntity.ok(&quot;Product updated successfully.&quot;);</span>
+<span class="nc" id="L68">            boolean updated = productService.updateProduct(id, updatedProduct);</span>
+<span class="nc bnc" id="L69" title="All 2 branches missed.">            if (updated) {</span>
+<span class="nc" id="L70">                return ResponseEntity.ok(&quot;Produto atualizado com sucesso.&quot;);</span>
             } else {
-<span class="nc" id="L70">                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(&quot;Product not found.&quot;);</span>
+<span class="nc" id="L72">                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(&quot;UpdateProduct: Produto não encontrado&quot;);</span>
             }
-<span class="nc" id="L72">        } catch (Exception e) {</span>
-<span class="nc" id="L73">            e.printStackTrace();</span>
-<span class="nc" id="L74">            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(&quot;Put: Failed to update product.&quot;);</span>
+<span class="nc" id="L74">        } catch (Exception e) {</span>
+<span class="nc" id="L75">            e.printStackTrace();</span>
+<span class="nc" id="L76">            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(&quot;UpdateProduct: Failed to update product.&quot;);</span>
         }
     }
 
+    /*
+     * Why Post instead of Put:
+     * You're not just updating the product; you're performing a specific action (a &quot;purchase&quot;) on it,
+     * which has its own logic and side effects:
+     * You're not replacing the entire product.
+     * The action is contextual: it depends on business logic (stock check, validation).
+     * You’re not sending the whole product, only a quantity — that's not a full update.
+     */
+    @PostMapping(&quot;/{id}/buy&quot;)
+    public ResponseEntity&lt;?&gt; buyProduct(@PathVariable int id, @RequestBody BuyRequestDTO request) {
+        try {
+<span class="nc" id="L91">            int quantity = request.getQuantity();</span>
+<span class="nc" id="L92">            Product updated = productService.buyProduct(id, quantity);</span>
+<span class="nc" id="L93">            return ResponseEntity.ok(updated);</span>
+<span class="nc" id="L94">        } catch (IllegalArgumentException e) {</span>
+<span class="nc" id="L95">            return ResponseEntity.badRequest().body(e.getMessage());</span>
+        }
+    }
+
+
     @DeleteMapping(&quot;/{id}&quot;)
     public void deleteProduct(@PathVariable int id) {
-<span class="nc" id="L80">        productService.deleteById(id);</span>
-<span class="nc" id="L81">    }</span>
+<span class="nc" id="L102">        productService.deleteById(id);</span>
+<span class="nc" id="L103">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>
