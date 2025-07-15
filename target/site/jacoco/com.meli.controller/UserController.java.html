@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pt"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UserController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Prototype</a> &gt; <a href="index.source.html" class="el_package">com.meli.controller</a> &gt; <span class="el_source">UserController.java</span></div><h1>UserController.java</h1><pre class="source lang-java linenums">package com.meli.controller;
+
+import com.meli.model.User;
+import com.meli.service.UserService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+/*
+ * Handles /signup, /login, etc.
+ */
+@RestController
+@RequestMapping(&quot;/users&quot;)
+public class UserController {
+
+    private final UserService userService;
+
+    // Constructor injection (required for Spring Boot)
+<span class="nc" id="L21">    public UserController(UserService userService) {</span>
+<span class="nc" id="L22">        this.userService = userService;</span>
+<span class="nc" id="L23">    }</span>
+
+    /**
+     * Get all users
+     */
+    @GetMapping
+    public List&lt;User&gt; getAllUsers() {
+<span class="nc" id="L30">        return userService.getAllUsers();</span>
+    }
+
+    /**
+     * Get user by ID
+     */
+    @GetMapping(&quot;/{id}&quot;)
+    public ResponseEntity&lt;?&gt; getUserById(@PathVariable int id) {
+<span class="nc" id="L38">        User user = userService.getUserById(id);</span>
+<span class="nc bnc" id="L39" title="All 2 branches missed.">        if (user != null) {</span>
+<span class="nc" id="L40">            return ResponseEntity.ok(user);</span>
+        } else {
+<span class="nc" id="L42">            return ResponseEntity.status(HttpStatus.NOT_FOUND)</span>
+<span class="nc" id="L43">                                 .body(&quot;Usuário com ID &quot; + id + &quot; não foi encontrado.&quot;);</span>
+        }
+    }
+
+    /**
+     * Register new user (Consumer or Seller depending on JSON type)
+     */
+    @PostMapping
+    public ResponseEntity&lt;User&gt; registerUser(@RequestBody User user) {
+<span class="nc" id="L52">        User created = userService.registerUser(user);</span>
+<span class="nc" id="L53">        return ResponseEntity.status(HttpStatus.CREATED).body(created);</span>
+    }
+
+    /**
+     * Delete user by ID
+     */
+    @DeleteMapping(&quot;/{id}&quot;)
+    public ResponseEntity&lt;String&gt; deleteUserById(@PathVariable int id) {
+<span class="nc" id="L61">        boolean removed = userService.deleteUserById(id);</span>
+<span class="nc bnc" id="L62" title="All 2 branches missed.">        if (removed) {</span>
+<span class="nc" id="L63">            return ResponseEntity.ok(&quot;Usuário removido com sucesso.&quot;);</span>
+        } else {
+<span class="nc" id="L65">            return ResponseEntity.status(HttpStatus.NOT_FOUND)</span>
+<span class="nc" id="L66">                                 .body(&quot;Usuário com ID &quot; + id + &quot; não encontrado.&quot;);</span>
+        }
+    }
+
+    /**
+     * Find user by email
+     */
+    @GetMapping(&quot;/email/{email}&quot;)
+    public ResponseEntity&lt;?&gt; findByEmail(@PathVariable String email) {
+<span class="nc" id="L75">        User user = userService.findByEmail(email);</span>
+<span class="nc bnc" id="L76" title="All 2 branches missed.">        if (user != null) {</span>
+<span class="nc" id="L77">            return ResponseEntity.ok(user);</span>
+        } else {
+<span class="nc" id="L79">            return ResponseEntity.status(HttpStatus.NOT_FOUND)</span>
+<span class="nc" id="L80">                                 .body(&quot;Usuário com email &quot; + email + &quot; não encontrado.&quot;);</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

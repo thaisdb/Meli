@@ -12,7 +12,8 @@ import java.util.List;
 
 /*
  * Encapsulates business logic related to User management
- * Handles loading/saving/registering/updateting and searching users via Jackson
+ * Handles loading/saving/registering/updating and searching users via Jackson
+ * Delegate persistance to UserRepository
  * 
  */
 @Service
@@ -74,6 +75,11 @@ public class UserService {
         return removed;
     }
 
+    /*
+     * Find user by given email, used in login page
+     * @param email
+     * @return User
+     */
     public User findByEmail(String email) {
         return users.stream()
                 .filter(u -> u.getEmail().equalsIgnoreCase(email))

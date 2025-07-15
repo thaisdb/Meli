@@ -1,5 +1,11 @@
 package com.meli.dto;
 
+/*
+ * Data Transfer Object used to carry data between processes
+ * Data -> Backend
+ * Controler -> Service layer
+ * Shaped for the resquest, it helps decouple data model from external APIs
+ */
 public class UserRequestDTO {
     private String name;
     private String email;

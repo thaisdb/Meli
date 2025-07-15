@@ -2,6 +2,7 @@
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
+
 @JsonTypeInfo(
   use = JsonTypeInfo.Id.NAME,
   include = JsonTypeInfo.As.PROPERTY,
@@ -12,7 +13,11 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
   @JsonSubTypes.Type(value = Seller.class, name = &quot;seller&quot;)
 })
 
-<span class="nc" id="L15">public abstract class User {</span>
+/*
+ * Abstract class to be extended by Consumers and Sellers
+ * With Jackson polymorphism
+ */
+<span class="nc" id="L20">public abstract class User {</span>
     private int id;
     private String name;
     private String email;
@@ -20,34 +25,34 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
     private String address;
 
     public int getId() {
-<span class="nc" id="L23">        return id;</span>
+<span class="nc" id="L28">        return id;</span>
     }
     public void setId(int id) {
-<span class="nc" id="L26">        this.id = id;</span>
-<span class="nc" id="L27">    }</span>
+<span class="nc" id="L31">        this.id = id;</span>
+<span class="nc" id="L32">    }</span>
     public String getName() {
-<span class="nc" id="L29">        return name;</span>
+<span class="nc" id="L34">        return name;</span>
     }
     public void setName(String name) {
-<span class="nc" id="L32">        this.name = name;</span>
-<span class="nc" id="L33">    }</span>
+<span class="nc" id="L37">        this.name = name;</span>
+<span class="nc" id="L38">    }</span>
     public String getEmail() {
-<span class="nc" id="L35">        return email;</span>
+<span class="nc" id="L40">        return email;</span>
     }
     public void setEmail(String email) {
-<span class="nc" id="L38">        this.email = email;</span>
-<span class="nc" id="L39">    }</span>
+<span class="nc" id="L43">        this.email = email;</span>
+<span class="nc" id="L44">    }</span>
     public String getPassword() {
-<span class="nc" id="L41">        return password;</span>
+<span class="nc" id="L46">        return password;</span>
     }
     public void setPassword(String password) {
-<span class="nc" id="L44">        this.password = password;</span>
-<span class="nc" id="L45">    }</span>
+<span class="nc" id="L49">        this.password = password;</span>
+<span class="nc" id="L50">    }</span>
     public String getAddress() {
-<span class="nc" id="L47">        return address;</span>
+<span class="nc" id="L52">        return address;</span>
     }
     public void setAddress(String address) {
-<span class="nc" id="L50">        this.address = address;</span>
-<span class="nc" id="L51">    }</span>
+<span class="nc" id="L55">        this.address = address;</span>
+<span class="nc" id="L56">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

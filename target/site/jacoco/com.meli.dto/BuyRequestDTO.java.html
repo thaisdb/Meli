@@ -3,7 +3,12 @@ package com.meli.dto;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
-
+/*
+ * Data Transfer Object used to carry data between processes
+ * Data -&gt; Backend
+ * Controler -&gt; Service layer
+ * Shaped for the resquest, it helps decouple data model from external APIs
+ */
 public class BuyRequestDTO {
     @NotNull(message = &quot;BuyRequestDTO: Quantidade é obrigatória.&quot;)
     @Min(value = 1, message = &quot;BuyRequestDTO: Quantidade deve ser pelo menos 1.&quot;)
@@ -12,20 +17,19 @@ public class BuyRequestDTO {
     /*
      * Default constructor used by Jackson
      */
-
-<span class="nc" id="L16">    public BuyRequestDTO() {</span>
-<span class="nc" id="L17">    }</span>
-
-<span class="nc" id="L19">    public BuyRequestDTO(Integer quantity) {</span>
-<span class="nc" id="L20">        this.quantity = quantity;</span>
+<span class="nc" id="L20">    public BuyRequestDTO() {</span>
 <span class="nc" id="L21">    }</span>
 
+<span class="nc" id="L23">    public BuyRequestDTO(Integer quantity) {</span>
+<span class="nc" id="L24">        this.quantity = quantity;</span>
+<span class="nc" id="L25">    }</span>
+
     public Integer getQuantity() {
-<span class="nc" id="L24">        return quantity;</span>
+<span class="nc" id="L28">        return quantity;</span>
     }
 
     public void setQuantity(Integer quantity) {
-<span class="nc" id="L28">        this.quantity = quantity;</span>
-<span class="nc" id="L29">    }</span>
+<span class="nc" id="L32">        this.quantity = quantity;</span>
+<span class="nc" id="L33">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

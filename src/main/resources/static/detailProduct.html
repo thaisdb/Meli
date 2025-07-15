@@ -2,13 +2,17 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Detalhes do Produto</title>
-  <link rel="stylesheet" type="text/css" href="/css/style.css">
+  <link rel="stylesheet" type="text/css" href="/css/page.css">
+    <!-- Font Awesome for icons - for login icon-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Link to the header.js script -->
+    <script src="header.js" defer></script>
 </head>
-<body>
-  <header>
-    <h1>Detalhes do Produto</h1>
-  </header>
+
+<body data-title="Products" data-show-profile-icon="true">
+  <div id="header-placeholder"></div>
 
   <div class="product-detail" id="productDetail">
     <p>Carregando produto...</p>
@@ -20,64 +24,72 @@
       return params.get(name);
     }
 
-  const productId = getQueryParam("id");
-  const url = `/products/${productId}`;
+    const productId = getQueryParam("id");
+    const url = `/products/${productId}`;
 
-  fetch(url)
-    .then(response => {
-      if (!response.ok) throw new Error("Produto não encontrado");
-      return response.json();
-    })
-    .then(product => {
-      const container = document.getElementById("productDetail");
-      const imageUrl = product.imageUrl || 'https://via.placeholder.com/600x400?text=Sem+Imagem';
+    fetch(url)
+      .then(response => {
+        if (!response.ok) throw new Error("Produto não encontrado");
+        return response.json();
+      })
+      .then(product => {
+        const container = document.getElementById("productDetail");
+        const imageUrl = product.imageUrl || 'https://placehold.co/600x400?text=Sem+Imagem';
 
-      container.innerHTML = `
-        <img src="${imageUrl}" alt="${product.title}">
-        <div class="info">
-          <div class="title">${product.title}</div>
-          <div class="price">R$ ${product.price.toFixed(2)}</div>
-          <div class="brand">Marca: ${product.brand || 'Desconhecida'}</div>
-          <div class="description">Descrição: ${product.description || 'Sem descrição disponível.'}</div>
-          <div class="description">Em estoque: <span id="stock">${product.stock}</span></div>
-          <div class="purchase-box">
-            <label for="quantity">Quantity:</label>
-            <input type="number" id="quantity" value="1" min="1" max="${product.stock}"/>
-            <button id="buy-button">Comprar</button>
-          </div>
-          <p id="buy-message" style="color: green;"></p>
-          <a href="/listProducts.html" class="back-link">← Voltar para lista</a>
-        </div>
-      `;
+        container.innerHTML = `
+            <div class="product-image-section">
+                <img src="${imageUrl}" alt="${product.title}" onerror="this.onerror=null;this.src='https://placehold.co/600x400/cccccc/333333?text=Imagem+Nao+Encontrada';"><br><br>
+                <div class="product-meta-details">
+                    <div class="brand"><label>Marca:</label> ${product.brand || 'Desconhecida'}</div><br>
+                    <div class="description"><label>Descrição:</label><br> ${product.description || 'Sem descrição disponível.'}</div>
+                </div>
+            </div>
+            <div class="info-and-purchase-card"> <!-- This is the inner card -->
+                <div class="product-main-info"> <!-- Group for title, price, stock -->
+                    <div class="title">${product.title}</div>
+                    <div class="price">R$ ${product.price.toFixed(2)}</div>
+                    <div class="stock-info">Em estoque: <span id="stock">${product.stock}</span></div>
+                </div>
+                <div class="purchase-box">
+                    <label for="quantity">Quantity:</label>
+                    <input type="number" id="quantity" value="1" min="1" max="${product.stock}"/>
+                    <button class="button" id="buy-button">Comprar</button>
+                    <button class="button light-blue-button">Adicionar ao carrinho</button>
+                </div>
+                <p id="buy-message" style="color: green;"></p>
+                <a href="/home.html" class="back-link">← Voltar para lista</a>
+            </div>
+        `;
 
-      // Now that button exists, attach event listener
-      document.getElementById('buy-button').addEventListener('click', async () => {
-      const quantity = parseInt(document.getElementById('quantity').value);
-      const resMessage = document.getElementById('buy-message');
+        // Event listener needs to be re-attached after innerHTML update
+        document.getElementById('buy-button').addEventListener('click', async () => {
+          const quantity = parseInt(document.getElementById('quantity').value);
+          const resMessage = document.getElementById('buy-message');
 
-      const response = await fetch(`/products/${productId}/buy`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ quantity })
+          const response = await fetch(`/products/${productId}/buy`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ quantity })
+          });
+
+          if (response.ok) {
+            const updatedProduct = await response.json();
+            resMessage.textContent = "Compra realizada com sucesso!";
+            resMessage.style.color = "green";
+            document.getElementById('stock').textContent = updatedProduct.stock;
+            document.getElementById('quantity').max = updatedProduct.stock;
+          } else {
+            const errorText = await response.text();
+            resMessage.textContent = errorText || "Erro ao realizar compra.";
+            resMessage.style.color = "red";
+          }
+        });
+      })
+      .catch(error => {
+        document.getElementById("productDetail").innerHTML = `<p>${error.message}</p>`;
       });
 
-      if (response.ok) {
-        const updatedProduct = await response.json();
-        resMessage.textContent = "Compra realizada com sucesso!";
-        resMessage.style.color = "green";
-        document.getElementById('stock').textContent = updatedProduct.stock;
-        document.getElementById('quantity').max = updatedProduct.stock;
-      } else {
-        const errorText = await response.text();
-        resMessage.textContent = errorText || "Erro ao realizar compra.";
-        resMessage.style.color = "red";
-      }
-    });
-   })
-   .catch(error => {
-     document.getElementById("productDetail").innerHTML = `<p>${error.message}</p>`;
-   });
+  </script>
 
-</script>
-    
+</body>
 </html>

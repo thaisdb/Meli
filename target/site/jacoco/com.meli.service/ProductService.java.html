@@ -1,132 +1,137 @@
 <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pt"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ProductService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Prototype</a> &gt; <a href="index.source.html" class="el_package">com.meli.service</a> &gt; <span class="el_source">ProductService.java</span></div><h1>ProductService.java</h1><pre class="source lang-java linenums">package com.meli.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.meli.model.Product;
+import com.meli.repository.ProductRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.http.HttpStatus;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
-import com.meli.model.Product;
-
-/*
- * Encapsulates business logic
- * Handles loading/saving products
- */
 @Service
 public class ProductService {
-<span class="nc" id="L20">    private final String DATA_FILE_PATH = &quot;data/products.json&quot;;</span>
-<span class="nc" id="L21">    private List&lt;Product&gt; products = new ArrayList&lt;&gt;();</span>
-<span class="nc" id="L22">    private final ObjectMapper mapper = new ObjectMapper();</span>
 
-<span class="nc" id="L24">    public ProductService() {</span>
-<span class="nc" id="L25">        loadProducts();</span>
-<span class="nc" id="L26">    }</span>
+    private final ProductRepository productRepository;
 
-    private void loadProducts() {
-<span class="nc" id="L29">        System.out.println(&quot;Trying to load from: &quot; + new File(DATA_FILE_PATH).getAbsolutePath());</span>
-        try {
-<span class="nc" id="L31">            File file = new File(DATA_FILE_PATH);</span>
-<span class="nc bnc" id="L32" title="All 2 branches missed.">            if (file.exists()) {</span>
-<span class="nc" id="L33">                Product[] productArray = mapper.readValue(file, Product[].class);</span>
-<span class="nc" id="L34">                products.clear();</span>
-<span class="nc" id="L35">                products = new ArrayList&lt;&gt;(Arrays.asList(productArray));</span>
-<span class="nc" id="L36">            } else {</span>
-<span class="nc" id="L37">                System.out.println(&quot;No product file found. Starting with empty list.&quot;);</span>
-<span class="nc" id="L38">                products = new ArrayList&lt;&gt;();</span>
+    @Autowired
+<span class="nc" id="L22">    public ProductService(ProductRepository productRepository) {</span>
+<span class="nc" id="L23">        this.productRepository = productRepository;</span>
+<span class="nc" id="L24">        System.out.println(&quot;BACKEND: ProductService: Initialized with ProductRepository.&quot;);</span>
+<span class="nc" id="L25">    }</span>
+
+// This method contains the core filtering logic
+    public List&lt;Product&gt; getAllProducts(Optional&lt;String&gt; tagsFilter) {
+<span class="nc" id="L29">        List&lt;Product&gt; allProducts = productRepository.getAll(); // Fetches all products initially</span>
+
+<span class="nc bnc" id="L31" title="All 4 branches missed.">        if (tagsFilter.isPresent() &amp;&amp; !tagsFilter.get().trim().isEmpty()) {</span>
+            // Process the incoming tags string (e.g., &quot;smartphone apple&quot;)
+<span class="nc" id="L33">            Set&lt;String&gt; searchTags = Arrays.stream(tagsFilter.get().split(&quot; &quot;))</span>
+<span class="nc" id="L34">                                           .map(String::trim)</span>
+<span class="nc bnc" id="L35" title="All 2 branches missed.">                                           .filter(tag -&gt; !tag.isEmpty())</span>
+<span class="nc" id="L36">                                           .map(String::toLowerCase)</span>
+<span class="nc" id="L37">                                           .collect(Collectors.toSet());</span>
+
+<span class="nc bnc" id="L39" title="All 2 branches missed.">            if (searchTags.isEmpty()) {</span>
+                // If after splitting and cleaning, no valid tags remain, return all products
+<span class="nc" id="L41">                return allProducts;</span>
             }
-<span class="nc" id="L40">        } catch (IOException e) {</span>
-<span class="nc" id="L41">            System.err.println(&quot;Failed to load products from file: &quot; + e.getMessage());</span>
-<span class="nc" id="L42">        }</span>
-<span class="nc" id="L43">    }</span>
 
-    private void saveProducts() {
-        try {
-<span class="nc" id="L47">            mapper.writerWithDefaultPrettyPrinter().writeValue(new File(DATA_FILE_PATH), products);</span>
-<span class="nc" id="L48">        } catch (IOException e) {</span>
-<span class="nc" id="L49">            System.err.println(&quot;Failed to save products to file: &quot; + e.getMessage());</span>
-<span class="nc" id="L50">        }</span>
-<span class="nc" id="L51">    }</span>
-
-    /*
-     * Get list of all products
-     * @return list of products
-     */
-    public List&lt;Product&gt; getAll() {
-<span class="nc" id="L58">        return products;</span>
-    }
-
-    /*
-     * Get product by Id
-     * @param product unique Id
-     * @return product which matches Id
-     */
-    public Product getProductById(int id) {
-<span class="nc bnc" id="L67" title="All 2 branches missed.">        return products.stream().filter(p -&gt; p.getId() == id).findFirst().orElse(null);</span>
-    }
-
-    /*
-     * Create new product generating newId automatically
-     * @param new product to be created
-     * @return created product
-     */
-    public Product addProduct(Product product) {
-<span class="nc" id="L76">        int newId = products.stream()</span>
-<span class="nc" id="L77">                            .mapToInt(Product::getId)</span>
-<span class="nc" id="L78">                            .max()</span>
-<span class="nc" id="L79">                            .orElse(0) + 1;</span>
-<span class="nc" id="L80">        product.setId(newId);</span>
-
-<span class="nc" id="L82">        products.add(product);</span>
-<span class="nc" id="L83">        saveProducts();</span>
-
-<span class="nc" id="L85">        return product;</span>
-    }
-
-    /*
-     * Search and delete product by id
-     * @param product unique id
-     */
-    public void deleteById(int id) {
-<span class="nc bnc" id="L93" title="All 2 branches missed.">        products.removeIf(p -&gt; p.getId() == id);</span>
-<span class="nc" id="L94">        saveProducts();</span>
-<span class="nc" id="L95">    }</span>
-
-    /*
-     * Update product by Id, replacing it with updatedProduct
-     * Preserves original Id and calls saveProducts function
-     * @param product unique Id
-     * @param product updated
-     * @return true if successefully update the product
-     *         false if can't find product
-     */
-    public boolean updateProduct(int id, Product updatedProduct) {
-<span class="nc bnc" id="L106" title="All 2 branches missed.">        for (int i = 0; i &lt; products.size(); i++) {</span>
-<span class="nc bnc" id="L107" title="All 2 branches missed.">            if (products.get(i).getId() == id) {</span>
-<span class="nc" id="L108">                updatedProduct.setId(id);</span>
-<span class="nc" id="L109">                products.set(i, updatedProduct);</span>
-<span class="nc" id="L110">                saveProducts();</span>
-<span class="nc" id="L111">                return true;</span>
-            }
+            // Filter products based on whether any of their tags match the search tags
+<span class="nc" id="L45">            return allProducts.stream()</span>
+<span class="nc" id="L46">                .filter(product -&gt; {</span>
+<span class="nc bnc" id="L47" title="All 4 branches missed.">                    if (product.getTags() == null || product.getTags().isEmpty()) {</span>
+<span class="nc" id="L48">                        return false; // Product has no tags, so it won't match</span>
+                    }
+                    // Check if any of the product's tags are present in the searchTags set
+<span class="nc" id="L51">                    return product.getTags().stream()</span>
+<span class="nc" id="L52">                                  .map(String::toLowerCase)</span>
+<span class="nc" id="L53">                                  .anyMatch(searchTags::contains);</span>
+                })
+<span class="nc" id="L55">                .collect(Collectors.toList());</span>
         }
-<span class="nc" id="L114">        return false;</span>
+        // If no tagsFilter is present or it's empty, return all products
+<span class="nc" id="L58">        return allProducts;</span>
+    }
+
+    public Product getProductById(int id) {
+<span class="nc" id="L62">        System.out.println(&quot;BACKEND: ProductService.getProductById() called for ID: &quot; + id);</span>
+<span class="nc" id="L63">        return productRepository.getById(id)</span>
+<span class="nc" id="L64">                                .orElseThrow(() -&gt; {</span>
+<span class="nc" id="L65">                                    System.err.println(&quot;BACKEND: ProductService.getProductById(): Product ID &quot; + id + &quot; not found. Throwing 404.&quot;);</span>
+<span class="nc" id="L66">                                    return new ResponseStatusException(HttpStatus.NOT_FOUND, &quot;Product with ID &quot; + id + &quot; not found&quot;);</span>
+                                });
+    }
+
+    public Product addProduct(Product product) {
+<span class="nc" id="L71">        System.out.println(&quot;BACKEND: ProductService.addProduct() called for product: &quot; + product.getTitle());</span>
+<span class="nc" id="L72">        int newId = productRepository.getAll().stream()</span>
+<span class="nc" id="L73">                                    .mapToInt(Product::getId)</span>
+<span class="nc" id="L74">                                    .max()</span>
+<span class="nc" id="L75">                                    .orElse(0) + 1;</span>
+<span class="nc" id="L76">        product.setId(newId);</span>
+<span class="nc" id="L77">        System.out.println(&quot;BACKEND: ProductService.addProduct(): Assigned new ID &quot; + newId + &quot; to product.&quot;);</span>
+<span class="nc" id="L78">        return productRepository.save(product);</span>
+    }
+
+    public void deleteProductById(int id) {
+<span class="nc" id="L82">        System.out.println(&quot;BACKEND: ProductService.deleteProductById() called for ID: &quot; + id);</span>
+<span class="nc" id="L83">        boolean deleted = productRepository.deleteById(id);</span>
+<span class="nc bnc" id="L84" title="All 2 branches missed.">        if (!deleted) {</span>
+<span class="nc" id="L85">            System.err.println(&quot;BACKEND: ProductService.deleteProductById(): Product ID &quot; + id + &quot; not found by repository. Throwing 404.&quot;);</span>
+<span class="nc" id="L86">            throw new ResponseStatusException(HttpStatus.NOT_FOUND, &quot;Product with ID &quot; + id + &quot; not found for deletion.&quot;);</span>
+        }
+<span class="nc" id="L88">        System.out.println(&quot;BACKEND: ProductService.deleteProductById(): Product ID &quot; + id + &quot; successfully deleted.&quot;);</span>
+<span class="nc" id="L89">    }</span>
+
+    public Product updateProduct(int id, Product updatedProductData) {
+<span class="nc" id="L92">        System.out.println(&quot;BACKEND: ProductService.updateProduct() called for ID: &quot; + id);</span>
+<span class="nc" id="L93">        Product existingProduct = getProductById(id); // This will throw 404 if not found</span>
+
+<span class="nc" id="L95">        System.out.println(&quot;BACKEND: ProductService.updateProduct(): Found existing product for ID &quot; + id + &quot;. Merging data.&quot;);</span>
+<span class="nc" id="L96">        existingProduct.setTitle(updatedProductData.getTitle());</span>
+<span class="nc" id="L97">        existingProduct.setPrice(updatedProductData.getPrice());</span>
+<span class="nc" id="L98">        existingProduct.setDescription(updatedProductData.getDescription());</span>
+<span class="nc" id="L99">        existingProduct.setImageUrl(updatedProductData.getImageUrl());</span>
+<span class="nc" id="L100">        existingProduct.setBrand(updatedProductData.getBrand());</span>
+<span class="nc" id="L101">        existingProduct.setStock(updatedProductData.getStock());</span>
+<span class="nc" id="L102">        existingProduct.setTags(updatedProductData.getTags());</span>
+
+<span class="nc" id="L104">        boolean updated = productRepository.update(existingProduct);</span>
+<span class="nc bnc" id="L105" title="All 2 branches missed.">        if (!updated) {</span>
+<span class="nc" id="L106">            System.err.println(&quot;BACKEND: ProductService.updateProduct(): Failed to persist update for ID &quot; + id + &quot; in repository. Throwing 500.&quot;);</span>
+<span class="nc" id="L107">            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, &quot;Failed to persist product update for ID &quot; + id);</span>
+        }
+<span class="nc" id="L109">        System.out.println(&quot;BACKEND: ProductService.updateProduct(): Product ID &quot; + id + &quot; successfully updated.&quot;);</span>
+<span class="nc" id="L110">        return existingProduct;</span>
     }
 
     public Product buyProduct(int id, int quantity) {
-<span class="nc" id="L118">        Product product = getProductById(id); </span>
-<span class="nc bnc" id="L119" title="All 2 branches missed.">        if (product == null) {</span>
-<span class="nc" id="L120">            throw new IllegalArgumentException(&quot;buyProduct: Produto não encontrado&quot;);</span>
+<span class="nc" id="L114">        System.out.println(&quot;BACKEND: ProductService.buyProduct() called for ID: &quot; + id + &quot;, Quantity: &quot; + quantity);</span>
+<span class="nc" id="L115">        Product product = getProductById(id);</span>
+
+<span class="nc bnc" id="L117" title="All 2 branches missed.">        if (quantity &lt;= 0) {</span>
+<span class="nc" id="L118">            System.err.println(&quot;BACKEND: ProductService.buyProduct(): Invalid quantity &quot; + quantity + &quot;. Throwing IllegalArgumentException.&quot;);</span>
+<span class="nc" id="L119">            throw new IllegalArgumentException(&quot;buyProduct: Quantity must be positive.&quot;);</span>
+        }
+<span class="nc bnc" id="L121" title="All 2 branches missed.">        if (quantity &gt; product.getStock()) {</span>
+<span class="nc" id="L122">            System.err.println(&quot;BACKEND: ProductService.buyProduct(): Insufficient stock for ID &quot; + id + &quot;. Available: &quot; + product.getStock() + &quot;, Requested: &quot; + quantity + &quot;. Throwing IllegalArgumentException.&quot;);</span>
+<span class="nc" id="L123">            throw new IllegalArgumentException(&quot;buyProduct: Insufficient stock. Available: &quot; + product.getStock() + &quot;, Requested: &quot; + quantity);</span>
         }
 
-<span class="nc bnc" id="L123" title="All 4 branches missed.">        if (quantity &lt;= 0 || quantity &gt; product.getStock()) {</span>
-<span class="nc" id="L124">            throw new IllegalArgumentException(&quot;buyProduct: Quantidade inválida: &quot; + quantity);</span>
+<span class="nc" id="L126">        product.setStock(product.getStock() - quantity);</span>
+<span class="nc" id="L127">        System.out.println(&quot;BACKEND: ProductService.buyProduct(): Updated stock for ID &quot; + id + &quot; to &quot; + product.getStock());</span>
+<span class="nc" id="L128">        boolean updated = productRepository.update(product);</span>
+<span class="nc bnc" id="L129" title="All 2 branches missed.">        if (!updated) {</span>
+<span class="nc" id="L130">            System.err.println(&quot;BACKEND: ProductService.buyProduct(): Failed to persist stock update for ID &quot; + id + &quot;. Throwing 500.&quot;);</span>
+<span class="nc" id="L131">            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, &quot;Failed to persist stock update for ID &quot; + id);</span>
         }
-
-<span class="nc" id="L127">        product.setStock(product.getStock() - quantity);</span>
-<span class="nc" id="L128">        saveProducts();</span>
-<span class="nc" id="L129">        return product;</span>
+<span class="nc" id="L133">        System.out.println(&quot;BACKEND: ProductService.buyProduct(): Stock updated and persisted for ID &quot; + id + &quot;.&quot;);</span>
+<span class="nc" id="L134">        return product;</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

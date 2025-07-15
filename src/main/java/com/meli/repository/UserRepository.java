@@ -54,12 +54,12 @@ public class UserRepository {
         int maxId = users.stream().mapToInt(User::getId).max().orElse(0);
         user.setId(maxId + 1);
         users.add(user);
-        saveUsers();
+        saveUsers(users);
     }
 
     public boolean deleteById(int id) {
         boolean removed = users.removeIf(u -> u.getId() == id);
-        if (removed) saveUsers();
+        if (removed) saveUsers(users);
         return removed;
     }
 }

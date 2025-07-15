@@ -1,6 +1,135 @@
-<body>
-  <header>
-	<img src="https://http2.mlstatic.com/frontend-assets/ml-web-navigation/ui-navigation/6.6.130/mercadolibre/pt_logo_large_plus@2x.webp">
-    <h1>Detalhes do Produto</h1>
-  </header>
-</body> 
+<!-- header.html -->
+<!-- IMPORTANT: Font Awesome CDN link is now in main pages (e.g., home.html, manageProducts.html) -->
+<style>
+    /* Basic styling for the header */
+    .main-header {
+        display: flex;
+        justify-content: space-between; /* Distribute items with space between them */
+        align-items: center; /* Vertically centers all direct children */
+        padding: 15px 20px; /* Padding for overall spacing */
+        background-color: #ffe600; /* Mercado Livre yellow */
+        font-family: 'Inter', sans-serif;
+        border-radius: 0; /* No border-radius for the header itself */
+        margin-bottom: 20px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Subtle shadow for the header */
+        min-height: 60px; /* Ensure a minimum height for consistent layout */
+    }
+
+    .main-header .logo {
+        height: 34px; /* Adjusted logo size */
+        width: 134px; /* Adjusted logo width */
+        flex-shrink: 0; /* Prevent logo from shrinking */
+        margin-right: 20px; /* Space between logo and search bar */
+        margin-left: 50px;
+    }
+
+    .main-header .logo img {
+        height: 100%; /* Make image fill the logo container */
+        width: 100%;
+        object-fit: contain; /* Ensure image fits without cropping */
+        border-radius: 4px; /* Apply border-radius to the image itself */
+    }
+
+    /* Styles for the search bar container within the header */
+    .header-search-bar {
+        flex-grow: 1; /* Allow search bar to take available space */
+        max-width: 600px; /* Max width for the search bar */
+        margin: 0 20px; /* Horizontal margin to separate from logo/profile */
+        position: relative; /* For positioning the search icon inside */
+        display: flex; /* Use flex to align input and icon */
+        align-items: center;
+        background-color: white; /* White background as per image */
+        box-shadow: 0 1px 4px rgba(0,0,0,0.1); /* Subtle shadow as per image */
+        height: 40px; /* Fixed height for the search bar */
+        overflow: hidden; /* Hide anything overflowing the rounded corners */
+    }
+
+    .header-search-bar input[type="text"] {
+        flex-grow: 1; /* Input takes all available space */
+        padding: 8px 15px; /* Padding inside the input */
+        border: none; /* No border for the input itself */
+        outline: none; /* Remove outline on focus */
+        font-size: 1em;
+        background-color: transparent; /* Transparent background to show parent white */
+        height: 100%; /* Make input fill container height */
+        box-sizing: border-box; /* Include padding in height */
+    }
+
+    .header-search-bar .search-icon {
+        padding: 0 15px; /* Padding around the icon */
+        font-size: 1.2em;
+        color: #666; /* Grey color for the icon */
+        cursor: pointer;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        border-left: 1px solid #eee; /* Light separator line */
+    }
+
+    .header-search-bar .search-icon:hover {
+        color: #333; /* Slightly darker on hover */
+    }
+
+    .profile-icon-container {
+        cursor: pointer;
+        display: flex; /* Ensure it's a flex container for centering its content if needed */
+        font-size: 1.8em;
+        color: #00009C; /* Dark blue for the icon */
+        padding: 5px;
+        border-radius: 4px; /* Apply border-radius */
+        transition: background-color 0.3s ease;
+        flex-shrink: 0; /* Prevent profile icon from shrinking */
+        margin-left: 20px; /* Space between search bar and profile icon */
+        margin-right: 50px;
+    }
+
+    .profile-icon-container:hover {
+        background-color: rgba(0, 0, 0, 0.05); /* Subtle dark background on hover */
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) { /* Adjusted breakpoint for better mobile layout */
+        .main-header {
+            flex-direction: column; /* Stack items vertically on small screens */
+            text-align: center;
+            gap: 10px; /* Space between stacked items */
+            padding: 15px;
+            min-height: auto; /* Remove min-height when stacked */
+        }
+        .main-header .logo,
+        .profile-icon-container {
+            position: static; /* Put logo/icon back in normal flow */
+            transform: none;
+            margin: 0; /* Remove specific margins */
+            width: auto; /* Allow width to be determined by content */
+            justify-content: center; /* Center content if it's a flex container */
+            display: flex; /* Ensure it's a flex container for centering */
+        }
+        .main-header .logo {
+            margin-bottom: 10px; /* Add some space below logo when stacked */
+        }
+        .header-search-bar {
+            width: 90%; /* Take more width when stacked */
+            margin: 10px 0; /* Add vertical margin when stacked */
+            max-width: none; /* Remove max-width constraint */
+        }
+    }
+</style>
+
+<header class="main-header">
+    <a href="/" class="logo">
+        <img src="https://http2.mlstatic.com/frontend-assets/ml-web-navigation/ui-navigation/6.6.130/mercadolibre/pt_logo_large_plus@2x.webp" alt="Mercado Livre Logo">
+    </a>
+    
+    <!-- Search Bar - Now the central element -->
+    <div class="header-search-bar">
+        <input type="text" id="headerTagSearchInput" placeholder="Buscar produtos, marcas e muito mais...">
+        <div class="search-icon" id="headerSearchIcon">
+            <i class="fas fa-search"></i>
+        </div>
+    </div>
+
+    <div class="profile-icon-container" id="profile-icon">
+        <i class="fas fa-user-circle"></i> <!-- Correctly placed Font Awesome user icon -->
+    </div>
+</header>

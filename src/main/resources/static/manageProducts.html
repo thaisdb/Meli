@@ -1,125 +1,398 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Product List</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
-    }
-
-    table {
-      border-collapse: collapse;
-      width: 100%;
-      margin-top: 20px;
-    }
-
-    th, td {
-      padding: 8px 12px;
-      border: 1px solid #ccc;
-      text-align: left;
-    }
-
-    th {
-      background-color: #f4f4f4;
-    }
-
-    button {
-      padding: 4px 10px;
-      background-color: #e74c3c;
-      color: white;
-      border: none;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background-color: #c0392b;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Management</title>
+    <link rel="stylesheet" type="text/css" href="/css/page.css">
+    <!-- Font Awesome for icons - for login icon-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Link to the header.js script -->
+    <script src="header.js" defer></script>
 </head>
-<body>
 
-  <h1>Product List</h1>
-  <table id="productTable">
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>Title</th>
-        <th>Price</th>
-        <th>Description</th>
-        <th>Brand</th>
-        <th>Stock</th>
-        <th>Action</th>
-      </tr>
-    </thead>
-    <tbody>
-      <!-- Product rows go here -->
-    </tbody>
-  </table>
+<body data-title="Manage Products" data-show-profile-icon="true" data-show-search-bar="true">
+    <div class="header-placeholder"></div>
 
-  <script>
-    function formatProductPrice(price) {
-      if (price !== null && price !== undefined && price !== '') {
-          return new Intl.NumberFormat('pt-BR', {
-              style: 'currency',
-              currency: 'BRL',
-              minimumFractionDigits: 2,
-          }).format(price);
-      }
-      return ''; // Return empty string if price is not valid
-    }
-    
-    function fetchProducts() {
-    fetch('/products')
-        .then(response => response.json())
-        .then(products => {
-        const tbody = document.querySelector('#productTable tbody');
-        tbody.innerHTML = ''; // Clear existing rows
-        products.forEach(product => {
-            const formattedPrice = formatProductPrice(product.price);
-            const row = document.createElement('tr');
-            row.innerHTML = `
-            <td>${product.id}</td>
-            <td>${product.title ?? ''}</td>
-            <td>${formattedPrice ?? ''}</td>
-            <td>${product.description ?? ''}</td>
-            <td>${product.brand ?? ''}</td>
-            <td>${product.stock ?? ''}</td>
-            <td>
-                <button onclick="location.href='editProduct.html?id=${product.id}'">Update</button>
-                <button onclick="deleteProduct(${product.id}, this)">Delete</button>
-            </td>
-            `;
-            tbody.appendChild(row);
-        });
-        });
-    }
+    <div class="card product-list-table-card">
+        <h1>Manage Products</h1>
 
-    function deleteProduct(id, button) {
-      if (!confirm(`Are you sure you want to delete product ID ${id}?`)) return;
+        <table class="product-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Título</th>
+                    <th>Preço</th>
+                    <th>Descrição</th>
+                    <th>Marca</th>
+                    <th>Quantidade em estoque</th>
+                    <th>Tags</th>
+                    <th>Ação</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Product rows go here -->
+            </tbody>
+        </table>
+        <div class="no-products-message hidden">Nenhum produto encontrado.</div>
 
-      fetch(`/products/${id}`, {
-        method: 'DELETE'
-      })
-      .then(response => {
-        if (response.ok) {
-          // Remove row from table
-          const row = button.closest('tr');
-          row.remove();
-        } else {
-          alert('Failed to delete product.');
+        <!-- Pagination Controls -->
+        <div class="pagination-controls">
+            <button id="firstPage" class="button pagination-button">First</button>
+            <button id="prevPage" class="button pagination-button">Previous</button>
+            <div id="pageNumbers" class="page-numbers">
+                <!-- Page number buttons will be injected here -->
+            </div>
+            <button id="nextPage" class="button pagination-button">Next</button>
+            <button id="lastPage" class="button pagination-button">Last</button>
+        </div>
+
+        <!-- Add Product Button -->
+        <div class="add-product-button-container">
+            <button id="addProductBtn" class="button add-product-button">Add New Product</button>
+        </div>
+    </div>
+
+    <!-- Custom Confirmation Modal for Delete - UPDATED CLASS NAMES -->
+    <div class="confirm-modal-overlay hidden app-modal-overlay">
+        <div class="confirm-modal-content app-modal-content">
+            <h2 class="confirm-modal-title app-modal-title">Confirmar Exclusão</h2>
+            <p class="confirm-modal-message app-modal-message">Tem certeza que deseja excluir o produto <span class="product-id-to-delete"></span>?</p>
+            <div class="confirm-modal-actions app-modal-actions">
+                <button class="button confirm-button confirm-delete-btn">Excluir</button>
+                <button class="button confirm-button cancel-delete-btn">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Pagination state variables
+        let currentPage = 1;
+        const productsPerPage = 20; // Max 20 lines per table page
+        let allProductsData = []; // Stores all products fetched from the backend
+        let totalPages = 0;
+
+        // DOM element references
+        let productIdToDelete = null;
+        let rowToDelete = null;
+        let confirmModalOverlay;
+        let productIdToDeleteSpan;
+        let confirmDeleteBtn;
+        let cancelDeleteBtn;
+        let productTableTbody;
+        let noProductsMessage;
+        let firstPageBtn;
+        let prevPageBtn;
+        let nextPageBtn;
+        let lastPageBtn;
+        let pageNumbersContainer;
+        let addProductBtn;
+
+        function initializeDOMElements() {
+            console.log("manageProducts.html: initializeDOMElements() START.");
+            confirmModalOverlay = document.querySelector('.confirm-modal-overlay');
+            productIdToDeleteSpan = document.querySelector('.product-id-to-delete');
+            confirmDeleteBtn = document.querySelector('.confirm-delete-btn');
+            cancelDeleteBtn = document.querySelector('.cancel-delete-btn');
+            productTableTbody = document.querySelector('.product-table tbody');
+            noProductsMessage = document.querySelector('.no-products-message');
+            firstPageBtn = document.getElementById('firstPage');
+            prevPageBtn = document.getElementById('prevPage');
+            nextPageBtn = document.getElementById('nextPage');
+            lastPageBtn = document.getElementById('lastPage');
+            pageNumbersContainer = document.getElementById('pageNumbers');
+            addProductBtn = document.getElementById('addProductBtn');
+
+            console.log("manageProducts.html: initializeDOMElements() Results:");
+            console.log("  confirmModalOverlay found:", !!confirmModalOverlay);
+            console.log("  productIdToDeleteSpan found:", !!productIdToDeleteSpan);
+            console.log("  confirmDeleteBtn found:", !!confirmDeleteBtn);
+            console.log("  cancelDeleteBtn found:", !!cancelDeleteBtn);
+            console.log("  productTableTbody found:", !!productTableTbody);
+            console.log("  noProductsMessage found:", !!noProductsMessage);
+            console.log("  firstPageBtn found:", !!firstPageBtn);
+            console.log("  prevPageBtn found:", !!prevPageBtn);
+            console.log("  nextPageBtn found:", !!nextPageBtn);
+            console.log("  lastPageBtn found:", !!lastPageBtn);
+            console.log("  pageNumbersContainer found:", !!pageNumbersContainer);
+            console.log("  addProductBtn found:", !!addProductBtn);
+
+
+            if (!confirmModalOverlay || !productIdToDeleteSpan || !confirmDeleteBtn || !cancelDeleteBtn || !productTableTbody || !noProductsMessage || !firstPageBtn || !prevPageBtn || !nextPageBtn || !lastPageBtn || !pageNumbersContainer || !addProductBtn) {
+                console.error("manageProducts.html: CRITICAL ERROR: One or more required DOM elements for product management were NOT found. Functionality may not work.");
+            }
+            console.log("manageProducts.html: initializeDOMElements() END.");
         }
-      })
-      .catch(error => {
-        console.error('Delete error:', error);
-        alert('Error deleting product.');
-      });
-    }
 
-    // Initial load
-    fetchProducts();
-  </script>
+        function formatProductPrice(price) {
+            if (price !== null && price !== undefined && price !== '') {
+                return new Intl.NumberFormat('pt-BR', {
+                    style: 'currency',
+                    currency: 'BRL',
+                    minimumFractionDigits: 2,
+                }).format(price);
+            }
+            return '';
+        }
+        
+        // fetchProducts now fetches all products (or filtered by tags) and stores them for pagination
+        function fetchProducts(searchTags = '') {
+            let url = '/products';
+            if (searchTags.trim() !== '') {
+                url += `?tags=${encodeURIComponent(searchTags.trim())}`;
+            }
+
+            console.log(`manageProducts.html: fetchProducts() START. Attempting to fetch products from: ${url}`);
+            fetch(url)
+                .then(response => {
+                    console.log("manageProducts.html: fetchProducts(): Fetch response received:", response);
+                    if (!response.ok) {
+                        console.error("manageProducts.html: fetchProducts(): HTTP error, status:", response.status, "URL:", response.url);
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(products => {
+                    console.log("manageProducts.html: fetchProducts(): Products fetched successfully. Count:", products.length, "Products:", products);
+                    
+                    allProductsData = products; // Store all fetched products
+                    totalPages = Math.ceil(allProductsData.length / productsPerPage);
+                    currentPage = 1; // Reset to first page on new fetch or search
+
+                    renderTablePage(currentPage); // Render the first page of results
+                    updatePaginationControls(); // Update pagination buttons/numbers
+
+                    console.log("manageProducts.html: fetchProducts() END.");
+                })
+                .catch(error => {
+                    console.error('manageProducts.html: fetchProducts(): Global error fetching products:', error);
+                    if (productTableTbody) {
+                        productTableTbody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: red;">Erro ao carregar produtos. Verifique o console para detalhes.</td></tr>';
+                    }
+                    if (noProductsMessage) {
+                        noProductsMessage.classList.remove('hidden'); // Show message on error
+                    }
+                    allProductsData = []; // Clear data on error
+                    totalPages = 0;
+                    currentPage = 0;
+                    updatePaginationControls(); // Disable pagination controls
+                    console.log("manageProducts.html: fetchProducts() END with error.");
+                });
+        }
+
+        // Renders the products for the given page number
+        function renderTablePage(page) {
+            if (!productTableTbody || !noProductsMessage) {
+                console.error("manageProducts.html: renderTablePage(): Table body or no products message element not found, cannot render page.");
+                return;
+            }
+
+            productTableTbody.innerHTML = ''; // Clear current table content
+
+            const startIndex = (page - 1) * productsPerPage;
+            const endIndex = startIndex + productsPerPage;
+            const productsToDisplay = allProductsData.slice(startIndex, endIndex);
+
+            if (productsToDisplay.length === 0) {
+                noProductsMessage.classList.remove('hidden');
+                console.log("manageProducts.html: renderTablePage(): No products to display on this page, showing message.");
+            } else {
+                noProductsMessage.classList.add('hidden');
+                console.log(`manageProducts.html: renderTablePage(): Displaying products for page ${page}. Count: ${productsToDisplay.length}`);
+                productsToDisplay.forEach(product => {
+                    const formattedPrice = formatProductPrice(product.price);
+                    const row = document.createElement('tr');
+                    const tagsDisplay = (product.tags && Array.isArray(product.tags))
+                                        ? product.tags.join(' ')
+                                        : (product.tags instanceof Set ? Array.from(product.tags).join(' ') : '');
+                    
+                    row.innerHTML = `
+                        <td>${product.id}</td>
+                        <td>${product.title ?? ''}</td>
+                        <td>${formattedPrice ?? ''}</td>
+                        <td>${product.description ?? ''}</td>
+                        <td>${product.brand ?? ''}</td>
+                        <td>${product.stock ?? ''}</td>
+                        <td>${tagsDisplay ?? ''}</td>
+                        <td>
+                            <button class="button update-button" onclick="location.href='editProduct.html?id=${product.id}'">Update</button>
+                            <button class="button delete-button" data-product-id="${product.id}">Delete</button>
+                        </td>
+                    `;
+                    productTableTbody.appendChild(row);
+                });
+
+                // Re-attach delete listeners for new rows
+                document.querySelectorAll('.delete-button').forEach(button => {
+                    button.addEventListener('click', (event) => {
+                        productIdToDelete = event.target.dataset.productId;
+                        rowToDelete = event.target.closest('tr'); // Get the row to remove after successful delete
+                        if (productIdToDeleteSpan && confirmModalOverlay) {
+                            confirmModalOverlay.classList.remove('hidden');
+                            productIdToDeleteSpan.textContent = productIdToDelete;
+                        }
+                    });
+                });
+            }
+            updatePaginationControls(); // Update controls after rendering page
+        }
+
+        // Updates the pagination buttons (First/Previous/Next/Last) and page numbers
+        function updatePaginationControls() {
+            if (!firstPageBtn || !prevPageBtn || !nextPageBtn || !lastPageBtn || !pageNumbersContainer) {
+                console.error("manageProducts.html: updatePaginationControls(): Pagination control elements not found.");
+                return;
+            }
+
+            // Show/hide pagination controls based on totalPages
+            const displayStyle = totalPages > 1 ? 'flex' : 'none';
+            firstPageBtn.style.display = displayStyle;
+            prevPageBtn.style.display = displayStyle;
+            nextPageBtn.style.display = displayStyle;
+            lastPageBtn.style.display = displayStyle;
+            pageNumbersContainer.style.display = displayStyle;
+
+
+            firstPageBtn.disabled = (currentPage <= 1);
+            prevPageBtn.disabled = (currentPage <= 1);
+            nextPageBtn.disabled = (currentPage >= totalPages);
+            lastPageBtn.disabled = (currentPage >= totalPages);
+
+            pageNumbersContainer.innerHTML = ''; // Clear existing page numbers
+
+            // Only show page numbers if there's more than one page
+            if (totalPages > 1) {
+                for (let i = 1; i <= totalPages; i++) {
+                    const pageButton = document.createElement('button');
+                    pageButton.classList.add('button', 'page-number-button');
+                    if (i === currentPage) {
+                        pageButton.classList.add('active');
+                    }
+                    pageButton.textContent = i;
+                    pageButton.addEventListener('click', () => {
+                        currentPage = i;
+                        renderTablePage(currentPage);
+                    });
+                    pageNumbersContainer.appendChild(pageButton);
+                }
+            }
+            console.log(`manageProducts.html: Pagination controls updated. Current Page: ${currentPage}, Total Pages: ${totalPages}`);
+        }
+
+
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log("manageProducts.html: DOMContentLoaded event fired. Starting script execution.");
+            initializeDOMElements();
+
+            // Event listeners for pagination buttons
+            if (firstPageBtn) {
+                firstPageBtn.addEventListener('click', () => {
+                    if (currentPage !== 1) {
+                        currentPage = 1;
+                        renderTablePage(currentPage);
+                    }
+                });
+            }
+            if (prevPageBtn) {
+                prevPageBtn.addEventListener('click', () => {
+                    if (currentPage > 1) {
+                        currentPage--;
+                        renderTablePage(currentPage);
+                    }
+                });
+            }
+            if (nextPageBtn) {
+                nextPageBtn.addEventListener('click', () => {
+                    if (currentPage < totalPages) {
+                        currentPage++;
+                        renderTablePage(currentPage);
+                    }
+                });
+            }
+            if (lastPageBtn) {
+                lastPageBtn.addEventListener('click', () => {
+                    if (currentPage !== totalPages) {
+                        currentPage = totalPages;
+                        renderTablePage(currentPage);
+                    }
+                });
+            }
+
+            // Event listener for Add Product button
+            if (addProductBtn) {
+                addProductBtn.addEventListener('click', () => {
+                    console.log("manageProducts.html: Add New Product button clicked. Redirecting to addProduct.html");
+                    window.location.href = 'addProduct.html';
+                });
+            }
+
+            // Listen for the custom search event from the header
+            window.addEventListener('productSearch', (event) => {
+                console.log("manageProducts.html: Received 'productSearch' event from header.", event.detail.searchTags);
+                fetchProducts(event.detail.searchTags); // Re-fetch products with the new search query
+            });
+
+            // Initial load of products when the page loads
+            console.log("manageProducts.html: Calling fetchProducts() for initial load.");
+            fetchProducts();
+            console.log("manageProducts.html: DOMContentLoaded event END. fetchProducts called.");
+
+            // Confirmation modal logic (remains the same)
+            if (confirmDeleteBtn && cancelDeleteBtn) {
+                console.log("manageProducts.html: Confirmation modal buttons found. Attaching listeners.");
+                confirmDeleteBtn.addEventListener('click', () => {
+                    console.log(`manageProducts.html: 'Excluir' button clicked in modal for product ID: ${productIdToDelete}`);
+                    if (productIdToDelete && rowToDelete) {
+                        console.log(`manageProducts.html: Attempting DELETE fetch to URL: /products/${productIdToDelete}`);
+                        fetch(`/products/${productIdToDelete}`, { 
+                            method: 'DELETE'
+                        })
+                        .then(response => {
+                            console.log("manageProducts.html: DELETE fetch response received:", response);
+                            if (response.ok) {
+                                console.log(`manageProducts.html: Product ID ${productIdToDelete} deleted successfully from backend.`);
+                                // IMPORTANT: Re-fetch all products after a successful delete to ensure data consistency
+                                fetchProducts(); 
+                            } else {
+                                response.text().then(errorText => {
+                                    console.error('manageProducts.html: DELETE fetch failed. Server response:', errorText);
+                                    showCustomMessageBox(`Failed to delete product ID ${productIdToDelete}: ${errorText || response.statusText}`); 
+                                });
+                            }
+                        })
+                        .catch(error => {
+                            console.error('manageProducts.html: DELETE fetch error (network/other):', error);
+                            showCustomMessageBox(`An unexpected error occurred: ${error.message}`);
+                        })
+                        .finally(() => {
+                            confirmModalOverlay.classList.add('hidden');
+                            productIdToDelete = null;
+                            rowToDelete = null;
+                            console.log("manageProducts.html: Delete process finished, modal hidden and variables reset.");
+                        });
+                    } else {
+                        console.warn("manageProducts.html: Attempted to confirm delete, but productIdToDelete or rowToDelete was null. Cannot proceed with fetch.");
+                    }
+                });
+
+                cancelDeleteBtn.addEventListener('click', () => {
+                    console.log("manageProducts.html: 'Cancelar' button clicked in modal. Cancelling delete.");
+                    confirmModalOverlay.classList.add('hidden');
+                    productIdToDelete = null;
+                    rowToDelete = null;
+                    console.log("manageProducts.html: Delete cancelled, modal hidden and variables reset.");
+                });
+            } else {
+                console.error("manageProducts.html: Confirmation modal buttons (confirmDeleteBtn, cancelDeleteBtn) not found. Delete functionality disabled from modal.");
+            }
+        });
+
+        // Placeholder for a custom message box (replace alert)
+        function showCustomMessageBox(message) {
+            console.warn("Custom Message Box:", message);
+            alert(message); // For now, using alert for quick feedback, but replace with custom UI
+        }
+    </script>
 
 </body>
 </html>

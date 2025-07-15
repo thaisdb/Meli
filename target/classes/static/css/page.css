@@ -1,0 +1,763 @@
+/* --- Base Styles --- */
+.body-div {
+    padding: 50px;
+    background-color: #ebebeb;
+    font-family: "Proxima Nova", -apple-system, Roboto, Arial, sans-serif, sans-serif;
+    table-layout: fixed;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    background-color: #f5f5f5; /* Ensure body has a background to see modal overlay clearly */
+}
+
+/* --- Crucial: Hidden class (ensure it always hides) --- */
+.hidden {
+    display: none !important; /* This is absolutely critical for hiding modals */
+}
+
+.info { /* General .info style - this is now likely unused or only for very specific cases not related to product detail */
+    margin-top: 20px;
+}
+
+.title { /* General .title style - overridden by .product-detail .title */
+    font-size: 20px; /* This is for card title, not product-detail title */
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.price { /* General .price style - overridden by .product-detail .price */
+    color: #00a650;
+    font-size: 16px; /* This is for card price, not product-detail price */
+    margin-bottom: 10px;
+}
+
+.brand,
+.description {
+    font-size: 14px; /* This is for card brand/description */
+    margin-top: 10px;
+    color: #555;
+}
+
+a.back-link {
+    display: inline-block;
+    margin-top: 30px; /* This will now be overridden by .product-detail .back-link */
+    color: #3483fa;
+    text-decoration: none;
+}
+
+a.back-link:hover {
+    text-decoration: underline;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 30px auto;
+    padding: 10px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.login-container {
+    width: 100%;
+    max-width: 400px;
+    margin: 100px auto;
+    padding: 30px;
+    background-color: white;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 15px;
+}
+
+.card {
+    background-color: white;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s;
+    padding: 20px;
+    /*width: 250px; /* Fixed width as requested */
+    max-width: 600px;
+    margin: 40px auto;
+}
+.card img {
+    width: 100%; /* Image will take 100% of the card's content width */
+    height: 200px; /* Fixed height for the image container */
+    object-fit: contain; /* IMPORTANT: Scales the image down to fit entirely within the 200px height, maintaining aspect ratio. Will show full image. */
+    background-color: white; /* Background color for any empty space if object-fit: contain is used */
+}
+
+.list-card:hover {
+    transform: scale(1.2);
+}
+
+.card-content {
+    padding: 15px;
+}
+
+.purchase-box {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: start;
+    margin-top: 20px; /* This will now be overridden by .product-detail .purchase-box */
+    padding: 20px; /* This will now be overridden by .product-detail .purchase-box */
+    padding-right: 20px;
+    background-color: #fff; /* This will now be overridden by .product-detail .purchase-box */
+    border: 1px solid #ddd; /* This will now be overridden by .product-detail .purchase-box */
+    border-radius: 15px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); /* This will now be overridden by .product-detail .purchase-box */
+    gap: 10px;
+}
+
+.purchase-box input[type="number"] {
+    width: 100%;
+    padding: 8px;
+    font-size: 16px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+.button {
+    background-color: #3483fa;
+    color: white;
+    padding: 12px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 100%;
+    transition: background-color 0.3s ease;
+}
+
+.button:hover {
+    background-color: #2968c8;
+}
+
+/* NEW: Style for the "Adicionar ao carrinho" button */
+.light-blue-button {
+    background-color: #e3f2fd; /* Light blue background */
+    color: #3483fa; /* Mercado Livre blue text */
+}
+
+.light-blue-button:hover {
+    background-color: #cce5ff; /* Slightly darker blue on hover */
+    color: #2968c8; /* Darker blue text on hover */
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 16px;
+}
+
+.form-group label,
+.purchase-box label,
+.role-toggle label {
+    font-weight: bold;
+    font-size: 16px;
+    margin-bottom: 6px;
+}
+
+.form-group input,
+.form-group textarea {
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+    width: 100%;
+}
+
+h2 {
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+.signup-link {
+    display: block;
+    text-align: center;
+    margin-top: 15px;
+    color: #3483fa;
+    text-decoration: none;
+}
+
+.signup-link:hover {
+    text-decoration: underline;
+}
+
+.signup-container {
+    width: 100%;
+    max-width: 500px;
+    margin: 60px auto;
+    padding: 30px;
+    background-color: white;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 15px;
+}
+
+.toggle-container {
+    display: flex;
+    gap: 20px;
+    margin-top: 6px;
+    align-items: center;
+}
+
+.label {
+    font-weight: bold;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 5px 0;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 54px;
+    height: 30px;
+    vertical-align: middle;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #2196F3;
+    -webkit-transition: .4s;
+    transition: .4s;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 22px;
+    width: 22px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    -webkit-transition: .4s;
+    transition: .4s;
+}
+
+input:checked+.slider:before {
+    -webkit-transform: translateX(24px);
+    -ms-transform: translateX(24px);
+    transform: translateX(24px);
+}
+
+/* --- Product Detail Page Specific Styles (Mercado Livre Card-in-Card Layout) --- */
+.product-detail {
+    max-width: 1200px; /* Increased max-width for overall layout */
+    margin: 20px auto; /* Center the main card horizontally */
+    padding: 20px; /* Padding for the outer card's internal content */
+    background-color: white; /* White background for the main outer card */
+    border-radius: 15px; /* Rounded corners for the main outer card */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Shadow for the main outer card */
+    display: flex; /* Make this the flex container for the left image section and the right info-purchase card */
+    flex-direction: row; /* Arrange children horizontally */
+    gap: 30px; /* Space between the image section and the info-purchase card */
+    align-items: flex-start; /* Align items to the top */
+    flex-wrap: wrap; /* Allow columns to wrap onto the next line on smaller screens */
+    box-sizing: border-box; /* Ensure padding is included in width calculation */
+}
+
+/* Left Column: Image and its associated details (brand, description) */
+.product-detail .product-image-section {
+    flex: 2; /* Allows image section to take more space (e.g., 2/3) */
+    min-width: 300px; /* Minimum width for image column before wrapping */
+    display: flex; /* Make it a flex container to stack image and meta details */
+    flex-direction: column; /* Stack image and meta details vertically */
+    align-items: center; /* Center image horizontally within its wrapper */
+    gap: 15px; /* Space between image and meta details */
+}
+
+/* Product image itself within the detail page */
+.product-detail img {
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05); /* Added subtle shadow for image */
+    max-width: 500px; /* Restrict maximum width of the image (adjust as needed) */
+    max-height: 400px; /* Restrict maximum height of the image (already existed, but confirmed) */
+    width: 100%; /* Ensure it scales down responsively */
+    height: auto; /* Maintain aspect ratio */
+    object-fit: contain; /* Changed to 'contain' to show the full image without cropping */
+    border-radius: 15px; /* Existing border-radius */
+}
+
+/* Container for brand and description below the image */
+.product-detail .product-meta-details {
+    width: 100%; /* Take full width of its parent (.product-image-section) */
+    padding: 0 10px; /* Small horizontal padding for text */
+    box-sizing: border-box;
+}
+
+/* Right Column: Information and Purchase Card (THE INNER CARD) */
+.product-detail .info-and-purchase-card {
+    flex: 1; /* Allows this section to take less space (e.g., 1/3 of available space) */
+    min-width: 300px; /* Minimum width for this card before wrapping */
+    background-color: #fcfcfc; /* Lighter background for this inner card */
+    border: 1px solid #ddd;
+    border-radius: 15px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    padding: 20px; /* Padding inside this inner card */
+    display: flex; /* Make it a flex container to stack its children */
+    flex-direction: column; /* Stack elements vertically within this card */
+    gap: 15px; /* Space between info blocks, purchase box, and back link */
+}
+
+/* Product title within the detail page (now inside .info-and-purchase-card) */
+.product-detail .title {
+    font-size: 2em;
+    margin-top: 0; /* Remove default margin-top if present */
+    margin-bottom: 5; /* Let gap handle spacing */
+}
+
+/* Product price within the detail page (now inside .info-and-purchase-card) */
+.product-detail .price {
+    color: #333; /* Changed price color to black like ML */
+    font-size: 2.5em; /* Larger price font size */
+    margin-bottom: 0; /* Let gap handle spacing */
+}
+
+/* Brand and description (now in .product-meta-details, not in .info-and-purchase-card) */
+.product-detail .brand,
+.product-detail .description {
+    font-size: 16px; /* Adjusted to be consistent with main info text */
+    color: #666;
+    margin-top: 0;
+    margin-bottom: 5px; /* Small margin between brand and description */
+}
+
+.product-detail .brand label,
+.product-detail .description label {
+    font-size: 16px; /* Adjusted to be consistent with main info text */
+    color: #666;
+    margin-top: 0;
+    margin-bottom: 5px; /* Small margin between brand and description */
+    font-weight: bold;
+}
+
+/* Stock information (now in .info-and-purchase-card) */
+.product-detail .stock-info { /* New class for stock line */
+    font-size: 16px;
+    color: #555;
+    margin-bottom: 0; /* Let gap handle spacing */
+}
+
+/* Purchase box (now inside .info-and-purchase-card) */
+.purchase-box {
+    width: 100%; /* Ensure it takes full width of its parent (.info-and-purchase-card) */
+    box-sizing: border-box; /* Include padding in width */
+    margin-top: 0; /* Remove margin-top as gap on .info-and-purchase-card handles spacing */
+    padding: 0; /* Remove padding here, as .info-and-purchase-card has padding */
+    border: none; /* Remove border here, as .info-and-purchase-card has border */
+    background-color: transparent; /* Remove background here */
+    box-shadow: none; /* Remove shadow here */
+}
+
+/* Back link within the detail page (now inside .info-and-purchase-card) */
+.product-detail .back-link {
+    margin-top: 0; /* Remove specific margin-top, gap on .info-and-purchase-card handles spacing */
+}
+
+/* Responsive adjustments for smaller screens */
+@media (max-width: 768px) {
+    .product-detail {
+        flex-direction: column; /* Stack sections vertically on smaller screens */
+        align-items: center; /* Center items when stacked */
+        padding: 15px; /* Slightly less padding on mobile */
+        max-width: 95%; /* Adjust max-width for better mobile fit */
+    }
+
+    .product-detail .product-image-section,
+    .product-detail .info-and-purchase-card {
+        flex: none; /* Remove flex-grow properties when stacked */
+        width: 100%; /* Make them take full width */
+        min-width: unset; /* Remove min-width constraint */
+    }
+
+    .product-detail .product-image-section {
+        margin-bottom: 20px; /* Add space between stacked sections */
+    }
+    .product-detail .info-and-purchase-card {
+        margin-top: 0; /* Ensure no extra margin when stacked */
+    }
+}
+/* --- End Product Detail Page Specific Styles --- */
+
+/* --- NEW: Styles for Product List Table Card --- */
+/* This class should be applied to the div wrapping your <h1> and <table> in home.html */
+.product-list-table-card {
+    background-color: white; /* Card background */
+    border-radius: 10px; /* Card rounded corners */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Card shadow */
+    max-width: 1200px; /* Adjust max-width for the table card */
+    width: 95%; /* Ensure it's responsive */
+    margin: 20px auto; /* Center the card */
+    padding: 25px; /* Padding inside the table card */
+    box-sizing: border-box; /* Include padding in width */
+    overflow-x: auto; /* Allow horizontal scrolling for table on small screens */
+}
+
+.product-list-table-card h1 {
+    text-align: center;
+    margin-bottom: 25px;
+    color: #333;
+    font-size: 2em;
+}
+
+.product-list-table-card .product-table { /* Nested under new class */
+    width: 100%; /* Make table take full width of its container */
+    border-collapse: collapse; /* Collapse table borders */
+    margin-top: 20px;
+    font-size: 0.95em;
+}
+
+.product-list-table-card .product-table th, /* Nested under new class */
+.product-list-table-card .product-table td { /* Nested under new class */
+    border: 1px solid #eee; /* Light borders for cells */
+    padding: 12px 15px;
+    text-align: left;
+}
+
+.product-list-table-card .product-table th { /* Nested under new class */
+    background-color: #f0f0f0; /* Header background */
+    font-weight: bold;
+    color: #333;
+    text-transform: uppercase;
+}
+
+.product-list-table-card .product-table tbody tr:nth-child(even) { /* Nested under new class */
+    background-color: #f9f9f9; /* Zebra striping for rows */
+}
+
+.product-list-table-card .product-table tbody tr:hover { /* Nested under new class */
+    background-color: #eef; /* Highlight row on hover */
+}
+
+.product-list-table-card .product-table td:last-child { /* Nested under new class */
+    text-align: center; /* Center action buttons */
+    white-space: nowrap; /* Prevent buttons from wrapping */
+}
+
+.product-list-table-card .product-table .button { /* Nested under new class */
+    padding: 8px 12px; /* Smaller padding for table buttons */
+    font-size: 0.9em; /* Smaller font for table buttons */
+    margin: 0 5px; /* Space between buttons */
+    width: auto; /* Override width: 100% from general .button */
+    display: inline-block; /* Allow buttons to sit side-by-side */
+}
+
+.product-list-table-card .product-table .delete-button { /* Nested under new class */
+    background-color: #dc3545; /* Red color for delete button */
+}
+
+.product-list-table-card .product-table .delete-button:hover { /* Nested under new class */
+    background-color: #c82333;
+}
+
+/* Specific style for the Description column to limit to one line with ellipsis */
+.product-list-table-card .product-table td:nth-child(4) { /* Assuming Description is the 4th column */
+    max-width: 200px; /* Adjust this value as needed to control the column width */
+    white-space: nowrap; /* Prevents text from wrapping to the next line */
+    overflow: hidden; /* Hides any content that overflows the element's box */
+    text-overflow: ellipsis; /* Displays an ellipsis (...) for clipped text */
+}
+
+/* --- Search Bar Styles --- */
+.search-bar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 25px; /* Space below the search bar */
+    padding: 0 10px; /* Small horizontal padding */
+    justify-content: center; /* Center the search bar within its container */
+    flex-wrap: wrap; /* Allow elements to wrap on smaller screens */
+}
+
+.search-bar input[type="text"] {
+    flex-grow: 1; /* Allow input to take available space */
+    max-width: 400px; /* Limit max width for input */
+    padding: 10px 15px;
+    border: 1px solid #ccc;
+    border-radius: 8px; /* Slightly more rounded */
+    font-size: 1em;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.05); /* Subtle inner shadow */
+}
+
+.search-bar .search-button {
+    width: auto; /* Override 100% width from general .button */
+    padding: 10px 20px;
+    font-size: 1em;
+    border-radius: 8px; /* Match input border-radius */
+    background-color: #3483fa; /* Mercado Livre blue */
+    color: white;
+    transition: background-color 0.3s ease;
+}
+
+.search-bar .search-button:hover {
+    background-color: #2968c8; /* Darker blue on hover */
+}
+
+/* Responsive adjustments for search bar */
+@media (max-width: 600px) {
+    .search-bar {
+        flex-direction: column; /* Stack input and button vertically */
+        align-items: center; /* Center items when stacked */
+    }
+    .search-bar input[type="text"],
+    .search-bar .search-button {
+        width: 90%; /* Make them take more width on small screens */
+        max-width: 300px; /* Limit overall width */
+    }
+}
+
+/* --- Refined: Styles for Pagination Controls (manageProdcts.html) --- */
+.pagination-controls {
+    display: flex; /* Use flexbox to keep items in a row */
+    justify-content: center; /* Center the entire pagination block */
+    align-items: stretch; /* Make all direct children stretch to the same height */
+    margin-top: 20px;
+    border: 1px solid #ddd; /* Outer border for the whole control group */
+    border-radius: 5px; /* Rounded corners for the whole group */
+    overflow: hidden; /* Ensures inner borders align perfectly and content stays within rounded corners */
+    background-color: white; /* White background for the group as per image */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05); /* Subtle shadow */
+    width: fit-content; /* Make the container only as wide as its content */
+    margin-left: auto; /* Center the container horizontally */
+    margin-right: auto; /* Center the container horizontally */
+}
+
+.pagination-button,
+.page-number-button {
+    padding: 10px 15px; /* Consistent padding */
+    font-size: 0.95em;
+    color: #3483fa; /* Mercado Livre blue for text */
+    background-color: white; /* White background for inactive buttons */
+    border: none; /* Remove individual button borders */
+    border-radius: 0; /* Remove individual button border-radius */
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+    /* Add individual right border for separation */
+    border-right: 1px solid #eee; /* Light separator */
+    white-space: nowrap; /* Prevent text from wrapping inside buttons */
+    flex-shrink: 0; /* Prevent buttons from shrinking */
+}
+
+/* Remove last button's right border within the flex container */
+/* This targets the last direct child button of .pagination-controls */
+.pagination-controls > .pagination-button:last-of-type,
+.pagination-controls > .page-numbers > .page-number-button:last-of-type {
+    border-right: none;
+}
+
+/* Hover state */
+.pagination-button:hover:not(:disabled),
+.page-number-button:hover:not(.active) {
+    background-color: #f0f0f0; /* Light grey on hover */
+    color: #2968c8; /* Slightly darker blue on hover */
+}
+
+/* Disabled state */
+.pagination-button:disabled {
+    background-color: white; /* Keep white background for disabled */
+    color: #ccc; /* Lighter text color for disabled */
+    cursor: not-allowed;
+}
+
+.page-numbers {
+    display: flex; /* Ensure page numbers themselves are a flex container */
+    /* No gap needed here, buttons have their own borders */
+}
+
+.page-number-button.active {
+    background-color: #00009C; /* Dark blue for active page */
+    color: white;
+    font-weight: bold;
+    cursor: default;
+    border-color: #00009C; /* Match border to background */
+}
+
+/* Adjust border for page number buttons to align with overall pagination-controls border */
+.page-number-button {
+    border-right: 1px solid #eee; /* Light separator */
+}
+.page-numbers .page-number-button:last-child {
+    border-right: none; /* No border on the very last page number button */
+}
+
+
+/* --- Styles for Add Product Button (Retained) --- */
+.add-product-button-container {
+    margin-top: 20px;
+    text-align: center; /* Center the button */
+}
+
+.add-product-button {
+    background-color: #00a650; /* Green color for add */
+    color: white;
+    padding: 12px 25px;
+    font-size: 1.1em;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.1s ease;
+    box-shadow: 0 4px 8px rgba(0, 166, 80, 0.2); /* Subtle shadow */
+}
+
+.add-product-button:hover {
+    background-color: #008f44; /* Darker green on hover */
+    transform: translateY(-2px); /* Slight lift */
+}
+
+.add-product-button:active {
+    transform: translateY(0); /* Press effect */
+    box-shadow: 0 2px 4px rgba(0, 166, 80, 0.2);
+}
+
+/* --- NEW: Base Styles for All Application Modals --- */
+.app-modal-overlay {
+    position: fixed; /* This makes the modal fixed relative to the viewport */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6); /* Semi-transparent black background */
+    display: flex; /* Use flexbox to center content when visible */
+    justify-content: center;
+    align-items: center;
+    z-index: 1000; /* Base z-index for all modals - ensure it's high enough */
+}
+
+.app-modal-content {
+    background-color: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    max-width: 400px;
+    width: 90%; /* Responsive width */
+    box-sizing: border-box;
+}
+
+.app-modal-title {
+    font-size: 1.5em;
+    color: #333;
+    margin-bottom: 15px;
+}
+
+.app-modal-message {
+    font-size: 1em;
+    color: #555;
+    margin-bottom: 25px;
+}
+
+.app-modal-actions {
+    display: flex;
+    flex-direction: column; /* Stack buttons vertically by default */
+    gap: 10px;
+}
+
+.app-modal-actions .button {
+    width: 100%;
+    font-weight: bold;
+}
+
+/* Responsive adjustment for buttons in modals */
+@media (min-width: 480px) {
+    .app-modal-actions {
+        flex-direction: row; /* Buttons side-by-side on larger screens */
+        justify-content: center;
+    }
+    .app-modal-actions .button {
+        width: auto; /* Allow buttons to size based on content */
+        flex-grow: 1; /* Distribute space evenly */
+        max-width: 180px; /* Limit max width */
+    }
+}
+
+/* --- REFACTORED: Styles for Delete Confirmation Modal (Using Base Styles) --- */
+.confirm-modal-overlay {
+    /* Inherits from .app-modal-overlay */
+    z-index: 1001; /* Slightly higher z-index for delete if it needs to be on top of success */
+}
+
+.confirm-modal-content {
+    /* Inherits from .app-modal-content */
+}
+
+.confirm-modal-title {
+    /* Inherits from .app-modal-title */
+}
+
+.confirm-modal-message {
+    /* Inherits from .app-modal-message */
+}
+
+.confirm-modal-message .product-id-to-delete {
+    font-weight: bold;
+    color: #3483fa;
+}
+
+.confirm-modal-actions {
+    /* Inherits from .app-modal-actions */
+}
+
+.confirm-modal-actions .confirm-delete-btn {
+    background-color: #dc3545; /* Red for delete */
+}
+
+.confirm-modal-actions .confirm-delete-btn:hover {
+    background-color: #c82333;
+}
+
+.confirm-modal-actions .cancel-delete-btn {
+    background-color: #6c757d; /* Grey for cancel */
+}
+
+.confirm-modal-actions .cancel-delete-btn:hover {
+    background-color: #5a6268;
+}
+
+/* --- REFACTORED: Styles for Product Added Success Modal (Using Base Styles) --- */
+.success-modal-overlay {
+    /* Inherits from .app-modal-overlay */
+    z-index: 1002; /* Highest z-index for add success to ensure it's always on top */
+}
+
+.success-modal-content {
+    /* Inherits from .app-modal-content */
+}
+
+.success-modal-title {
+    /* Inherits from .app-modal-title */
+}
+
+.success-modal-message {
+    /* Inherits from .app-modal-message */
+}
+
+.success-modal-actions {
+    /* Inherits from .app-modal-actions */
+}
+
+.success-modal-actions .add-more-button {
+    background-color: #00a650; /* Green for "Add More" */
+}
+
+.success-modal-actions .add-more-button:hover {
+    background-color: #008f44;
+}
+
+.success-modal-actions .go-to-manage-button {
+    background-color: #3483fa; /* Blue for "Go to Manage" */
+}
+
+.success-modal-actions .go-to-manage-button:hover {
+    background-color: #2968c8;
+}

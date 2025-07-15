@@ -4,7 +4,7 @@
 package com.meli.controller;
 
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.meli.dto.BuyRequestDTO;
@@ -27,54 +29,50 @@ public class ProductController {
 
     private final ProductService productService;
 
-<span class="nc" id="L30">    public ProductController(ProductService productService) {</span>
-<span class="nc" id="L31">        this.productService = productService;</span>
-<span class="nc" id="L32">    }</span>
+<span class="nc" id="L32">    public ProductController(ProductService productService) {</span>
+<span class="nc" id="L33">        this.productService = productService;</span>
+<span class="nc" id="L34">    }</span>
 
+    // This endpoint receives the 'tags' query parameter from the frontend
     @GetMapping
-    public List&lt;Product&gt; getAllProducts() {
-<span class="nc" id="L36">        return productService.getAll();</span>
+    public List&lt;Product&gt; getAllProducts(@RequestParam Optional&lt;String&gt; tags) {
+<span class="nc" id="L39">        System.out.println(&quot;BACKEND: ProductController.getAllProducts() called. Tags param: &quot; + tags.orElse(&quot;N/A&quot;));</span>
+        // It delegates the filtering logic entirely to the ProductService
+<span class="nc" id="L41">        return productService.getAllProducts(tags);</span>
     }
 
     @GetMapping(&quot;/{id}&quot;)
-    public ResponseEntity&lt;?&gt; getProductById(@PathVariable(&quot;id&quot;) int id) {
-<span class="nc" id="L41">        Product product = productService.getProductById(id);</span>
-<span class="nc bnc" id="L42" title="All 2 branches missed.">        if (product != null) {</span>
-<span class="nc" id="L43">            return ResponseEntity.ok(product);</span>
-        } else {
-<span class="nc" id="L45">            return ResponseEntity.status(HttpStatus.NOT_FOUND)</span>
-<span class="nc" id="L46">                                 .body(&quot;Produto com ID &quot; + id + &quot; não foi encontrado.&quot;);</span>
-        }
+    public ResponseEntity&lt;Product&gt; getProductById(@PathVariable(&quot;id&quot;) int id) {
+        // ProductService.getProductById now throws ResponseStatusException (HttpStatus.NOT_FOUND)
+        // if the product is not found. Spring will automatically translate this
+        // into an HTTP 404 response. No need for explicit if/else here.
+<span class="nc" id="L49">        Product product = productService.getProductById(id);</span>
+<span class="nc" id="L50">        return ResponseEntity.ok(product); // Returns 200 OK with the product</span>
     }
 
+
     @PostMapping
-    public ResponseEntity&lt;Product&gt; addProduct(@RequestBody Product product) {
-<span class="nc" id="L52">        Product createdProduct = productService.addProduct(product);</span>
-<span class="nc" id="L53">        return ResponseEntity.status(HttpStatus.CREATED).body(createdProduct);</span>
+    @ResponseStatus(HttpStatus.CREATED) // Returns HTTP 201 Created on success
+    public Product addProduct(@RequestBody Product product) {
+        // ProductService.addProduct now handles ID generation and saving
+<span class="nc" id="L58">        return productService.addProduct(product);</span>
     }
 
     /**
      * Put method used to update products
-     * 
-     * @param id product's unique id
+     * * @param id product's unique id
      * @param updatedProduct Product with updated information
-     * @return HTTP 200 OK if product is succefully updated,
-     *         400 Not Found if product ID is not found
-     *         or 500 Internal Server Error if product failed to update
+     * @return HTTP 200 OK with the updated product if successful,
+     * 404 Not Found if product ID is not found (handled by service throwing ResponseStatusException),
+     * or 500 Internal Server Error if persistence failed (handled by service throwing ResponseStatusException).
      */
     @PutMapping(&quot;/{id}&quot;)
-    public ResponseEntity&lt;String&gt; updateProduct(@PathVariable int id, @RequestBody Product updatedProduct) {
-        try {
-<span class="nc" id="L68">            boolean updated = productService.updateProduct(id, updatedProduct);</span>
-<span class="nc bnc" id="L69" title="All 2 branches missed.">            if (updated) {</span>
-<span class="nc" id="L70">                return ResponseEntity.ok(&quot;Produto atualizado com sucesso.&quot;);</span>
-            } else {
-<span class="nc" id="L72">                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(&quot;UpdateProduct: Produto não encontrado&quot;);</span>
-            }
-<span class="nc" id="L74">        } catch (Exception e) {</span>
-<span class="nc" id="L75">            e.printStackTrace();</span>
-<span class="nc" id="L76">            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(&quot;UpdateProduct: Failed to update product.&quot;);</span>
-        }
+    public ResponseEntity&lt;Product&gt; updateProduct(@PathVariable int id, @RequestBody Product updatedProduct) {
+        // ProductService.updateProduct now returns the updated Product or throws
+        // ResponseStatusException (e.g., 404 NOT_FOUND or 500 INTERNAL_SERVER_ERROR).
+        // Spring will handle these exceptions automatically.
+<span class="nc" id="L74">        Product resultProduct = productService.updateProduct(id, updatedProduct);</span>
+<span class="nc" id="L75">        return ResponseEntity.ok(resultProduct); // Returns 200 OK with the updated product</span>
     }
 
     /*
@@ -88,18 +86,22 @@ public class ProductController {
     @PostMapping(&quot;/{id}/buy&quot;)
     public ResponseEntity&lt;?&gt; buyProduct(@PathVariable int id, @RequestBody BuyRequestDTO request) {
         try {
-<span class="nc" id="L91">            int quantity = request.getQuantity();</span>
-<span class="nc" id="L92">            Product updated = productService.buyProduct(id, quantity);</span>
-<span class="nc" id="L93">            return ResponseEntity.ok(updated);</span>
-<span class="nc" id="L94">        } catch (IllegalArgumentException e) {</span>
-<span class="nc" id="L95">            return ResponseEntity.badRequest().body(e.getMessage());</span>
+<span class="nc" id="L89">            int quantity = request.getQuantity();</span>
+<span class="nc" id="L90">            Product updated = productService.buyProduct(id, quantity);</span>
+<span class="nc" id="L91">            return ResponseEntity.ok(updated); // Returns 200 OK with the updated product</span>
+<span class="nc" id="L92">        } catch (IllegalArgumentException e) {</span>
+            // This exception is for business validation (e.g., invalid quantity, insufficient stock)
+<span class="nc" id="L94">            return ResponseEntity.badRequest().body(e.getMessage()); // Returns 400 Bad Request</span>
         }
     }
 
-
     @DeleteMapping(&quot;/{id}&quot;)
+    @ResponseStatus(HttpStatus.NO_CONTENT) // Returns HTTP 204 No Content on successful deletion
     public void deleteProduct(@PathVariable int id) {
-<span class="nc" id="L102">        productService.deleteById(id);</span>
-<span class="nc" id="L103">    }</span>
+        // ProductService.deleteProductById now throws ResponseStatusException (HttpStatus.NOT_FOUND)
+        // if the product is not found. Spring will automatically translate this
+        // into an HTTP 404 response.
+<span class="nc" id="L104">        productService.deleteProductById(id);</span>
+<span class="nc" id="L105">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>
