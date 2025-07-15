@@ -81,10 +81,84 @@
         flex-shrink: 0; /* Prevent profile icon from shrinking */
         margin-left: 20px; /* Space between search bar and profile icon */
         margin-right: 50px;
+        position: relative; /* CRITICAL: For positioning the dropdown menu */
     }
 
     .profile-icon-container:hover {
         background-color: rgba(0, 0, 0, 0.05); /* Subtle dark background on hover */
+    }
+
+    /* --- NEW: Dropdown Menu Styles (Inline) --- */
+    .dropdown-menu {
+        position: absolute;
+        top: 100%; /* Position below the icon container */
+        right: 0; /* Align to the right of the icon container */
+        background-color: #fff;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        min-width: 180px;
+        z-index: 100; /* Ensure it's above other content */
+        display: flex;
+        flex-direction: column;
+        overflow: hidden; /* Ensures rounded corners are respected for items */
+    }
+
+    .dropdown-item {
+        padding: 12px 15px;
+        text-decoration: none;
+        color: #333;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background-color: white; /* Explicitly white background */
+        border: none; /* Remove button default border */
+        width: 100%; /* Make button fill item width */
+        text-align: left; /* Align text to left for buttons */
+        cursor: pointer;
+        transition: background-color 0.2s ease, color 0.2s ease;
+        font-size: 1em; /* Set font size to 1em */
+        font-family: 'Inter', sans-serif; /* Set font family to Inter */
+    }
+
+    .dropdown-item:hover {
+        background-color: #e3f2fd; /* Light blue on hover (from add to cart button) */
+        color: #333; /* Keep text color consistent or adjust if needed for contrast */
+    }
+
+    .dropdown-item i {
+        font-size: 1.1em; /* Icon size within dropdown items */
+        color: #666; /* Default icon color */
+    }
+
+    .dropdown-item:hover i {
+        color: #333; /* Icon color on hover (match text) */
+    }
+
+    /* Style for the logout button within the dropdown */
+    .dropdown-item.logout-button {
+        background-color: white; /* Start with white background */
+        color: #dc3545; /* Red text for logout */
+        margin-top: 5px; /* Small space above logout button */
+        border-top: 1px solid #eee; /* Separator */
+    }
+
+    .dropdown-item.logout-button:hover {
+        background-color: #e3f2fd; /* Light blue on hover */
+        color: #c82333; /* Darker red text on hover */
+    }
+
+    .dropdown-item.logout-button i {
+        color: #dc3545; /* Red icon for logout button */
+    }
+    .dropdown-item.logout-button:hover i {
+        color: #c82333; /* Darker red icon on hover */
+    }
+
+
+    /* Utility class to hide elements */
+    .hidden {
+        display: none !important;
     }
 
     /* Responsive adjustments */
@@ -96,22 +170,28 @@
             padding: 15px;
             min-height: auto; /* Remove min-height when stacked */
         }
-        .main-header .logo,
-        .profile-icon-container {
-            position: static; /* Put logo/icon back in normal flow */
+        .main-header .logo {
+            position: static; /* Put logo back in normal flow */
             transform: none;
             margin: 0; /* Remove specific margins */
             width: auto; /* Allow width to be determined by content */
             justify-content: center; /* Center content if it's a flex container */
             display: flex; /* Ensure it's a flex container for centering */
-        }
-        .main-header .logo {
             margin-bottom: 10px; /* Add some space below logo when stacked */
         }
         .header-search-bar {
             width: 90%; /* Take more width when stacked */
             margin: 10px 0; /* Add vertical margin when stacked */
             max-width: none; /* Remove max-width constraint */
+        }
+        /* Adjust positioning for profile icon on small screens */
+        .profile-icon-container {
+            position: static; /* Remove absolute positioning */
+            transform: none;
+            margin: 0 auto; /* Center horizontally */
+            width: fit-content; /* Adjust width to content */
+            padding: 0; /* Remove padding */
+            font-size: 1.5em; /* Smaller icon on mobile */
         }
     }
 </style>
@@ -129,7 +209,18 @@
         </div>
     </div>
 
-    <div class="profile-icon-container" id="profile-icon">
-        <i class="fas fa-user-circle"></i> <!-- Correctly placed Font Awesome user icon -->
+    <!-- Profile Icon Container - This is the clickable area -->
+    <div class="profile-icon-container" id="profile-icon-container">
+        <i class="fas fa-user-circle profile-icon-fa"></i> <!-- The actual Font Awesome user icon -->
+        <!-- Dropdown Menu (hidden by default) -->
+        <div class="dropdown-menu hidden" id="profileDropdown">
+            <!-- Removed the user greeting span -->
+            <a href="#" id="configLink" class="dropdown-item">
+                <i class="fas fa-cog"></i> Configurações
+            </a>
+            <button id="logoutButton" class="dropdown-item logout-button">
+                <i class="fas fa-sign-out-alt"></i> Sair
+            </button>
+        </div>
     </div>
 </header>

@@ -2,6 +2,8 @@ package com.meli.controller;
 
 import com.meli.model.User;
 import com.meli.service.UserService;
+import com.meli.dto.LoginRequestDTO;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -47,10 +49,26 @@ public class UserController {
     /**
      * Register new user (Consumer or Seller depending on JSON type)
      */
-    @PostMapping
+    @PostMapping("/register")
     public ResponseEntity<User> registerUser(@RequestBody User user) {
         User created = userService.registerUser(user);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
+    }
+
+    /**
+     * Authenticate user and return user details for redirection.
+     * This method will handle the login logic.
+     */
+    @PostMapping(value = "/login", consumes = "application/json") // Added explicit consumes
+    public ResponseEntity<?> loginUser(@RequestBody LoginRequestDTO loginRequest) {
+        User user = userService.findByEmail(loginRequest.getEmail());
+
+        if (user != null && userService.verifyPassword(loginRequest.getPassword(), user.getPassword())) {
+            return ResponseEntity.ok(user);
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                                 .body("Credenciais inválidas.");
+        }
     }
 
     /**

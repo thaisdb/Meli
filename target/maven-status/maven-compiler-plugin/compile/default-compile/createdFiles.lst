@@ -3,11 +3,10 @@ com\meli\model\Product.class
 com\meli\repository\ProductRepository.class
 com\meli\model\User.class
 com\meli\service\ProductService.class
-com\meli\model\Product$TagsDeserializer.class
 com\meli\model\Consumer.class
 com\meli\controller\ProductController.class
 com\meli\service\UserService.class
-com\meli\model\Product$TagsSerializer.class
+com\meli\dto\LoginRequestDTO.class
 com\meli\model\Seller.class
 com\meli\dto\UserRequestDTO.class
 com\meli\repository\UserRepository.class

@@ -3,41 +3,42 @@
 
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Added viewport meta tag -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Product</title>
     <link rel="stylesheet" type="text/css" href="/css/page.css">
-    <!-- Font Awesome for icons - for login icon-->
+    <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <!-- Link to the header.js script -->
     <script src="header.js" defer></script>
 </head>
 
-<body data-title="Products" data-show-profile-icon="true">
-    <div class="header-placeholder"></div> <!-- Changed id to class -->
+<body data-title="Products" data-show-profile-icon="true" data-show-search-bar="false">
+    <div class="header-placeholder"></div>
 
-    <div class="card edit-product-card"> <!-- Added a specific class for this card -->
+    <div class="card edit-product-card">
         <h1>Edit Product</h1>
-        <form class="edit-form"> <!-- Changed id to class -->
-            <input type="hidden" class="product-id-input" name="id"> <!-- Changed id to class -->
+        <form class="edit-form">
+            <input type="hidden" class="product-id-input" name="id">
+            <input type="hidden" class="seller-id-input" name="sellerId"> <!-- Hidden input for sellerId -->
 
             <div class="form-group">
-                <label for="title-input">Título:</label> <!-- Changed for attribute to match new class -->
-                <input type="text" class="title-input" name="title"> <!-- Changed id to class -->
+                <label for="title-input">Título:</label>
+                <input type="text" class="title-input" name="title" required>
             </div>
 
             <div class="form-group">
-                <label for="price-input">Preço:</label> <!-- Changed for attribute to match new class -->
-                <input type="number" class="price-input" name="price" step="0.01"> <!-- Changed id to class -->
+                <label for="price-input">Preço:</label>
+                <input type="number" class="price-input" name="price" step="0.01" required>
             </div>
 
             <div class="form-group">
                 <label for="description-input">Descrição:</label>
-                <textarea class="description-input" name="description" row="3"></textarea>
+                <textarea class="description-input" name="description" rows="4"></textarea>
             </div>
             
             <div class="form-group">
-                <label for="url-input">Url da imagem:</label>
-                <input type="text" class="url-input" name="url">
+                <label for="imageUrl-input">Url da imagem:</label>
+                <input type="url" class="imageUrl-input" name="imageUrl">
             </div>
 
             <div class="form-group">
@@ -56,34 +57,44 @@
             </div>
 
             <button class="button save-changes-button" type="submit">Save Changes</button>
+            <!-- Back link now includes sellerId for proper navigation -->
+            <a href="/manageProducts.html?sellerId=" + window.loggedInUserId class="back-link">Back to Product Management</a>
         </form>
     </div>
 
     <script>
         const urlParams = new URLSearchParams(window.location.search);
         const productId = urlParams.get('id');
+        const sellerIdFromUrl = urlParams.get('sellerId'); // Get sellerId from URL
 
         // Get references to form elements using their classes
         const editForm = document.querySelector('.edit-form');
         const productIdInput = document.querySelector('.product-id-input');
+        const sellerIdInput = document.querySelector('.seller-id-input'); // Reference to hidden sellerId input
         const titleInput = document.querySelector('.title-input');
         const priceInput = document.querySelector('.price-input');
         const descriptionInput = document.querySelector('.description-input');
-        const urlInput = document.querySelector('.url-input');
+        const imageUrlInput = document.querySelector('.imageUrl-input');
         const brandInput = document.querySelector('.brand-input');
         const stockInput = document.querySelector('.stock-input');
         const tagsInput = document.querySelector('.tags-input');
-        const saveChangesButton = document.querySelector('.save-changes-button'); // Reference to the save button
+        const saveChangesButton = document.querySelector('.save-changes-button');
 
         // Function to load product data
         function loadProductData() {
             if (!productId) {
-                alert('Error: Product ID not found in URL.');
-                window.location.href = '/manageProducts.html'; // Redirect if no ID
+                alert('Error: Product ID not found in URL. Redirecting to product list.');
+                window.location.href = '/manageProducts.html';
+                return;
+            }
+            // Check if user is logged in and is a seller
+            if (!window.loggedInUserId || window.loggedInUserType !== 'seller') {
+                alert('Access Denied: You must be logged in as a seller to edit products.');
+                window.location.href = '/login.html'; // Redirect to login if not a seller
                 return;
             }
 
-            fetch(`/products/${productId}`)
+            fetch(`/products/${productId}`) // Fetch the product details
                 .then(res => {
                     if (!res.ok) {
                         console.error(`HTTP error! status: ${res.status}`);
@@ -92,68 +103,92 @@
                     return res.json();
                 })
                 .then(product => {
-                    console.log("Product data received:", product);
+                    // Critical check: Ensure the product's sellerId matches the logged-in seller's ID
+                    if (product.sellerId !== parseInt(window.loggedInUserId)) {
+                        alert('Access Denied: You are not authorized to edit this product.');
+                        window.location.href = '/manageProducts.html'; // Redirect if not authorized
+                        return;
+                    }
+
+                    console.log("Product data received for editing:", product);
                     productIdInput.value = product.id;
-                    titleInput.value = product.title || ''; // Corrected typo from 'tigle' to 'titleInput'
+                    sellerIdInput.value = product.sellerId; // Set the hidden sellerId input
+                    titleInput.value = product.title || '';
                     priceInput.value = product.price || '';
                     descriptionInput.value = product.description || '';
-                    urlInput.value = product.imageUrl || '';
+                    imageUrlInput.value = product.imageUrl || '';
                     brandInput.value = product.brand || '';
                     stockInput.value = product.stock || '';
                     
-                    
-                    // Convert Set<String> to space-separated String for the input field
                     tagsInput.value = (product.tags && Array.isArray(product.tags)) 
-                                        ? product.tags.join(';') 
-                                        : (product.tags instanceof Set ? Array.from(product.tags).join(' ') : '');
-                    
+                                            ? product.tags.join(';') 
+                                            : '';
                 })
                 .catch(err => {
-                    console.error('Error loading product:', err);
+                    console.error('Error loading product for editing:', err);
                     alert('Error loading product: ' + err.message + '. Redirecting to product list.');
                     window.location.href = '/manageProducts.html';
                 });
         }
 
         // Load product data when the page loads
-        document.addEventListener('DOMContentLoaded', loadProductData);
+        document.addEventListener('DOMContentLoaded', () => {
+            // Ensure the back link is correctly set with the sellerId
+            document.querySelector('.back-link').href = `/manageProducts.html?sellerId=${window.loggedInUserId}`;
+
+            loadProductData();
+        });
 
 
         // Event listener for form submission
-        editForm.addEventListener('submit', function (event) {
+        editForm.addEventListener('submit', async function (event) {
             event.preventDefault();
 
             const updatedProduct = {
                 title: titleInput.value,
-                price: parseFloat(priceInput.value),
+                // Handle price and stock as null if empty string
+                price: priceInput.value !== '' ? parseFloat(priceInput.value) : null,
                 description: descriptionInput.value,
-                imageUrl: urlInput.value,
+                imageUrl: imageUrlInput.value,
                 brand: brandInput.value,
-                stock: parseInt(stockInput.value),
-                // Convert space-separated string back to a Set<String> for the backend
-                tags: tagsInput.value.split(';').filter(tag => tag.trim() !== '')
+                stock: stockInput.value !== '' ? parseInt(stockInput.value) : null,
+                tags: tagsInput.value.split(';').map(tag => tag.trim()).filter(tag => tag !== ''),
+                sellerId: parseInt(sellerIdInput.value) // Include sellerId from the hidden input
             };
 
-            fetch(`/products/${productId}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(updatedProduct)
-            })
-                .then(response => {
-                    if (response.ok) {
-                        alert('Product updated successfully!'); // Using alert for simplicity
-                        window.location.href = '/manageProducts.html';
-                    } else {
-                        response.text().then(errorText => {
-                            console.error('Failed to update product. Server response:', errorText);
-                            alert('Failed to update product: ' + (errorText || response.statusText));
-                        });
-                    }
-                })
-                .catch(error => {
-                    console.error('Error updating product:', error);
-                    alert('Error updating product: ' + error.message);
+            console.log("FRONTEND: editProduct.html: Product data being sent for update:", JSON.stringify(updatedProduct, null, 2)); // Log formatted JSON
+            console.log("FRONTEND: editProduct.html: X-User-Id header value:", window.loggedInUserId);
+
+            try {
+                const response = await fetch(`/products/${productId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-User-Id': window.loggedInUserId // <--- THIS IS THE CRITICAL LINE TO ADD/ENSURE
+                    },
+                    body: JSON.stringify(updatedProduct)
                 });
+
+                if (response.ok) {
+                    console.log("FRONTEND: editProduct.html: Product updated successfully!");
+                    alert('Produto atualizado com sucesso!');
+                    window.location.href = '/manageProducts.html';
+                } else {
+                    const errorText = await response.text();
+                    let errorMessage = `Error: ${response.status} ${response.statusText}`;
+                    try {
+                        const errorJson = JSON.parse(errorText);
+                        errorMessage = `Error: ${errorJson.message || errorJson.error || JSON.stringify(errorJson)}`;
+                    } catch (e) {
+                        errorMessage = `Error: ${e.message} - Failed to parse error response. Raw: ${errorText}`;
+                    }
+                    console.error('FRONTEND: editProduct.html: Failed to update product. Server response:', errorText);
+                    alert(errorMessage);
+                }
+            } catch (error) {
+                console.error('FRONTEND: editProduct.html: Network error during update:', error);
+                alert('Network error during update: ' + error.message);
+            }
         });
     </script>
 

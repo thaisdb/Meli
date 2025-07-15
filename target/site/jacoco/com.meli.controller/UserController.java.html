@@ -2,6 +2,8 @@
 
 import com.meli.model.User;
 import com.meli.service.UserService;
+import com.meli.dto.LoginRequestDTO;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,16 +20,16 @@ public class UserController {
     private final UserService userService;
 
     // Constructor injection (required for Spring Boot)
-<span class="nc" id="L21">    public UserController(UserService userService) {</span>
-<span class="nc" id="L22">        this.userService = userService;</span>
-<span class="nc" id="L23">    }</span>
+<span class="nc" id="L23">    public UserController(UserService userService) {</span>
+<span class="nc" id="L24">        this.userService = userService;</span>
+<span class="nc" id="L25">    }</span>
 
     /**
      * Get all users
      */
     @GetMapping
     public List&lt;User&gt; getAllUsers() {
-<span class="nc" id="L30">        return userService.getAllUsers();</span>
+<span class="nc" id="L32">        return userService.getAllUsers();</span>
     }
 
     /**
@@ -35,22 +37,38 @@ public class UserController {
      */
     @GetMapping(&quot;/{id}&quot;)
     public ResponseEntity&lt;?&gt; getUserById(@PathVariable int id) {
-<span class="nc" id="L38">        User user = userService.getUserById(id);</span>
-<span class="nc bnc" id="L39" title="All 2 branches missed.">        if (user != null) {</span>
-<span class="nc" id="L40">            return ResponseEntity.ok(user);</span>
+<span class="nc" id="L40">        User user = userService.getUserById(id);</span>
+<span class="nc bnc" id="L41" title="All 2 branches missed.">        if (user != null) {</span>
+<span class="nc" id="L42">            return ResponseEntity.ok(user);</span>
         } else {
-<span class="nc" id="L42">            return ResponseEntity.status(HttpStatus.NOT_FOUND)</span>
-<span class="nc" id="L43">                                 .body(&quot;Usuário com ID &quot; + id + &quot; não foi encontrado.&quot;);</span>
+<span class="nc" id="L44">            return ResponseEntity.status(HttpStatus.NOT_FOUND)</span>
+<span class="nc" id="L45">                                 .body(&quot;Usuário com ID &quot; + id + &quot; não foi encontrado.&quot;);</span>
         }
     }
 
     /**
      * Register new user (Consumer or Seller depending on JSON type)
      */
-    @PostMapping
+    @PostMapping(&quot;/register&quot;)
     public ResponseEntity&lt;User&gt; registerUser(@RequestBody User user) {
-<span class="nc" id="L52">        User created = userService.registerUser(user);</span>
-<span class="nc" id="L53">        return ResponseEntity.status(HttpStatus.CREATED).body(created);</span>
+<span class="nc" id="L54">        User created = userService.registerUser(user);</span>
+<span class="nc" id="L55">        return ResponseEntity.status(HttpStatus.CREATED).body(created);</span>
+    }
+
+    /**
+     * Authenticate user and return user details for redirection.
+     * This method will handle the login logic.
+     */
+    @PostMapping(value = &quot;/login&quot;, consumes = &quot;application/json&quot;) // Added explicit consumes
+    public ResponseEntity&lt;?&gt; loginUser(@RequestBody LoginRequestDTO loginRequest) {
+<span class="nc" id="L64">        User user = userService.findByEmail(loginRequest.getEmail());</span>
+
+<span class="nc bnc" id="L66" title="All 4 branches missed.">        if (user != null &amp;&amp; userService.verifyPassword(loginRequest.getPassword(), user.getPassword())) {</span>
+<span class="nc" id="L67">            return ResponseEntity.ok(user);</span>
+        } else {
+<span class="nc" id="L69">            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)</span>
+<span class="nc" id="L70">                                 .body(&quot;Credenciais inválidas.&quot;);</span>
+        }
     }
 
     /**
@@ -58,12 +76,12 @@ public class UserController {
      */
     @DeleteMapping(&quot;/{id}&quot;)
     public ResponseEntity&lt;String&gt; deleteUserById(@PathVariable int id) {
-<span class="nc" id="L61">        boolean removed = userService.deleteUserById(id);</span>
-<span class="nc bnc" id="L62" title="All 2 branches missed.">        if (removed) {</span>
-<span class="nc" id="L63">            return ResponseEntity.ok(&quot;Usuário removido com sucesso.&quot;);</span>
+<span class="nc" id="L79">        boolean removed = userService.deleteUserById(id);</span>
+<span class="nc bnc" id="L80" title="All 2 branches missed.">        if (removed) {</span>
+<span class="nc" id="L81">            return ResponseEntity.ok(&quot;Usuário removido com sucesso.&quot;);</span>
         } else {
-<span class="nc" id="L65">            return ResponseEntity.status(HttpStatus.NOT_FOUND)</span>
-<span class="nc" id="L66">                                 .body(&quot;Usuário com ID &quot; + id + &quot; não encontrado.&quot;);</span>
+<span class="nc" id="L83">            return ResponseEntity.status(HttpStatus.NOT_FOUND)</span>
+<span class="nc" id="L84">                                 .body(&quot;Usuário com ID &quot; + id + &quot; não encontrado.&quot;);</span>
         }
     }
 
@@ -72,12 +90,12 @@ public class UserController {
      */
     @GetMapping(&quot;/email/{email}&quot;)
     public ResponseEntity&lt;?&gt; findByEmail(@PathVariable String email) {
-<span class="nc" id="L75">        User user = userService.findByEmail(email);</span>
-<span class="nc bnc" id="L76" title="All 2 branches missed.">        if (user != null) {</span>
-<span class="nc" id="L77">            return ResponseEntity.ok(user);</span>
+<span class="nc" id="L93">        User user = userService.findByEmail(email);</span>
+<span class="nc bnc" id="L94" title="All 2 branches missed.">        if (user != null) {</span>
+<span class="nc" id="L95">            return ResponseEntity.ok(user);</span>
         } else {
-<span class="nc" id="L79">            return ResponseEntity.status(HttpStatus.NOT_FOUND)</span>
-<span class="nc" id="L80">                                 .body(&quot;Usuário com email &quot; + email + &quot; não encontrado.&quot;);</span>
+<span class="nc" id="L97">            return ResponseEntity.status(HttpStatus.NOT_FOUND)</span>
+<span class="nc" id="L98">                                 .body(&quot;Usuário com email &quot; + email + &quot; não encontrado.&quot;);</span>
         }
     }
 }

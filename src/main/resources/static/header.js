@@ -1,3 +1,12 @@
+// Global variables to store logged-in user info
+// Retrieve user info from sessionStorage immediately when the script is parsed
+let loggedInUserId = sessionStorage.getItem('loggedInUserId');
+let loggedInUserType = sessionStorage.getItem('loggedInUserType');
+
+// Make these global so other scripts can access them immediately
+window.loggedInUserId = loggedInUserId;
+window.loggedInUserType = loggedInUserType;
+
 document.addEventListener('DOMContentLoaded', () => {
     // Function to load the header HTML
     async function loadHeader() {
@@ -22,19 +31,19 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log("header.js: loadHeader: styleElement found:", !!styleElement);
             console.log("header.js: loadHeader: headerElement found:", !!headerElement);
 
-            // Find the target element where the header should be inserted (using class now, as per new HTML)
-            const headerPlaceholder = document.querySelector('.header-placeholder'); // Changed from getElementById to querySelector
+            // Find the target element where the header should be inserted
+            const headerPlaceholder = document.querySelector('.header-placeholder');
             console.log("header.js: loadHeader: headerPlaceholder found (by class):", !!headerPlaceholder);
 
             if (headerPlaceholder) {
-                // Insert the style into the head if it's not already there (and keep it there per user request)
+                // Insert the style into the head if it's not already there
                 if (styleElement && !document.head.querySelector(`style[data-header-style]`)) {
                     styleElement.setAttribute('data-header-style', 'true'); // Add a marker to prevent duplicates
                     document.head.appendChild(styleElement);
                     console.log("header.js: loadHeader: Style appended to head.");
                 }
                 // Replace the placeholder with the loaded header content
-                headerPlaceholder.replaceWith(headerElement); // Changed from appendChild to replaceWith
+                headerPlaceholder.replaceWith(headerElement);
                 console.log("header.js: loadHeader: Header content replaced placeholder.");
             } else {
                 console.warn("header.js: No element with class 'header-placeholder' found. Prepending header to body.");
@@ -47,10 +56,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.log("header.js: loadHeader: Header content prepended to body (fallback).");
             }
 
-            // After the header is in the DOM, initialize its interactive elements (like the search bar)
-            initializeHeaderSearchBar(); // Call the new function for search bar setup
+            // After the header is in the DOM, initialize its interactive elements
+            initializeHeaderSearchBar();
+            initializeProfileBehavior(); // Handle conditional profile behavior
 
-            // Update all dynamic content (browser tab title and element visibility) after the header is loaded
+            // Update all dynamic content (browser tab title) after the header is loaded
             updateHeaderContent();
             console.log("header.js: updateHeaderContent called.");
 
@@ -65,8 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const body = document.body;
         const pageTitle = body.dataset.title || 'Default Page Title';
-        const showProfileIcon = body.dataset.showProfileIcon === 'true';
-        const showSearchBar = body.dataset.showSearchBar === 'true'; // Added search bar visibility
+        const showSearchBarData = body.dataset.showSearchBar === 'true';
 
         console.log("header.js: updateHeaderContent: Detected pageTitle from body data-attribute:", pageTitle);
 
@@ -74,31 +83,11 @@ document.addEventListener('DOMContentLoaded', () => {
         document.title = pageTitle;
         console.log("header.js: updateHeaderContent: Browser tab title updated to:", pageTitle);
 
-        // 2. Control visibility of the profile icon
-        const profileIcon = document.querySelector('.profile-icon-container');
-        if (profileIcon) {
-            profileIcon.style.display = showProfileIcon ? 'flex' : 'none'; // Use 'flex' for display
-            console.log("header.js: Profile icon visibility set to:", showProfileIcon);
-            // Add event listener to the profile icon after it's loaded into the DOM
-            if (showProfileIcon) {
-                // Ensure listener is only added once to prevent multiple bindings
-                if (!profileIcon.dataset.listenerAdded) { // Prevent adding multiple listeners
-                    profileIcon.addEventListener('click', () => {
-                        console.log("header.js: Profile icon clicked! Redirecting to login.html");
-                        window.location.href = 'login.html';
-                    });
-                    profileIcon.dataset.listenerAdded = 'true'; // Mark listener as added
-                }
-            }
-        } else {
-            console.warn("header.js: Could not find element with class 'profile-icon-container'.");
-        }
-
-        // 3. Control visibility of the header search bar
+        // 2. Control visibility of the header search bar
         const headerSearchBar = document.querySelector('.header-search-bar');
         if (headerSearchBar) {
-            headerSearchBar.style.display = showSearchBar ? 'flex' : 'none'; // Use 'flex' for display
-            console.log("header.js: updateHeaderContent: Header search bar visibility set to:", showSearchBar);
+            headerSearchBar.style.display = showSearchBarData ? 'flex' : 'none';
+            console.log("header.js: updateHeaderContent: Header search bar visibility set to:", showSearchBarData);
         } else {
             console.warn("header.js: updateHeaderContent: Could not find element with class 'header-search-bar'.");
         }
@@ -130,6 +119,78 @@ document.addEventListener('DOMContentLoaded', () => {
 
         } else {
             console.warn("header.js: Header search input or icon not found, search functionality not initialized.");
+        }
+    }
+
+    // Handle conditional profile icon behavior (dropdown vs redirect)
+    function initializeProfileBehavior() {
+        const profileIconContainer = document.getElementById('profile-icon-container');
+        const profileDropdown = document.getElementById('profileDropdown');
+        const configLink = document.getElementById('configLink');
+        const logoutButton = document.getElementById('logoutButton');
+
+        if (!profileIconContainer) {
+            console.warn("header.js: Profile icon container not found. Cannot initialize profile behavior.");
+            return;
+        }
+
+        if (loggedInUserId) { // User is logged in: Show dropdown on click
+            console.log("header.js: User is logged in. Initializing profile dropdown behavior.");
+            
+            // Set config link
+            if (configLink) {
+                configLink.href = `/updateProfile.html?userId=${loggedInUserId}`;
+            }
+
+            // Ensure dropdown is hidden initially
+            if (profileDropdown) {
+                profileDropdown.classList.add('hidden');
+            }
+
+            // Attach click listener to toggle dropdown
+            profileIconContainer.addEventListener('click', (event) => {
+                event.stopPropagation(); // Prevent click from immediately closing the dropdown
+                if (profileDropdown) {
+                    profileDropdown.classList.toggle('hidden');
+                    console.log("header.js: Profile icon clicked. Dropdown toggled.");
+                }
+            });
+
+            // Close dropdown if clicked outside
+            document.addEventListener('click', (event) => {
+                if (profileDropdown && !profileDropdown.contains(event.target) && !profileIconContainer.contains(event.target)) {
+                    profileDropdown.classList.add('hidden');
+                    console.log("header.js: Clicked outside. Dropdown hidden.");
+                }
+            });
+
+            // Add event listener for logout button
+            if (logoutButton) {
+                logoutButton.addEventListener('click', () => {
+                    sessionStorage.removeItem('loggedInUserId');
+                    sessionStorage.removeItem('loggedInUserType');
+                    console.log("header.js: User logged out. Session cleared.");
+                    window.location.href = '/login.html'; // Redirect to login page after logout
+                });
+            }
+
+        } else { // User is NOT logged in: Redirect to login page on click
+            console.log("header.js: User is NOT logged in. Initializing profile icon redirect behavior.");
+            // Hide the dropdown menu
+            if (profileDropdown) {
+                profileDropdown.classList.add('hidden');
+            }
+            // Remove any existing click listeners to avoid conflicts (important for re-renders)
+            // Clone the element to remove all previous listeners, then re-add to DOM
+            const oldProfileIconContainer = profileIconContainer;
+            const newProfileIconContainer = oldProfileIconContainer.cloneNode(true);
+            oldProfileIconContainer.parentNode.replaceChild(newProfileIconContainer, oldProfileIconContainer);
+
+            // Attach click listener to redirect to login on the new element
+            newProfileIconContainer.addEventListener('click', () => {
+                console.log("header.js: Profile icon clicked! Redirecting to login.html");
+                window.location.href = '/login.html';
+            });
         }
     }
 

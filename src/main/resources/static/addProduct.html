@@ -30,11 +30,11 @@
             </div>
             <div class="form-group">
                 <label for="brand">Marca:</label>
-                <input type="text" id="brand" name="brand"></input>
+                <input type="text" id="brand" name="brand">
             </div>
             <div class="form-group">
                 <label for="stock">Quantidade em estoque:</label>
-                <input type="number" id="stock" value="1" min="1" name="stock" required>
+                <input type="number" id="stock" value="1" min="1" name="stock">
             </div>
             <div class="form-group">
                 <label for="tags">Tags (separadas por ";"):</label>
@@ -42,21 +42,22 @@
             </div>
             <div class="form-group">
                 <label for="imageUrl">URL da imagem:</label>
-                <input type="text" id="imageUrl" name="imageUrl">
+                <input type="url" id="imageUrl" name="imageUrl">
             </div>
-            <button type="submit" class="button">Adicionar produto</button><br><br>
-            <button class="button light-blue-button" onclick="location.href='/manageProducts.html'" type="button">Voltar para página de gerenciamento de produtos</button>
+            <button type="submit" class="button">Adicionar produto</button>
+            <!-- Back link now includes sellerId for proper navigation -->
+            <a href="/manageProducts.html?sellerId=" + window.loggedInUserId class="back-link">Voltar para página de gerenciamento de produtos</a>
         </form>
     </div>
 
-    <!-- NEW: Product Added Confirmation Modal - Now uses app-modal-overlay -->
+    <!-- Product Added Confirmation Modal -->
     <div class="success-modal-overlay hidden app-modal-overlay">
         <div class="success-modal-content app-modal-content">
             <h2 class="success-modal-title app-modal-title">Produto adicionado com sucesso!</h2>
-            <p class="success-modal-message app-modal-message">O que deseja fazer?</p>
+            <p class="success-modal-message app-modal-message">O que gostaria de fazer?</p>
             <div class="success-modal-actions app-modal-actions">
-                <button id="goToManageProductsBtn" class="button light-blue-button">Voltar para o gerenciador de produtos</button>
-                <button id="addMoreProductsBtn" class="button">Adicionar mais produtos</button>
+                <button id="addMoreProductsBtn" class="button add-more-button">Adicionar mais produtos</button>
+                <button id="goToManageProductsBtn" class="button go-to-manage-button">Voltar para pagina de gerenciamento</button>
             </div>
         </div>
     </div>
@@ -67,7 +68,20 @@
         let addMoreProductsBtn;
         let goToManageProductsBtn;
 
+        // Get sellerId from URL parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        const sellerIdFromUrl = urlParams.get('sellerId');
+
         document.addEventListener('DOMContentLoaded', () => {
+            // Check if user is logged in and is a seller, and if sellerId is present
+            if (!window.loggedInUserId || window.loggedInUserType !== 'seller' || !sellerIdFromUrl) {
+                alert('Access Denied: You must be logged in as a seller to add products, and your seller ID must be provided.');
+                window.location.href = '/login.html'; // Redirect to login if not a seller or no sellerId
+                return;
+            }
+            // Ensure the back link is correctly set with the sellerId
+            document.querySelector('.back-link').href = `/manageProducts.html?sellerId=${window.loggedInUserId}`;
+
             const addProductForm = document.getElementById('addProductForm');
             
             // Initialize new modal elements
@@ -88,7 +102,7 @@
                 goToManageProductsBtn.addEventListener('click', () => {
                     console.log("FRONTEND: addProduct.html: 'Go to Manage Products' clicked. Redirecting...");
                     successModalOverlay.classList.add('hidden'); // Hide the modal
-                    window.location.href = '/manageProducts.html'; // Redirect
+                    window.location.href = `/manageProducts.html?sellerId=${window.loggedInUserId}`; // Redirect with sellerId
                 });
             }
 
@@ -99,46 +113,50 @@
                     const formData = new FormData(addProductForm);
                     const productData = {};
                     formData.forEach((value, key) => {
-                        // Convert price and stock to numbers
-                        if (key === 'price' || key === 'stock') {
-                            productData[key] = parseFloat(value);
+                        if (key === 'price') {
+                            // Convert to float, if empty string, set to null
+                            productData[key] = value !== '' ? parseFloat(value) : null;
+                        } else if (key === 'stock') {
+                            // Convert to int, if empty string, set to null
+                            productData[key] = value !== '' ? parseInt(value) : null;
                         } else if (key === 'tags') {
-                            // Split tags by SEMICOLON and filter out empty strings
                             productData[key] = value.split(';').map(tag => tag.trim()).filter(tag => tag !== '');
                         } else {
-                            productData[key] = value;
+                            productData[key] = value !== '' ? value : null;
                         }
                     });
 
-                    // DEBUGGING: Log the productData object before sending
-                    console.log("FRONTEND: addProduct.html: Product data being sent:", productData);
-                    console.log("FRONTEND: addProduct.html: JSON stringified data:", JSON.stringify(productData));
+                    // Add the sellerId to the product data
+                    productData.sellerId = parseInt(sellerIdFromUrl); // Ensure it's an integer
+
+                    console.log("FRONTEND: addProduct.html: Product data being sent:", JSON.stringify(productData, null, 2)); // Log formatted JSON
+                    console.log("FRONTEND: addProduct.html: X-User-Id header value:", window.loggedInUserId);
 
                     try {
                         const response = await fetch('/products', {
                             method: 'POST',
                             headers: {
-                                'Content-Type': 'application/json'
+                                'Content-Type': 'application/json',
+                                'X-User-Id': window.loggedInUserId // Send logged-in user ID for backend validation
                             },
                             body: JSON.stringify(productData)
                         });
 
                         if (response.ok) {
                             console.log("FRONTEND: addProduct.html: Product added successfully!");
-                            // Show the custom success modal
                             if (successModalOverlay) {
                                 successModalOverlay.classList.remove('hidden');
                             } else {
-                                alert('Product added successfully!'); // Fallback if modal not found
+                                showCustomMessageBox('Produto adicionado com sucesso!');
                             }
                         } else {
-                            const errorText = await response.text(); // Get raw text to avoid JSON parsing issues on error
+                            const errorText = await response.text();
                             let errorMessage = `Error: ${response.status} ${response.statusText}`;
                             try {
                                 const errorJson = JSON.parse(errorText);
                                 errorMessage = `Error: ${errorJson.message || errorJson.error || JSON.stringify(errorJson)}`;
                             } catch (e) {
-                                errorMessage = `Error: ${errorText}`; // Fallback to raw text if not JSON
+                                errorMessage = `Error: ${errorText}`;
                             }
                             console.error("FRONTEND: addProduct.html: Error adding product. Status:", response.status, "Error Text:", errorText);
                             showCustomMessageBox(errorMessage);
@@ -153,10 +171,9 @@
             }
         });
 
-        // Placeholder for a custom message box (replace alert for errors)
         function showCustomMessageBox(message) {
-            console.warn("Custom Message Box (Error):", message);
-            alert(message); // For now, using alert for quick feedback, but replace with custom UI
+            console.warn("Custom Message Box:", message);
+            alert(message); // Fallback
         }
     </script>
 </body>

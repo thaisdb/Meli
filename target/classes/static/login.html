@@ -1,31 +1,139 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" type="text/css" href="/css/page.css">
-  <title>Login</title>
-  <script src="header.js" defer></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="/css/page.css">
+    <title>Login</title>
+    <script src="header.js" defer></script>
 </head>
-<body data-title="Login" data-show-profile-icon="false">
+<body data-title="Login" data-show-profile-icon="false" data-show-search-bar="false">
     <div id="header-placeholder"></div>
     
     <div class="login-container">
-        <form action="/email" method="post">
-        <div class="form-group">
-            <label for="email">Email:</label>
-            <input type="text" id="email" name="email" required>
-        </div>
+        <h2>Log In</h2>
+        <form id="loginForm"> <!-- Added ID for JavaScript handling -->
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required>
+            </div>
 
-        <div class="form-group">
-            <label for="password">Password</label>
-            <input type="password" id="password" name="password" required>
-        </div>
+            <div class="form-group">
+                <label for="password">Senha:</label>
+                <input type="password" id="password" name="password" required>
+            </div>
 
-        <button type="submit" class="login-button">Log In</button>
-        <a class="signup-link" href="/register">Don't have an account? Sign up</a>
+            <button type="submit" class="button">Log In</button><br><br>
+            <button class="button light-blue-button" onclick="location.href='/signUp.html'" type="button">Não tem uma conta? Cadastre-se</button>
         </form>
     </div>
 
+    <!-- Custom Message Box for Success/Error - Uses app-modal classes -->
+    <div id="messageBoxOverlay" class="app-modal-overlay hidden">
+        <div class="app-modal-content">
+            <h2 id="messageBoxTitle" class="app-modal-title"></h2>
+            <p id="messageBoxMessage" class="app-modal-message"></p>
+            <div class="app-modal-actions">
+                <button id="messageBoxCloseBtn" class="button">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Custom message box functions (re-used from other pages)
+        const messageBoxOverlay = document.getElementById('messageBoxOverlay');
+        const messageBoxTitle = document.getElementById('messageBoxTitle');
+        const messageBoxMessage = document.getElementById('messageBoxMessage');
+        const messageBoxCloseBtn = document.getElementById('messageBoxCloseBtn');
+
+        function showCustomMessageBox(title, message, isSuccess = true, callback = null) {
+            messageBoxTitle.textContent = title;
+            messageBoxMessage.textContent = message;
+            messageBoxTitle.style.color = isSuccess ? '#00a650' : '#dc3545'; // Green for success, red for error
+            messageBoxCloseBtn.style.backgroundColor = isSuccess ? '#3483fa' : '#6c757d'; // Blue for success, grey for error
+
+            messageBoxOverlay.classList.remove('hidden');
+
+            // Attach callback to the close button if provided
+            if (callback) {
+                messageBoxCloseBtn.onclick = () => {
+                    messageBoxOverlay.classList.add('hidden');
+                    callback(); // Execute the callback after closing
+                    messageBoxCloseBtn.onclick = null; // Remove handler to prevent multiple calls
+                };
+            } else {
+                messageBoxCloseBtn.onclick = () => {
+                    messageBoxOverlay.classList.add('hidden');
+                    messageBoxCloseBtn.onclick = null;
+                };
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const loginForm = document.getElementById('loginForm');
+
+            if (loginForm) {
+                loginForm.addEventListener('submit', async (event) => {
+                    event.preventDefault(); // Prevent default form submission
+
+                    const email = document.getElementById('email').value;
+                    const password = document.getElementById('password').value;
+
+                    const credentials = {
+                        email: email,
+                        password: password
+                    };
+
+                    console.log("FRONTEND: login.html: Attempting login for:", credentials.email);
+
+                    try {
+                        const response = await fetch('/users/login', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(credentials)
+                        });
+
+                        if (response.ok) {
+                            const user = await response.json(); // Assuming backend returns the User object
+                            console.log("FRONTEND: login.html: Login successful. User data:", user);
+
+                            // Store user ID and type in sessionStorage for persistence
+                            sessionStorage.setItem('loggedInUserId', user.id);
+                            sessionStorage.setItem('loggedInUserType', user.type);
+                            console.log(`User ${user.id} (${user.type}) logged in and session stored.`);
+
+                            // Determine user type and redirect directly without a success modal
+                            if (user.type === 'seller') {
+                                window.location.href = '/manageProducts.html';
+                            } else if (user.type === 'consumer') {
+                                window.location.href = '/home.html';
+                            } else {
+                                console.warn("FRONTEND: login.html: Unknown user type. Redirecting to home page as fallback.");
+                                window.location.href = '/home.html'; // Fallback
+                            }
+                        } else {
+                            const errorText = await response.text();
+                            let errorMessage = `Error: ${response.status} ${response.statusText}`;
+                            try {
+                                const errorJson = JSON.parse(errorText);
+                                errorMessage = `Error: ${errorJson.message || errorJson.error || JSON.stringify(errorJson)}`;
+                            } catch (e) {
+                                errorMessage = `Error: ${errorText}`;
+                            }
+                            console.error("FRONTEND: login.html: Login failed. Status:", response.status, "Error:", errorText);
+                            showCustomMessageBox('Login Failed', errorMessage, false);
+                        }
+                    } catch (error) {
+                        console.error("FRONTEND: login.html: Network or unexpected error during login:", error);
+                        showCustomMessageBox('Network Error', `An unexpected error occurred: ${error.message}`, false);
+                    }
+                });
+            } else {
+                console.error("FRONTEND: login.html: loginForm element not found.");
+            }
+        });
+    </script>
 </body>
 </html>

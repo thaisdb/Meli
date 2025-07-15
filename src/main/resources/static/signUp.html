@@ -1,111 +1,171 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <link rel="stylesheet" type="text/css" href="/css/page.css">
-
-  <title>Sign Up</title>
-  <!--style>
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: Arial, sans-serif;
-      background-color: #f5f5f5;
-    }
-
-    .signup-container {
-      width: 100%;
-      max-width: 500px;
-      margin: 60px auto;
-      padding: 30px;
-      background-color: white;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-      border-radius: 10px;
-    }
-
-    h2 {
-      text-align: center;
-      margin-bottom: 24px;
-    }
-
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      margin-bottom: 16px;
-    }
-
-    .signup-button {
-      width: 100%;
-      padding: 12px;
-      background-color: #3483fa;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      font-size: 16px;
-      cursor: pointer;
-    }
-
-    .signup-button:hover {
-      background-color: #2968c8;
-    }
-
-    .login-link {
-      display: block;
-      text-align: center;
-      margin-top: 15px;
-      color: #3483fa;
-      text-decoration: none;
-    }
-
-    .login-link:hover {
-      text-decoration: underline;
-    }
-  </style-->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sign Up</title>
+    <link rel="stylesheet" type="text/css" href="/css/page.css">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Link to the header.js script -->
+    <script src="header.js" defer></script>
 </head>
-<body>
 
-  <div class="signup-container">
-    <h2>Create an Account</h2>
-    <form action="/register" method="post">
-      <!-- ID is auto-generated and not shown -->
+<body data-title="Sign Up" data-show-profile-icon="false" data-show-search-bar="false">
+    <div class="header-placeholder"></div>
 
-        <div class="form-group">
-            <label for="name">Full Name:</label>
-            <input type="text" id="name" name="name" required />
+    <div class="signup-container">
+        <h2>Crie uma conta</h2>
+        <form id="signupForm">
+            <div class="form-group">
+                <label for="name">Nome:</label>
+                <input type="text" id="name" name="name" required />
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required />
+            </div>
+
+            <div class="form-group">
+                <label for="password">Senha:</label>
+                <input type="password" id="password" name="password" required />
+            </div>
+
+            <div class="form-group">
+                <label for="confirmPassword">Confirmar Senha:</label> <!-- Added Confirm Password -->
+                <input type="password" id="confirmPassword" name="confirmPassword" required />
+            </div>
+
+            <div class="form-group">
+                <label for="address">Endereço:</label>
+                <input type="text" id="address" name="address" required />
+            </div>
+
+            <div class="form-group">
+                <label>Tipo de conta:</label>
+                <div class="toggle-container">
+                    <span class="label">Consumidor</span>
+                    <label class="switch">
+                        <input type="checkbox" id="accountTypeToggle">
+                        <span class="slider round"></span>
+                    </label>
+                    <span class="label">Vendedor</span>
+                </div>
+            </div>
+
+            <button type="submit" class="button">Sign Up</button><br><br>
+            <button class="button light-blue-button" onclick="location.href='/login.html'" type="button">Já tem uma conta? Log in</button>
+
+        </form>
+    </div>
+
+    <!-- Custom Message Box for Success/Error - Uses app-modal classes -->
+    <div id="messageBoxOverlay" class="app-modal-overlay hidden">
+        <div class="app-modal-content">
+            <h2 id="messageBoxTitle" class="app-modal-title"></h2>
+            <p id="messageBoxMessage" class="app-modal-message"></p>
+            <div class="app-modal-actions">
+                <button id="messageBoxCloseBtn" class="button">OK</button>
+            </div>
         </div>
+    </div>
 
-        <div class="form-group">
-            <label for="email">Email Address:</label>
-            <input type="email" id="email" name="email" required />
-        </div>
+    <script>
+        // Custom message box functions (re-used from other pages)
+        const messageBoxOverlay = document.getElementById('messageBoxOverlay');
+        const messageBoxTitle = document.getElementById('messageBoxTitle');
+        const messageBoxMessage = document.getElementById('messageBoxMessage');
+        const messageBoxCloseBtn = document.getElementById('messageBoxCloseBtn');
 
-        <div class="form-group">
-            <label for="password">Password:</label>
-            <input type="password" id="password" name="password" required />
-        </div>
+        function showCustomMessageBox(title, message, isSuccess = true) {
+            messageBoxTitle.textContent = title;
+            messageBoxMessage.textContent = message;
+            // Apply colors based on success/error
+            messageBoxTitle.style.color = isSuccess ? '#00a650' : '#dc3545'; // Green for success, red for error
+            messageBoxCloseBtn.style.backgroundColor = isSuccess ? '#3483fa' : '#6c757d'; // Blue for success, grey for error
 
-        <div class="form-group">
-            <label for="address">Address:</label>
-            <input type="text" id="address" name="address" required />
-        </div>
+            messageBoxOverlay.classList.remove('hidden');
+        }
 
-        <div class="form-group">
-        <label>Account Type:</label>
-        <div class="toggle-container">
-            <span class="label consumer-label">Consumer</span>
-            <label class="switch">
-            <input type="checkbox" id="accountTypeToggle" data-on-value="seller" data-off-value="consumer" checked>
-            <span class="slider round"></span>
-            </label>
-            <span class="label seller-label">Seller</span>
-        </div>
-        </div>
+        if (messageBoxCloseBtn) {
+            messageBoxCloseBtn.addEventListener('click', () => {
+                messageBoxOverlay.classList.add('hidden');
+            });
+        }
 
-      <button type="submit" class="button">Sign Up</button><br><br>
-      <a class="login-link" href="/login">Already have an account? Log in</a>
-    </form>
-  </div>
+        document.addEventListener('DOMContentLoaded', () => {
+            const signupForm = document.getElementById('signupForm');
+            const accountTypeToggle = document.getElementById('accountTypeToggle');
 
+            if (signupForm) {
+                signupForm.addEventListener('submit', async (event) => {
+                    event.preventDefault(); // Prevent default form submission
+
+                    const name = document.getElementById('name').value;
+                    const email = document.getElementById('email').value;
+                    const password = document.getElementById('password').value;
+                    const confirmPassword = document.getElementById('confirmPassword').value;
+                    const address = document.getElementById('address').value;
+                    
+                    // Determine the 'type' string based on the toggle state
+                    const userType = accountTypeToggle.checked ? "seller" : "consumer"; 
+
+                    if (password !== confirmPassword) {
+                        showCustomMessageBox('Erro de Registro', 'As senhas não coincidem.', false);
+                        return;
+                    }
+
+                    const userData = {
+                        name: name,
+                        email: email,
+                        password: password,
+                        address: address,
+                        type: userType // <--- CRUCIAL CHANGE: Send 'type' instead of 'isSeller'
+                    };
+
+                    console.log("FRONTEND: signup.html: User data being sent:", userData);
+
+                    try {
+                        const response = await fetch('/users/register', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json' // Crucial: Specify JSON content type
+                            },
+                            body: JSON.stringify(userData) // Convert JavaScript object to JSON string
+                        });
+
+                        if (response.ok) {
+                            console.log("FRONTEND: signup.html: Usuário registrado com sucesso!");
+                            showCustomMessageBox('Registro Concluído!', 'Usuário registrado com sucesso. Você já pode fazer login.', true);
+                            signupForm.reset(); // Clear the form
+                            // Optionally redirect after a short delay
+                            // setTimeout(() => {
+                            //     window.location.href = '/login.html';
+                            // }, 2000);
+                        } else {
+                            const errorText = await response.text();
+                            let errorMessage = `Erro: ${response.status} ${response.statusText}`;
+                            try {
+                                const errorJson = JSON.parse(errorText);
+                                errorMessage = `Erro: ${errorJson.message || errorJson.error || JSON.stringify(errorJson)}`;
+                            } catch (e) {
+                                errorMessage = `Erro: ${errorText}`; // Fallback to raw text if not JSON
+                            }
+                            console.error("FRONTEND: signup.html: Falha no registro. Status:", response.status, "Erro:", errorText);
+                            showCustomMessageBox('Falha no Registro', errorMessage, false);
+                        }
+                    } catch (error) {
+                        console.error("FRONTEND: signup.html: Erro de rede ou inesperado durante o registro:", error);
+                        showCustomMessageBox('Erro de Rede', `Ocorreu um erro inesperado: ${error.message}`, false);
+                    }
+                });
+            } else {
+                console.error("FRONTEND: signup.html: signupForm element not found.");
+            }
+        });
+    </script>
 </body>
+
 </html>

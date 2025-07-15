@@ -1,18 +1,17 @@
 GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
 Prototype,com.meli.dto,UserRequestDTO,38,0,0,0,11,0,11,0,11,0
-Prototype,com.meli.dto,BuyRequestDTO,19,0,0,0,8,0,4,0,4,0
-Prototype,com.meli,PrototypeApplication,12,0,0,0,4,0,3,0,3,0
+Prototype,com.meli.dto,BuyRequestDTO,26,0,0,0,12,0,6,0,6,0
+Prototype,com.meli.dto,LoginRequestDTO,26,0,0,0,12,0,6,0,6,0
+Prototype,com.meli,PrototypeApplication,17,0,0,0,5,0,3,0,3,0
 Prototype,com.meli.repository,UserRepository.new TypeReference() {...},3,0,0,0,1,0,1,0,1,0
 Prototype,com.meli.repository,ProductRepository.new TypeReference() {...},6,0,0,0,1,0,1,0,1,0
 Prototype,com.meli.repository,ProductRepository,508,0,40,0,107,0,31,0,11,0
 Prototype,com.meli.repository,UserRepository,115,0,8,0,25,0,14,0,10,0
-Prototype,com.meli.model,Consumer,24,0,0,0,7,0,4,0,4,0
-Prototype,com.meli.model,Product,95,0,4,0,26,0,19,0,17,0
-Prototype,com.meli.model,User,38,0,0,0,16,0,11,0,11,0
-Prototype,com.meli.model,Product.TagsDeserializer,88,0,16,0,21,0,11,0,3,0
-Prototype,com.meli.model,Product.TagsSerializer,20,0,4,0,6,0,4,0,2,0
-Prototype,com.meli.model,Seller,35,0,0,0,12,0,6,0,6,0
-Prototype,com.meli.controller,ProductController,64,0,0,0,17,0,7,0,7,0
-Prototype,com.meli.controller,UserController,68,0,6,0,21,0,9,0,6,0
-Prototype,com.meli.service,ProductService,301,0,22,0,74,0,21,0,10,0
-Prototype,com.meli.service,UserService,168,0,8,0,41,0,16,0,12,0
+Prototype,com.meli.model,Consumer,52,0,0,0,13,0,7,0,7,0
+Prototype,com.meli.model,Product,96,0,0,0,40,0,20,0,20,0
+Prototype,com.meli.model,User,53,0,0,0,23,0,12,0,12,0
+Prototype,com.meli.model,Seller,86,0,2,0,21,0,11,0,10,0
+Prototype,com.meli.controller,ProductController,350,0,42,0,81,0,31,0,10,0
+Prototype,com.meli.controller,UserController,92,0,10,0,26,0,12,0,7,0
+Prototype,com.meli.service,ProductService,393,0,28,0,86,0,27,0,13,0
+Prototype,com.meli.service,UserService,263,0,12,0,66,0,19,0,13,0

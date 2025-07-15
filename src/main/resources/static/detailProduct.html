@@ -1,95 +1,147 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Detalhes do Produto</title>
-  <link rel="stylesheet" type="text/css" href="/css/page.css">
-    <!-- Font Awesome for icons - for login icon-->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <!-- Link to the header.js script -->
-    <script src="header.js" defer></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Detalhes do Produto</title>
+  <link rel="stylesheet" type="text/css" href="/css/page.css">
+    <!-- Font Awesome for icons - for login icon-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Link to the header.js script -->
+    <script src="header.js" defer></script>
 </head>
 
 <body data-title="Products" data-show-profile-icon="true">
-  <div id="header-placeholder"></div>
+  <div id="header-placeholder"></div>
 
-  <div class="product-detail" id="productDetail">
-    <p>Carregando produto...</p>
-  </div>
+  <div class="product-detail" id="productDetail">
+    <p>Carregando produto...</p>
+  </div>
 
-  <script>
-    function getQueryParam(name) {
-      const params = new URLSearchParams(window.location.search);
-      return params.get(name);
+  <script>
+    function getQueryParam(name) {
+      const params = new URLSearchParams(window.location.search);
+      return params.get(name);
+    }
+
+    const productId = getQueryParam("id");
+    const url = `/products/${productId}`;
+
+    let currentProductData = null; // Variável para armazenar os dados do produto
+
+    fetch(url)
+      .then(response => {
+        if (!response.ok) throw new Error("Produto não encontrado");
+        return response.json();
+      })
+      .then(product => {
+        currentProductData = product; // Armazena os dados do produto
+
+        const container = document.getElementById("productDetail");
+        const imageUrl = product.imageUrl || 'https://placehold.co/600x400?text=Sem+Imagem';
+
+        container.innerHTML = `
+            <div class="product-image-section">
+                <img src="${imageUrl}" alt="${product.title}" onerror="this.onerror=null;this.src='https://placehold.co/600x400/cccccc/333333?text=Imagem+Nao+Encontrada';"><br><br>
+                <div class="product-meta-details">
+                    <div class="brand"><label>Marca:</label> ${product.brand || 'Desconhecida'}</div><br>
+                    <div class="description"><label>Descrição:</label><br> ${product.description || 'Sem descrição disponível.'}</div>
+                </div>
+            </div>
+            <div class="info-and-purchase-card"> <!-- This is the inner card -->
+                <div class="product-main-info"> <!-- Group for title, price, stock -->
+                    <div class="title">${product.title}</div>
+                    <div class="price">R$ ${product.price.toFixed(2)}</div>
+                    <div class="stock-info">Em estoque: <span id="stock">${product.stock}</span></div>
+                </div>
+                <div class="purchase-box">
+                    <label for="quantity">Quantity:</label>
+                    <input type="number" id="quantity" value="1" min="1" max="${product.stock}"/>
+                    <button class="button" id="buy-button">Comprar</button>
+                    <button class="button light-blue-button" id="addToCartButton">Adicionar ao carrinho</button>
+                </div>
+                <p id="buy-message" style="color: green;"></p>
+                <a href="/home.html" class="back-link">← Voltar para lista</a>
+            </div>
+        `;
+
+        // Event listener for "Comprar" button
+        document.getElementById('buy-button').addEventListener('click', async () => {
+          const quantity = parseInt(document.getElementById('quantity').value);
+          const resMessage = document.getElementById('buy-message');
+
+          const response = await fetch(`/products/${productId}/buy`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ quantity })
+          });
+
+          if (response.ok) {
+            const updatedProduct = await response.json();
+            resMessage.textContent = "Compra realizada com sucesso!";
+            resMessage.style.color = "green";
+            document.getElementById('stock').textContent = updatedProduct.stock;
+            document.getElementById('quantity').max = updatedProduct.stock;
+          } else {
+            const errorText = await response.text();
+            resMessage.textContent = errorText || "Erro ao realizar compra.";
+            resMessage.style.color = "red";
+          }
+        });
+
+        // Add event listener for "Adicionar ao carrinho" button
+        const addToCartButton = document.getElementById('addToCartButton');
+        if (addToCartButton) {
+            addToCartButton.addEventListener('click', () => {
+                handleAddToCart(currentProductData); 
+            });
+        } else {
+            console.error("FRONTEND: detailProduct.html: Botão 'Adicionar ao carrinho' não encontrado após renderização.");
+        }
+
+      })
+      .catch(error => {
+        document.getElementById("productDetail").innerHTML = `<p>${error.message}</p>`;
+      });
+
+    async function handleAddToCart(product) {
+        if (!window.loggedInUserId) {
+            alert('Você precisa estar logado para adicionar produtos ao carrinho.');
+            window.location.href = '/login.html';
+            return;
+        }
+
+        let cartItems = JSON.parse(sessionStorage.getItem('cartItems')) || [];
+        console.log("DEBUG: detailProduct.html: Cart items BEFORE adding:", JSON.stringify(cartItems, null, 2));
+
+        const existingItemIndex = cartItems.findIndex(item => item.id === product.id);
+        const quantityInput = document.getElementById('quantity');
+        const quantityToAdd = parseInt(quantityInput ? quantityInput.value : 1) || 1;
+
+        if (existingItemIndex > -1) {
+            cartItems[existingItemIndex].quantity = (cartItems[existingItemIndex].quantity || 0) + quantityToAdd;
+            console.log(`DEBUG: detailProduct.html: Updated quantity for product ${product.id} to ${cartItems[existingItemIndex].quantity}.`);
+        } else {
+            cartItems.push({
+                id: product.id,
+                title: product.title,
+                imageUrl: product.imageUrl,
+                price: product.price,
+                stock: product.stock,
+                quantity: quantityToAdd,
+                isFull: true,
+                isPreSelected: true
+            });
+            console.log(`DEBUG: detailProduct.html: Added new product ${product.id} with quantity ${quantityToAdd}.`);
+        }
+
+        sessionStorage.setItem('cartItems', JSON.stringify(cartItems));
+        console.log("DEBUG: detailProduct.html: Cart items AFTER adding and saving:", JSON.stringify(cartItems, null, 2));
+
+        alert('Produto adicionado ao carrinho!');
+        window.location.href = '/cart.html';
     }
-
-    const productId = getQueryParam("id");
-    const url = `/products/${productId}`;
-
-    fetch(url)
-      .then(response => {
-        if (!response.ok) throw new Error("Produto não encontrado");
-        return response.json();
-      })
-      .then(product => {
-        const container = document.getElementById("productDetail");
-        const imageUrl = product.imageUrl || 'https://placehold.co/600x400?text=Sem+Imagem';
-
-        container.innerHTML = `
-            <div class="product-image-section">
-                <img src="${imageUrl}" alt="${product.title}" onerror="this.onerror=null;this.src='https://placehold.co/600x400/cccccc/333333?text=Imagem+Nao+Encontrada';"><br><br>
-                <div class="product-meta-details">
-                    <div class="brand"><label>Marca:</label> ${product.brand || 'Desconhecida'}</div><br>
-                    <div class="description"><label>Descrição:</label><br> ${product.description || 'Sem descrição disponível.'}</div>
-                </div>
-            </div>
-            <div class="info-and-purchase-card"> <!-- This is the inner card -->
-                <div class="product-main-info"> <!-- Group for title, price, stock -->
-                    <div class="title">${product.title}</div>
-                    <div class="price">R$ ${product.price.toFixed(2)}</div>
-                    <div class="stock-info">Em estoque: <span id="stock">${product.stock}</span></div>
-                </div>
-                <div class="purchase-box">
-                    <label for="quantity">Quantity:</label>
-                    <input type="number" id="quantity" value="1" min="1" max="${product.stock}"/>
-                    <button class="button" id="buy-button">Comprar</button>
-                    <button class="button light-blue-button">Adicionar ao carrinho</button>
-                </div>
-                <p id="buy-message" style="color: green;"></p>
-                <a href="/home.html" class="back-link">← Voltar para lista</a>
-            </div>
-        `;
-
-        // Event listener needs to be re-attached after innerHTML update
-        document.getElementById('buy-button').addEventListener('click', async () => {
-          const quantity = parseInt(document.getElementById('quantity').value);
-          const resMessage = document.getElementById('buy-message');
-
-          const response = await fetch(`/products/${productId}/buy`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ quantity })
-          });
-
-          if (response.ok) {
-            const updatedProduct = await response.json();
-            resMessage.textContent = "Compra realizada com sucesso!";
-            resMessage.style.color = "green";
-            document.getElementById('stock').textContent = updatedProduct.stock;
-            document.getElementById('quantity').max = updatedProduct.stock;
-          } else {
-            const errorText = await response.text();
-            resMessage.textContent = errorText || "Erro ao realizar compra.";
-            resMessage.style.color = "red";
-          }
-        });
-      })
-      .catch(error => {
-        document.getElementById("productDetail").innerHTML = `<p>${error.message}</p>`;
-      });
-
-  </script>
+  </script>
 
 </body>
 </html>

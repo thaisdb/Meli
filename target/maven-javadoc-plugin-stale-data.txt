@@ -34,6 +34,7 @@ com.meli.service
 'C:/Users/thaisdb/Desktop/Code/prototype/src/main/java/com/meli/controller/ProductController.java'
 'C:/Users/thaisdb/Desktop/Code/prototype/src/main/java/com/meli/controller/UserController.java'
 'C:/Users/thaisdb/Desktop/Code/prototype/src/main/java/com/meli/dto/BuyRequestDTO.java'
+'C:/Users/thaisdb/Desktop/Code/prototype/src/main/java/com/meli/dto/LoginRequestDTO.java'
 'C:/Users/thaisdb/Desktop/Code/prototype/src/main/java/com/meli/dto/UserRequestDTO.java'
 'C:/Users/thaisdb/Desktop/Code/prototype/src/main/java/com/meli/model/Consumer.java'
 'C:/Users/thaisdb/Desktop/Code/prototype/src/main/java/com/meli/model/Product.java'
@@ -84,18 +85,18 @@ C:\Users\thaisdb\.m2\repository\jakarta\validation\jakarta.validation-api\3.0.2\
 C:\Users\thaisdb\.m2\repository\org\jboss\logging\jboss-logging\3.5.3.Final\jboss-logging-3.5.3.Final.jar = 1752012457815
 C:\Users\thaisdb\.m2\repository\com\fasterxml\classmate\1.6.0\classmate-1.6.0.jar = 1752408612956
 C:\Users\thaisdb\Desktop\Code\prototype\src\main\java = 1752012224297
-C:\Users\thaisdb\Desktop\Code\prototype\target\generated-sources\annotations = 1752592046510
-C:\Users\thaisdb\Desktop\Code\prototype\target\site\apidocs\allclasses-index.html = 1752592055736
-C:\Users\thaisdb\Desktop\Code\prototype\target\site\apidocs\allpackages-index.html = 1752592055738
-C:\Users\thaisdb\Desktop\Code\prototype\target\site\apidocs\element-list = 1752592055542
-C:\Users\thaisdb\Desktop\Code\prototype\target\site\apidocs\help-doc.html = 1752592055771
-C:\Users\thaisdb\Desktop\Code\prototype\target\site\apidocs\index-all.html = 1752592055763
-C:\Users\thaisdb\Desktop\Code\prototype\target\site\apidocs\index.html = 1752592055719
-C:\Users\thaisdb\Desktop\Code\prototype\target\site\apidocs\member-search-index.js = 1752592055747
-C:\Users\thaisdb\Desktop\Code\prototype\target\site\apidocs\module-search-index.js = 1752592055740
-C:\Users\thaisdb\Desktop\Code\prototype\target\site\apidocs\overview-summary.html = 1752592055768
-C:\Users\thaisdb\Desktop\Code\prototype\target\site\apidocs\overview-tree.html = 1752592055713
-C:\Users\thaisdb\Desktop\Code\prototype\target\site\apidocs\package-search-index.js = 1752592055740
-C:\Users\thaisdb\Desktop\Code\prototype\target\site\apidocs\search.html = 1752592055765
-C:\Users\thaisdb\Desktop\Code\prototype\target\site\apidocs\tag-search-index.js = 1752592055748
-C:\Users\thaisdb\Desktop\Code\prototype\target\site\apidocs\type-search-index.js = 1752592055741
+C:\Users\thaisdb\Desktop\Code\prototype\target\generated-sources\annotations = 1752619542455
+C:\Users\thaisdb\Desktop\Code\prototype\target\site\apidocs\allclasses-index.html = 1752619548208
+C:\Users\thaisdb\Desktop\Code\prototype\target\site\apidocs\allpackages-index.html = 1752619548212
+C:\Users\thaisdb\Desktop\Code\prototype\target\site\apidocs\element-list = 1752619548043
+C:\Users\thaisdb\Desktop\Code\prototype\target\site\apidocs\help-doc.html = 1752619548246
+C:\Users\thaisdb\Desktop\Code\prototype\target\site\apidocs\index-all.html = 1752619548238
+C:\Users\thaisdb\Desktop\Code\prototype\target\site\apidocs\index.html = 1752619548188
+C:\Users\thaisdb\Desktop\Code\prototype\target\site\apidocs\member-search-index.js = 1752619548222
+C:\Users\thaisdb\Desktop\Code\prototype\target\site\apidocs\module-search-index.js = 1752619548214
+C:\Users\thaisdb\Desktop\Code\prototype\target\site\apidocs\overview-summary.html = 1752619548242
+C:\Users\thaisdb\Desktop\Code\prototype\target\site\apidocs\overview-tree.html = 1752619548182
+C:\Users\thaisdb\Desktop\Code\prototype\target\site\apidocs\package-search-index.js = 1752619548215
+C:\Users\thaisdb\Desktop\Code\prototype\target\site\apidocs\search.html = 1752619548239
+C:\Users\thaisdb\Desktop\Code\prototype\target\site\apidocs\tag-search-index.js = 1752619548222
+C:\Users\thaisdb\Desktop\Code\prototype\target\site\apidocs\type-search-index.js = 1752619548217

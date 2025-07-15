@@ -1,0 +1,25 @@
+[ {
+  "id" : 1,
+  "name" : "consu",
+  "email" : "consu@email",
+  "password" : "senha",
+  "address" : "rua",
+  "cart" : { },
+  "type" : "consumer"
+}, {
+  "id" : 2,
+  "name" : "vend",
+  "email" : "vend@email",
+  "password" : "senha",
+  "address" : "bairro",
+  "walletBalance" : 0.0,
+  "type" : "seller"
+}, {
+  "id" : 3,
+  "name" : "seller2",
+  "email" : "seller2@email",
+  "password" : "senha",
+  "address" : "rua",
+  "walletBalance" : 0.0,
+  "type" : "seller"
+} ]

@@ -1,20 +1,48 @@
 <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pt"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Consumer.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Prototype</a> &gt; <a href="index.source.html" class="el_package">com.meli.model</a> &gt; <span class="el_source">Consumer.java</span></div><h1>Consumer.java</h1><pre class="source lang-java linenums">package com.meli.model;
 
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.util.HashMap;
+import java.util.Map; // Import Map interface
 
+@JsonTypeName(&quot;consumer&quot;) // This links to the &quot;consumer&quot; type in User's JsonSubTypes
+public class Consumer extends User {
 
-<span class="nc" id="L6">public class Consumer extends User {</span>
-    /* HashMap&lt;Product, quantity&gt; cart */
-    
-<span class="nc" id="L9">    private HashMap&lt;Product, Integer&gt; cart = new HashMap&lt;&gt;();</span>
-    public HashMap&lt;Product, Integer&gt; getCart() {
-<span class="nc" id="L11">        return cart;</span>
+    // Corrected: Using HashMap&lt;Integer, Integer&gt; for cart
+<span class="nc" id="L11">    private Map&lt;Integer, Integer&gt; cart = new HashMap&lt;&gt;();</span>
+
+    // No-argument constructor is essential for Jackson deserialization
+    public Consumer() {
+<span class="nc" id="L15">        super(); // Call the no-arg constructor of the User superclass</span>
+<span class="nc" id="L16">    }</span>
+
+    // Parameterized constructor for convenience
+    public Consumer(String name, String email, String password, String address) {
+<span class="nc" id="L20">        super(name, email, password, address);</span>
+<span class="nc" id="L21">    }</span>
+
+    // Getter for cart
+    public Map&lt;Integer, Integer&gt; getCart() {
+<span class="nc" id="L25">        return cart;</span>
     }
-    public void insertIntoCart(Product product, Integer quantity) {
-<span class="nc" id="L14">        this.cart.put(product, quantity);</span>
-<span class="nc" id="L15">    }</span>
-    public void removeFromCart(Product product) {
-<span class="nc" id="L17">        this.cart.remove(product);</span>
-<span class="nc" id="L18">    }</span>
+
+    // Setter for cart
+    public void setCart(Map&lt;Integer, Integer&gt; cart) {
+<span class="nc" id="L30">        this.cart = cart;</span>
+<span class="nc" id="L31">    }</span>
+
+    // Methods to manage cart (using Integer productId)
+    public void addProductToCart(Integer productId, int quantity) {
+<span class="nc" id="L35">        this.cart.put(productId, this.cart.getOrDefault(productId, 0) + quantity);</span>
+<span class="nc" id="L36">    }</span>
+
+    public void removeProductFromCart(Integer productId) {
+<span class="nc" id="L39">        this.cart.remove(productId);</span>
+<span class="nc" id="L40">    }</span>
+
+    @Override // IMPORTANT: This annotation tells the compiler we are overriding a superclass method
+    public String getType() {
+<span class="nc" id="L44">        return &quot;consumer&quot;;</span>
+    }
+
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

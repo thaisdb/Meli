@@ -5,17 +5,19 @@
   "description" : "The iPhone 16 features a 6.1-inch OLED display, an A18 chip, and an advanced dual-camera system with a 48MP Fusion camera. It also boasts a new ultrawide camera with a wider aperture and automatic focus. The phone has a durable aerospace-grade aluminum enclosure and a color-infused glass back. It also includes a new internal design for improved heat dissipation. ",
   "imageUrl" : "/images/Iphone.jpg",
   "brand" : "Apple",
-  "stock" : 247,
-  "tags" : [ "apple smartphone celular iphone" ]
+  "stock" : 235,
+  "tags" : [ "apple smartphone celular iphone" ],
+  "sellerId" : 2
 }, {
   "id" : 1,
   "title" : "Triologia Senhor dos Aneis edição de luxo",
   "price" : 990.1,
-  "description" : "Edição em Ingles; Uma suntuosa edição em capa dura do clássico conto épico de aventuras de Tolkien, totalmente ilustrado em cores pela primeira vez pelo próprio autor. Este volume de luxo é encadernado em quatro partes e inclui muitos recursos especiais exclusivos desta edição.  Desde sua primeira publicação em 1954, O Senhor dos Anéis tem sido um livro estimado por todos. Imerso em magia e sobrenatural incomparáveis, sua fantasia arrebatadora e aventura épica tocou os corações de jovens e adultos. Mais de 100 milhões de cópias de suas muitas edições foram vendidas em todo o mundo, e edições ocasionais de colecionadores tornam-se itens valiosos e valiosos de publicação.  Esta edição de capa dura em um volume contém o texto completo, totalmente corrigido e refeito, impresso em vermelho e preto e apresenta, pela primeira vez, trinta ilustrações coloridas, mapas e esboços desenhados pelo próprio Tolkien enquanto compunha esta obra épica. Entre elas, estão as páginas do Livro de Mazarbul, maravilhosos fac-símiles criados por Tolkien para acompanhar o famoso capítulo \"A Ponte de Khazad-dûm\". Também estão presentes dois mapas desdobráveis removíveis, desenhados por Christopher Tolkien, que revelam todos os detalhes da Terra-média.  Esta edição de luxo muito especial é encadernada em quatro partes, com nervuras em relevo na lombada e estampada em duas folhas. As páginas têm bordas douradas e contêm detalhes especiais exclusivos desta edição.",
+  "description" : "Edição em Ingles; Uma suntuosa edição em capa dura do clássico conto épico de aventuras de Tolkien, totalmente ilustrado em cores pela primeira vez pelo próprio autor. Este volume de luxo é encadernado em quatro partes e inclui muitos recursos especiais exclusivos desta edição.  Desde sua primeira publicação em 1954, O Senhor dos Anéis tem sido um livro estimado por todos. Imerso em magia e sobrenatural incomparáveis, sua fantasia arrebatadora e aventura épica tocou os corações de jovens e adultos. Mais de 100 milhões de cópias de suas muitas edições foram vendidas em todo o mundo, e edições ocasionais de colecionadores tornam-se itens valiosos e valiosos de publicação.  Esta edição de capa dura em um volume contém o texto completo, totalmente corrigido e refeito, impresso em vermelho e preto e apresenta, pela primeira vez, trinta ilustrações coloridas, mapas e esboços desenhados pelo próprio Tolkien enquanto compunha esta obra épica. Entre elas, estão as páginas do Livro de Mazarbul, maravilhosos fac-símiles criados por Tolkien para acompanhar o famoso capítulo \"A Ponte de Khazad-dûm\". Também estão presentes dois mapas desdobráveis removíveis, desenhados por Christopher Tolkien, que revelam todos os detalhes da Terra-média.  Esta edição de luxo muito especial é encadernada em quatro partes, com nervuras em relevo na lombada e estampada em duas folhas. As páginas têm bordas douradas e contêm detalhes especiais exclusivos desta edição.",
   "imageUrl" : "/images/Senhor dos Aneis de luxo.jpg",
   "brand" : "Editora ‏ : ‎ William Morrow & Company",
-  "stock" : 15,
-  "tags" : [ "ingles", "livro", "ediçao de luxo", "tolkien" ]
+  "stock" : 10,
+  "tags" : [ "ingles", "livro", "ediçao de luxo", "tolkien" ],
+  "sellerId" : 2
 }, {
   "id" : 5,
   "title" : "Dungeons and Dragons Player Handbook",
@@ -24,7 +26,8 @@
   "imageUrl" : "/images/DND2024.jpg",
   "brand" : "Editora: ‎Wizards of the Coast",
   "stock" : 20,
-  "tags" : [ "fantasia livro rpg dnd" ]
+  "tags" : [ "fantasia livro rpg dnd" ],
+  "sellerId" : 2
 }, {
   "id" : 8,
   "title" : "Dice Set",
@@ -32,8 +35,9 @@
   "description" : "Contem 1 dado de cada: d4, d6, d8, d10, d12 e d20",
   "imageUrl" : "/images/diceSet.webp",
   "brand" : "Homebrew",
-  "stock" : 14,
-  "tags" : [ "d20", "dice", "rpg", "dnd" ]
+  "stock" : 13,
+  "tags" : [ "d20", "dice", "rpg", "dnd" ],
+  "sellerId" : 2
 }, {
   "id" : 16,
   "title" : "Patinete",
@@ -42,7 +46,8 @@
   "imageUrl" : "/images/Patinete.png",
   "brand" : "Joog",
   "stock" : 32,
-  "tags" : [ "radical", "esporte", "brinquedo" ]
+  "tags" : [ "radical", "esporte", "brinquedo" ],
+  "sellerId" : 2
 }, {
   "id" : 27,
   "title" : "Copo Stanley",
@@ -51,5 +56,36 @@
   "imageUrl" : "/images/stanley.jpg",
   "brand" : "Stanley",
   "stock" : 32,
-  "tags" : [ "copo termico", "preto", "copo", "stanley", "termico" ]
+  "tags" : [ "copo termico", "preto", "copo", "stanley", "termico" ],
+  "sellerId" : 2
+}, {
+  "id" : 28,
+  "title" : "seller2product",
+  "price" : 10.2,
+  "description" : "",
+  "imageUrl" : "",
+  "brand" : "",
+  "stock" : 0,
+  "tags" : [ "newtag" ],
+  "sellerId" : 3
+}, {
+  "id" : 29,
+  "title" : "newProd",
+  "price" : 3.2,
+  "description" : null,
+  "imageUrl" : null,
+  "brand" : null,
+  "stock" : 0,
+  "tags" : [ "apple" ],
+  "sellerId" : 3
+}, {
+  "id" : 30,
+  "title" : "a",
+  "price" : 2.0,
+  "description" : null,
+  "imageUrl" : null,
+  "brand" : null,
+  "stock" : 0,
+  "tags" : [ ],
+  "sellerId" : 3
 } ]

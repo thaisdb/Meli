@@ -1,30 +1,17 @@
-/**
- * Centralized entry point that handles web requests ans responses
- */
 package com.meli.controller;
 
-import java.util.List;
-import java.util.Optional;
-
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
-
-import com.meli.dto.BuyRequestDTO;
 import com.meli.model.Product;
 import com.meli.service.ProductService;
+import com.meli.dto.BuyRequestDTO; // Agora com o campo 'id'
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.ArrayList;
 
 @RestController
-@RequestMapping("/products")
+@RequestMapping("/products") // Base path for all methods in this controller
 public class ProductController {
 
     private final ProductService productService;
@@ -33,74 +20,202 @@ public class ProductController {
         this.productService = productService;
     }
 
-    // This endpoint receives the 'tags' query parameter from the frontend
-    @GetMapping
-    public List<Product> getAllProducts(@RequestParam Optional<String> tags) {
-        System.out.println("BACKEND: ProductController.getAllProducts() called. Tags param: " + tags.orElse("N/A"));
-        // It delegates the filtering logic entirely to the ProductService
-        return productService.getAllProducts(tags);
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<Product> getProductById(@PathVariable("id") int id) {
-        // ProductService.getProductById now throws ResponseStatusException (HttpStatus.NOT_FOUND)
-        // if the product is not found. Spring will automatically translate this
-        // into an HTTP 404 response. No need for explicit if/else here.
-        Product product = productService.getProductById(id);
-        return ResponseEntity.ok(product); // Returns 200 OK with the product
-    }
-
-
-    @PostMapping
-    @ResponseStatus(HttpStatus.CREATED) // Returns HTTP 201 Created on success
-    public Product addProduct(@RequestBody Product product) {
-        // ProductService.addProduct now handles ID generation and saving
-        return productService.addProduct(product);
+    /**
+     * Get ALL products.
+     * GET /products
+     * This endpoint is for general viewing (e.g., home page).
+     */
+    @GetMapping // Maps to /products
+    public ResponseEntity<List<Product>> getAllProducts() {
+        System.out.println("DEBUG: ProductController - Fetching all products.");
+        List<Product> products = productService.getAllProducts();
+        products.removeIf(p -> p.getStock().equals(0));
+        return ResponseEntity.ok(products);
     }
 
     /**
-     * Put method used to update products
-     * * @param id product's unique id
-     * @param updatedProduct Product with updated information
-     * @return HTTP 200 OK with the updated product if successful,
-     * 404 Not Found if product ID is not found (handled by service throwing ResponseStatusException),
-     * or 500 Internal Server Error if persistence failed (handled by service throwing ResponseStatusException).
+     * Get products belonging to a specific seller.
+     * GET /products/seller/{sellerId}
      */
-    @PutMapping("/{id}")
-    public ResponseEntity<Product> updateProduct(@PathVariable int id, @RequestBody Product updatedProduct) {
-        // ProductService.updateProduct now returns the updated Product or throws
-        // ResponseStatusException (e.g., 404 NOT_FOUND or 500 INTERNAL_SERVER_ERROR).
-        // Spring will handle these exceptions automatically.
-        Product resultProduct = productService.updateProduct(id, updatedProduct);
-        return ResponseEntity.ok(resultProduct); // Returns 200 OK with the updated product
+    @GetMapping("/seller/{sellerId}") // Correctly mapped to /products/seller/{sellerId}
+    public ResponseEntity<List<Product>> getProductsBySeller(@PathVariable int sellerId) {
+        System.out.println("DEBUG: ProductController - Fetching products for sellerId: " + sellerId);
+        List<Product> products = productService.getProductsBySellerId(sellerId);
+        return ResponseEntity.ok(products);
     }
 
-    /*
-     * Why Post instead of Put:
-     * You're not just updating the product; you're performing a specific action (a "purchase") on it,
-     * which has its own logic and side effects:
-     * You're not replacing the entire product.
-     * The action is contextual: it depends on business logic (stock check, validation).
-     * You’re not sending the whole product, only a quantity — that's not a full update.
+    /**
+     * Get a single product by ID (no seller scope here, for general product viewing if needed)
+     * This can be used by consumers or for internal lookups.
+     * GET /products/{id}
      */
-    @PostMapping("/{id}/buy")
-    public ResponseEntity<?> buyProduct(@PathVariable int id, @RequestBody BuyRequestDTO request) {
-        try {
-            int quantity = request.getQuantity();
-            Product updated = productService.buyProduct(id, quantity);
-            return ResponseEntity.ok(updated); // Returns 200 OK with the updated product
-        } catch (IllegalArgumentException e) {
-            // This exception is for business validation (e.g., invalid quantity, insufficient stock)
-            return ResponseEntity.badRequest().body(e.getMessage()); // Returns 400 Bad Request
+    @GetMapping("/{id}")
+    public ResponseEntity<Product> getProductById(@PathVariable int id) {
+        Product product = productService.getProductById(id);
+        if (product != null) {
+            return ResponseEntity.ok(product);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
 
+    /**
+     * Add a new product.
+     * POST /products
+     * Requires X-User-Id header for validation.
+     */
+    @PostMapping
+    public ResponseEntity<?> addProduct(@RequestBody Product product,
+                                        @RequestHeader("X-User-Id") int loggedInUserId) {
+        // Validate that the sellerId in the product matches the logged-in user
+        if (product.getSellerId() != loggedInUserId) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                                 .body("Unauthorized: Product sellerId does not match logged-in user.");
+        }
+        Product createdProduct = productService.addProduct(product);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdProduct);
+    }
+
+    /**
+     * Update an existing product.
+     * PUT /products/{id}
+     * Requires X-User-Id header for validation.
+     */
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateProduct(@PathVariable int id,
+                                           @RequestBody Product product,
+                                           @RequestHeader("X-User-Id") int loggedInUserId) {
+        // First, check if the product exists and get its original sellerId
+        Product existingProduct = productService.getProductById(id);
+        if (existingProduct == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Product not found.");
+        }
+
+        // Validate that the logged-in user owns this product
+        if (existingProduct.getSellerId() != loggedInUserId) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                                 .body("Unauthorized: You do not own this product.");
+        }
+
+        // Ensure the ID and sellerId are not changed via the request body
+        product.setId(id); // Use path variable ID
+        product.setSellerId(existingProduct.getSellerId()); // Preserve original sellerId
+
+        Product updatedProduct = productService.updateProduct(id, product);
+        if (updatedProduct != null) {
+            return ResponseEntity.ok(updatedProduct);
+        } else {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to update product.");
+        }
+    }
+
+    /**
+     * Delete a product by ID.
+     * DELETE /products/{id}
+     * Requires X-User-Id header for validation.
+     */
     @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT) // Returns HTTP 204 No Content on successful deletion
-    public void deleteProduct(@PathVariable int id) {
-        // ProductService.deleteProductById now throws ResponseStatusException (HttpStatus.NOT_FOUND)
-        // if the product is not found. Spring will automatically translate this
-        // into an HTTP 404 response.
-        productService.deleteProductById(id);
+    public ResponseEntity<?> deleteProduct(@PathVariable int id,
+                                           @RequestHeader("X-User-Id") int loggedInUserId) {
+        // First, check if the product exists and get its original sellerId
+        Product existingProduct = productService.getProductById(id);
+        if (existingProduct == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Product not found.");
+        }
+
+        // Validate that the logged-in user owns this product
+        if (existingProduct.getSellerId() != loggedInUserId) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                                 .body("Unauthorized: You do not own this product.");
+        }
+
+        boolean deleted = productService.deleteProduct(id);
+        if (deleted) {
+            return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to delete product.");
+        }
+    }
+
+    /**
+     * Endpoint to handle a single product purchase (from detailProduct.html).
+     * POST /products/{id}/buy
+     * Receives the quantity to purchase using BuyRequestDTO.
+     */
+    @PostMapping("/{id}/buy")
+    public ResponseEntity<?> buyProduct(@PathVariable int id, @RequestBody BuyRequestDTO buyRequest) {
+        Integer quantity = buyRequest.getQuantity(); // Obter a quantidade do DTO
+        System.out.println("DEBUG: ProductController - Received buy request for product ID: " + id + ", quantity: " + quantity);
+
+        if (quantity == null || quantity <= 0) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid quantity provided.");
+        }
+
+        Product product = productService.getProductById(id);
+        if (product == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Product not found.");
+        }
+
+        if (product.getStock() == null || product.getStock() < quantity) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Insufficient stock for " + product.getTitle() + ". Available: " + product.getStock() + ", Requested: " + quantity + ".");
+        }
+
+        // Decrement stock
+        product.setStock(product.getStock() - quantity);
+        productService.updateProduct(id, product); // Use updateProduct to save the new stock
+        System.out.println("DEBUG: ProductController - Decremented stock for product " + product.getTitle() + " (ID: " + id + ") by " + quantity + ". New stock: " + product.getStock());
+
+        return ResponseEntity.ok(product); // Return the updated product
+    }
+
+
+    /**
+     * Endpoint to handle a bulk purchase (from cart.html).
+     * POST /products/purchase
+     * Receives a list of BuyRequestDTOs.
+     */
+    @PostMapping("/purchase")
+    public ResponseEntity<?> purchaseProducts(@RequestBody List<BuyRequestDTO> purchaseItems) { // Alterado para List<BuyRequestDTO>
+        System.out.println("DEBUG: ProductController - Received bulk purchase request for " + purchaseItems.size() + " items.");
+        List<String> errors = new ArrayList<>();
+
+        for (BuyRequestDTO item : purchaseItems) { // Iterar sobre BuyRequestDTO
+            try {
+                Integer productId = item.getId(); // Obter ID do DTO
+                Integer quantity = item.getQuantity(); // Obter quantidade do DTO
+
+                if (productId == null || quantity == null || quantity <= 0) {
+                    errors.add("Invalid item data: ID or quantity missing/invalid for an item.");
+                    continue;
+                }
+
+                Product product = productService.getProductById(productId);
+                if (product == null) {
+                    errors.add("Product with ID " + productId + " not found.");
+                    continue;
+                }
+
+                if (product.getStock() == null || product.getStock() < quantity) {
+                    errors.add("Insufficient stock for product " + product.getTitle() + " (ID: " + productId + "). Available: " + product.getStock() + ", Requested: " + quantity + ".");
+                    continue;
+                }
+
+                // Decrement stock
+                product.setStock(product.getStock() - quantity);
+                productService.updateProduct(productId, product); // Use updateProduct to save the new stock
+                System.out.println("DEBUG: ProductController - Decremented stock for product " + product.getTitle() + " (ID: " + productId + ") by " + quantity + ". New stock: " + product.getStock());
+
+            } catch (Exception e) {
+                errors.add("Error processing item: " + e.getMessage());
+                System.err.println("ERROR: ProductController - General error in bulk purchase: " + e.getMessage());
+                e.printStackTrace();
+            }
+        }
+
+        if (errors.isEmpty()) {
+            return ResponseEntity.ok("Purchase completed successfully.");
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
+        }
     }
 }

@@ -1,136 +1,149 @@
 package com.meli.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.type.CollectionType;
 import com.meli.model.Product;
-import com.meli.repository.ProductRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
-import org.springframework.http.HttpStatus;
 
-import java.util.Arrays;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
 public class ProductService {
+    private final String DATA_DIR = "data";
+    private final String DATA_FILE_PATH = DATA_DIR + File.separator + "products.json";
 
-    private final ProductRepository productRepository;
+    private List<Product> products = new ArrayList<>();
+    private final ObjectMapper mapper = new ObjectMapper();
 
-    @Autowired
-    public ProductService(ProductRepository productRepository) {
-        this.productRepository = productRepository;
-        System.out.println("BACKEND: ProductService: Initialized with ProductRepository.");
+    public ProductService() {
+        File dataDir = new File(DATA_DIR);
+        if (!dataDir.exists()) {
+            if (dataDir.mkdirs()) {
+                System.out.println("DEBUG: ProductService - Created data directory: " + dataDir.getAbsolutePath());
+            } else {
+                System.err.println("ERROR: ProductService - Failed to create data directory: " + dataDir.getAbsolutePath());
+            }
+        }
+        loadProducts();
     }
 
-// This method contains the core filtering logic
-    public List<Product> getAllProducts(Optional<String> tagsFilter) {
-        List<Product> allProducts = productRepository.getAll(); // Fetches all products initially
+    private void loadProducts() {
+        File file = new File(DATA_FILE_PATH);
+        System.out.println("DEBUG: ProductService.loadProducts - Attempting to load products from: " + file.getAbsolutePath());
+        System.out.println("DEBUG: ProductService.loadProducts - File exists: " + file.exists());
+        System.out.println("DEBUG: ProductService.loadProducts - File is readable: " + file.canRead());
+        System.out.println("DEBUG: ProductService.loadProducts - File size (bytes): " + file.length());
 
-        if (tagsFilter.isPresent() && !tagsFilter.get().trim().isEmpty()) {
-            // Process the incoming tags string (e.g., "smartphone apple")
-            Set<String> searchTags = Arrays.stream(tagsFilter.get().split(" "))
-                                           .map(String::trim)
-                                           .filter(tag -> !tag.isEmpty())
-                                           .map(String::toLowerCase)
-                                           .collect(Collectors.toSet());
 
-            if (searchTags.isEmpty()) {
-                // If after splitting and cleaning, no valid tags remain, return all products
-                return allProducts;
+        if (file.exists() && file.length() > 0) {
+            try {
+                CollectionType listType = mapper.getTypeFactory().constructCollectionType(List.class, Product.class);
+                products = mapper.readValue(file, listType);
+                System.out.println("DEBUG: ProductService.loadProducts - Successfully loaded " + products.size() + " products.");
+                if (products.isEmpty()) {
+                    System.out.println("DEBUG: ProductService.loadProducts - Loaded list is empty. This might indicate malformed JSON or an empty array in the file.");
+                } else {
+                    System.out.println("DEBUG: ProductService.loadProducts - First product in list (for verification): " + products.get(0).getTitle() + " (ID: " + products.get(0).getId() + ")");
+                }
+            } catch (IOException e) {
+                System.err.println("ERROR: ProductService.loadProducts - Failed to read or parse products.json: " + e.getMessage());
+                e.printStackTrace();
+                products = new ArrayList<>(); // Ensure it's an empty list if loading fails
             }
-
-            // Filter products based on whether any of their tags match the search tags
-            return allProducts.stream()
-                .filter(product -> {
-                    if (product.getTags() == null || product.getTags().isEmpty()) {
-                        return false; // Product has no tags, so it won't match
-                    }
-                    // Check if any of the product's tags are present in the searchTags set
-                    return product.getTags().stream()
-                                  .map(String::toLowerCase)
-                                  .anyMatch(searchTags::contains);
-                })
-                .collect(Collectors.toList());
+        } else {
+            System.out.println("DEBUG: ProductService.loadProducts - products.json not found or is empty. Starting with an empty product list in memory.");
+            products = new ArrayList<>(); // Explicitly ensure it's empty
         }
-        // If no tagsFilter is present or it's empty, return all products
-        return allProducts;
+    }
+
+    private synchronized void saveProducts() {
+        File file = new File(DATA_FILE_PATH);
+        System.out.println("DEBUG: ProductService.saveProducts - Attempting to save " + products.size() + " products to: " + file.getAbsolutePath());
+        try {
+            File parentDir = file.getParentFile();
+            if (parentDir != null && !parentDir.exists()) {
+                parentDir.mkdirs();
+            }
+            mapper.writerWithDefaultPrettyPrinter().writeValue(file, products);
+            System.out.println("DEBUG: ProductService.saveProducts - Products saved successfully.");
+        } catch (IOException e) {
+            System.err.println("ERROR: ProductService.saveProducts - Failed to save products to file: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    public List<Product> getAllProducts() {
+        System.out.println("DEBUG: ProductService.getAllProducts - Returning " + products.size() + " products.");
+        return new ArrayList<>(products);
+    }
+
+    public List<Product> getProductsBySellerId(int sellerId) {
+        System.out.println("DEBUG: ProductService.getProductsBySellerId - Filtering for sellerId: " + sellerId);
+        List<Product> filteredProducts = products.stream()
+                       .filter(p -> p.getSellerId() == sellerId)
+                       .collect(Collectors.toList());
+        System.out.println("DEBUG: ProductService.getProductsBySellerId - Found " + filteredProducts.size() + " products for sellerId: " + sellerId);
+        return filteredProducts;
     }
 
     public Product getProductById(int id) {
-        System.out.println("BACKEND: ProductService.getProductById() called for ID: " + id);
-        return productRepository.getById(id)
-                                .orElseThrow(() -> {
-                                    System.err.println("BACKEND: ProductService.getProductById(): Product ID " + id + " not found. Throwing 404.");
-                                    return new ResponseStatusException(HttpStatus.NOT_FOUND, "Product with ID " + id + " not found");
-                                });
+        System.out.println("DEBUG: ProductService.getProductById - Searching for product with ID: " + id);
+        Optional<Product> foundProduct = products.stream().filter(p -> p.getId() == id).findFirst();
+        if (foundProduct.isPresent()) {
+            System.out.println("DEBUG: ProductService.getProductById - Found product: " + foundProduct.get().getTitle());
+        } else {
+            System.out.println("DEBUG: ProductService.getProductById - Product with ID " + id + " not found.");
+        }
+        return foundProduct.orElse(null);
     }
 
     public Product addProduct(Product product) {
-        System.out.println("BACKEND: ProductService.addProduct() called for product: " + product.getTitle());
-        int newId = productRepository.getAll().stream()
-                                    .mapToInt(Product::getId)
-                                    .max()
-                                    .orElse(0) + 1;
+        int newId = generateNextId();
         product.setId(newId);
-        System.out.println("BACKEND: ProductService.addProduct(): Assigned new ID " + newId + " to product.");
-        return productRepository.save(product);
-    }
-
-    public void deleteProductById(int id) {
-        System.out.println("BACKEND: ProductService.deleteProductById() called for ID: " + id);
-        boolean deleted = productRepository.deleteById(id);
-        if (!deleted) {
-            System.err.println("BACKEND: ProductService.deleteProductById(): Product ID " + id + " not found by repository. Throwing 404.");
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Product with ID " + id + " not found for deletion.");
-        }
-        System.out.println("BACKEND: ProductService.deleteProductById(): Product ID " + id + " successfully deleted.");
-    }
-
-    public Product updateProduct(int id, Product updatedProductData) {
-        System.out.println("BACKEND: ProductService.updateProduct() called for ID: " + id);
-        Product existingProduct = getProductById(id); // This will throw 404 if not found
-
-        System.out.println("BACKEND: ProductService.updateProduct(): Found existing product for ID " + id + ". Merging data.");
-        existingProduct.setTitle(updatedProductData.getTitle());
-        existingProduct.setPrice(updatedProductData.getPrice());
-        existingProduct.setDescription(updatedProductData.getDescription());
-        existingProduct.setImageUrl(updatedProductData.getImageUrl());
-        existingProduct.setBrand(updatedProductData.getBrand());
-        existingProduct.setStock(updatedProductData.getStock());
-        existingProduct.setTags(updatedProductData.getTags());
-
-        boolean updated = productRepository.update(existingProduct);
-        if (!updated) {
-            System.err.println("BACKEND: ProductService.updateProduct(): Failed to persist update for ID " + id + " in repository. Throwing 500.");
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to persist product update for ID " + id);
-        }
-        System.out.println("BACKEND: ProductService.updateProduct(): Product ID " + id + " successfully updated.");
-        return existingProduct;
-    }
-
-    public Product buyProduct(int id, int quantity) {
-        System.out.println("BACKEND: ProductService.buyProduct() called for ID: " + id + ", Quantity: " + quantity);
-        Product product = getProductById(id);
-
-        if (quantity <= 0) {
-            System.err.println("BACKEND: ProductService.buyProduct(): Invalid quantity " + quantity + ". Throwing IllegalArgumentException.");
-            throw new IllegalArgumentException("buyProduct: Quantity must be positive.");
-        }
-        if (quantity > product.getStock()) {
-            System.err.println("BACKEND: ProductService.buyProduct(): Insufficient stock for ID " + id + ". Available: " + product.getStock() + ", Requested: " + quantity + ". Throwing IllegalArgumentException.");
-            throw new IllegalArgumentException("buyProduct: Insufficient stock. Available: " + product.getStock() + ", Requested: " + quantity);
-        }
-
-        product.setStock(product.getStock() - quantity);
-        System.out.println("BACKEND: ProductService.buyProduct(): Updated stock for ID " + id + " to " + product.getStock());
-        boolean updated = productRepository.update(product);
-        if (!updated) {
-            System.err.println("BACKEND: ProductService.buyProduct(): Failed to persist stock update for ID " + id + ". Throwing 500.");
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to persist stock update for ID " + id);
-        }
-        System.out.println("BACKEND: ProductService.buyProduct(): Stock updated and persisted for ID " + id + ".");
+        products.add(product);
+        saveProducts();
+        System.out.println("DEBUG: ProductService.addProduct - Added new product: " + product.getTitle() + " with ID: " + product.getId() + " for seller: " + product.getSellerId());
         return product;
+    }
+
+    public Product updateProduct(int id, Product updatedProduct) {
+        System.out.println("DEBUG: ProductService.updateProduct - Attempting to update product with ID: " + id);
+        for (int i = 0; i < products.size(); i++) {
+            if (products.get(i).getId() == id) {
+                updatedProduct.setId(id);
+                updatedProduct.setSellerId(products.get(i).getSellerId());
+
+                products.set(i, updatedProduct);
+                saveProducts();
+                System.out.println("DEBUG: ProductService.updateProduct - Product " + id + " updated successfully.");
+                return updatedProduct;
+            }
+        }
+        System.out.println("DEBUG: ProductService.updateProduct - Product with ID " + id + " not found for update.");
+        return null;
+    }
+
+    public boolean deleteProduct(int id) {
+        System.out.println("DEBUG: ProductService.deleteProduct - Attempting to delete product with ID: " + id);
+        boolean removed = products.removeIf(p -> p.getId() == id);
+        if (removed) {
+            saveProducts();
+            System.out.println("DEBUG: ProductService.deleteProduct - Product with ID " + id + " removed successfully.");
+        } else {
+            System.out.println("DEBUG: ProductService.deleteProduct - Product with ID " + id + " not found for deletion.");
+        }
+        return removed;
+    }
+
+    private int generateNextId() {
+        return products.stream()
+                .mapToInt(Product::getId)
+                .max()
+                .orElse(0) + 1;
     }
 }

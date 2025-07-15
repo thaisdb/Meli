@@ -2,7 +2,10 @@
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
+// Removed unused imports if any, like JsonTypeInfo if not directly used in the constructor
 import com.meli.model.User;
+import com.meli.model.Consumer; // Keep if you explicitly register subtypes, otherwise can remove
+import com.meli.model.Seller;   // Keep if you explicitly register subtypes, otherwise can remove
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -14,65 +17,84 @@ import java.util.List;
  * Encapsulates business logic related to User management
  * Handles loading/saving/registering/updating and searching users via Jackson
  * Delegate persistance to UserRepository
- * 
+ *
  */
 @Service
 public class UserService {
-<span class="nc" id="L21">    private final String DATA_FILE_PATH = &quot;data/users.json&quot;;</span>
-<span class="nc" id="L22">    private List&lt;User&gt; users = new ArrayList&lt;&gt;();</span>
-<span class="nc" id="L23">    private final ObjectMapper mapper = new ObjectMapper();</span>
+<span class="nc" id="L24">    private final String DATA_FILE_PATH = &quot;data/users.json&quot;;</span>
+<span class="nc" id="L25">    private List&lt;User&gt; users = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L26">    private final ObjectMapper mapper = new ObjectMapper();</span>
 
-<span class="nc" id="L25">    public UserService() {</span>
-<span class="nc" id="L26">        loadUsers();</span>
-<span class="nc" id="L27">    }</span>
+<span class="nc" id="L28">    public UserService() {</span>
+<span class="nc" id="L29">        loadUsers();</span>
+<span class="nc" id="L30">    }</span>
 
     private void loadUsers() {
-<span class="nc" id="L30">        System.out.println(&quot;Trying to load users from: &quot; + new File(DATA_FILE_PATH).getAbsolutePath());</span>
+<span class="nc" id="L33">        System.out.println(&quot;DEBUG: UserService.loadUsers - Trying to load users from: &quot; + new File(DATA_FILE_PATH).getAbsolutePath());</span>
         try {
-<span class="nc" id="L32">            File file = new File(DATA_FILE_PATH);</span>
-<span class="nc bnc" id="L33" title="All 2 branches missed.">            if (file.exists()) {</span>
-<span class="nc" id="L34">                CollectionType listType = mapper.getTypeFactory().constructCollectionType(List.class, User.class);</span>
-<span class="nc" id="L35">                users = mapper.readValue(file, listType);</span>
-<span class="nc" id="L36">            } else {</span>
-<span class="nc" id="L37">                System.out.println(&quot;No user file found. Starting with empty list.&quot;);</span>
-<span class="nc" id="L38">                users = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L35">            File file = new File(DATA_FILE_PATH);</span>
+<span class="nc bnc" id="L36" title="All 2 branches missed.">            if (file.exists()) {</span>
+<span class="nc" id="L37">                CollectionType listType = mapper.getTypeFactory().constructCollectionType(List.class, User.class);</span>
+<span class="nc" id="L38">                users = mapper.readValue(file, listType);</span>
+<span class="nc" id="L39">                System.out.println(&quot;DEBUG: UserService.loadUsers - Successfully loaded &quot; + users.size() + &quot; users.&quot;);</span>
+<span class="nc" id="L40">            } else {</span>
+<span class="nc" id="L41">                System.out.println(&quot;DEBUG: UserService.loadUsers - No user file found. Starting with empty list.&quot;);</span>
+<span class="nc" id="L42">                users = new ArrayList&lt;&gt;();</span>
             }
-<span class="nc" id="L40">        } catch (IOException e) {</span>
-<span class="nc" id="L41">            System.err.println(&quot;Failed to load users from file: &quot; + e.getMessage());</span>
-<span class="nc" id="L42">        }</span>
-<span class="nc" id="L43">    }</span>
+<span class="nc" id="L44">        } catch (IOException e) {</span>
+<span class="nc" id="L45">            System.err.println(&quot;ERROR: UserService.loadUsers - Failed to load users from file: &quot; + e.getMessage());</span>
+<span class="nc" id="L46">            e.printStackTrace(); // Print stack trace for detailed error info</span>
+<span class="nc" id="L47">        }</span>
+<span class="nc" id="L48">    }</span>
 
     private void saveUsers() {
+<span class="nc" id="L51">        System.out.println(&quot;DEBUG: UserService.saveUsers - Attempting to save &quot; + users.size() + &quot; users to file.&quot;);</span>
         try {
-<span class="nc" id="L47">            mapper.writerWithDefaultPrettyPrinter().writeValue(new File(DATA_FILE_PATH), users);</span>
-<span class="nc" id="L48">        } catch (IOException e) {</span>
-<span class="nc" id="L49">            System.err.println(&quot;Failed to save users to file: &quot; + e.getMessage());</span>
-<span class="nc" id="L50">        }</span>
-<span class="nc" id="L51">    }</span>
+<span class="nc" id="L53">            mapper.writerWithDefaultPrettyPrinter().writeValue(new File(DATA_FILE_PATH), users);</span>
+<span class="nc" id="L54">            System.out.println(&quot;DEBUG: UserService.saveUsers - Users saved successfully.&quot;);</span>
+<span class="nc" id="L55">        } catch (IOException e) {</span>
+<span class="nc" id="L56">            System.err.println(&quot;ERROR: UserService.saveUsers - Failed to save users to file: &quot; + e.getMessage());</span>
+<span class="nc" id="L57">            e.printStackTrace();</span>
+<span class="nc" id="L58">        }</span>
+<span class="nc" id="L59">    }</span>
 
     /**
      * Register a new user (assigns a unique ID and saves)
      */
     public User registerUser(User user) {
-<span class="nc" id="L57">        int newId = generateNextId();</span>
-<span class="nc" id="L58">        user.setId(newId);</span>
-<span class="nc" id="L59">        users.add(user);</span>
-<span class="nc" id="L60">        saveUsers();</span>
-<span class="nc" id="L61">        return user;</span>
+<span class="nc" id="L65">        int newId = generateNextId();</span>
+<span class="nc" id="L66">        user.setId(newId);</span>
+<span class="nc" id="L67">        users.add(user);</span>
+<span class="nc" id="L68">        saveUsers();</span>
+<span class="nc" id="L69">        System.out.println(&quot;DEBUG: UserService.registerUser - Registered new user: &quot; + user.getEmail() + &quot; with ID: &quot; + user.getId());</span>
+<span class="nc" id="L70">        return user;</span>
     }
 
     public List&lt;User&gt; getAllUsers() {
-<span class="nc" id="L65">        return users;</span>
+<span class="nc" id="L74">        return users;</span>
     }
 
     public User getUserById(int id) {
-<span class="nc bnc" id="L69" title="All 2 branches missed.">        return users.stream().filter(u -&gt; u.getId() == id).findFirst().orElse(null);</span>
+<span class="nc" id="L78">        System.out.println(&quot;DEBUG: UserService.getUserById - Searching for user with ID: &quot; + id);</span>
+<span class="nc bnc" id="L79" title="All 2 branches missed.">        User foundUser = users.stream().filter(u -&gt; u.getId() == id).findFirst().orElse(null);</span>
+<span class="nc bnc" id="L80" title="All 2 branches missed.">        if (foundUser != null) {</span>
+<span class="nc" id="L81">            System.out.println(&quot;DEBUG: UserService.getUserById - Found user: &quot; + foundUser.getEmail());</span>
+        } else {
+<span class="nc" id="L83">            System.out.println(&quot;DEBUG: UserService.getUserById - User with ID &quot; + id + &quot; not found.&quot;);</span>
+        }
+<span class="nc" id="L85">        return foundUser;</span>
     }
 
     public boolean deleteUserById(int id) {
-<span class="nc bnc" id="L73" title="All 2 branches missed.">        boolean removed = users.removeIf(u -&gt; u.getId() == id);</span>
-<span class="nc bnc" id="L74" title="All 2 branches missed.">        if (removed) saveUsers();</span>
-<span class="nc" id="L75">        return removed;</span>
+<span class="nc" id="L89">        System.out.println(&quot;DEBUG: UserService.deleteUserById - Attempting to delete user with ID: &quot; + id);</span>
+<span class="nc bnc" id="L90" title="All 2 branches missed.">        boolean removed = users.removeIf(u -&gt; u.getId() == id);</span>
+<span class="nc bnc" id="L91" title="All 2 branches missed.">        if (removed) {</span>
+<span class="nc" id="L92">            saveUsers();</span>
+<span class="nc" id="L93">            System.out.println(&quot;DEBUG: UserService.deleteUserById - User with ID &quot; + id + &quot; removed successfully.&quot;);</span>
+        } else {
+<span class="nc" id="L95">            System.out.println(&quot;DEBUG: UserService.deleteUserById - User with ID &quot; + id + &quot; not found for deletion.&quot;);</span>
+        }
+<span class="nc" id="L97">        return removed;</span>
     }
 
     /*
@@ -81,10 +103,17 @@ public class UserService {
      * @return User
      */
     public User findByEmail(String email) {
-<span class="nc" id="L84">        return users.stream()</span>
-<span class="nc" id="L85">                .filter(u -&gt; u.getEmail().equalsIgnoreCase(email))</span>
-<span class="nc" id="L86">                .findFirst()</span>
-<span class="nc" id="L87">                .orElse(null);</span>
+<span class="nc" id="L106">        System.out.println(&quot;DEBUG: UserService.findByEmail - Searching for email: '&quot; + email + &quot;'&quot;);</span>
+<span class="nc" id="L107">        User user = users.stream()</span>
+<span class="nc" id="L108">                .filter(u -&gt; u.getEmail().equalsIgnoreCase(email))</span>
+<span class="nc" id="L109">                .findFirst()</span>
+<span class="nc" id="L110">                .orElse(null);</span>
+<span class="nc bnc" id="L111" title="All 2 branches missed.">        if (user != null) {</span>
+<span class="nc" id="L112">            System.out.println(&quot;DEBUG: UserService.findByEmail - User found: &quot; + user.getEmail() + &quot; (ID: &quot; + user.getId() + &quot;)&quot;);</span>
+        } else {
+<span class="nc" id="L114">            System.out.println(&quot;DEBUG: UserService.findByEmail - User NOT found for email: '&quot; + email + &quot;'&quot;);</span>
+        }
+<span class="nc" id="L116">        return user;</span>
     }
 
     /*
@@ -92,10 +121,26 @@ public class UserService {
      * @return unique Id
      */
     private int generateNextId() {
-<span class="nc" id="L95">        return users.stream()</span>
-<span class="nc" id="L96">                .mapToInt(User::getId)</span>
-<span class="nc" id="L97">                .max()</span>
-<span class="nc" id="L98">                .orElse(0) + 1;</span>
+<span class="nc" id="L124">        return users.stream()</span>
+<span class="nc" id="L125">                .mapToInt(User::getId)</span>
+<span class="nc" id="L126">                .max()</span>
+<span class="nc" id="L127">                .orElse(0) + 1;</span>
+    }
+
+    /**
+     * Simulates password verification.
+     * In a real application, use a secure password encoder (e.g., BCryptPasswordEncoder).
+     *
+     * @param rawPassword The password entered by the user.
+     * @param storedPassword The password retrieved from the database.
+     * @return true if passwords match, false otherwise.
+     */
+    public boolean verifyPassword(String rawPassword, String storedPassword) {
+<span class="nc" id="L139">        System.out.println(&quot;DEBUG: UserService.verifyPassword - Raw Password: '&quot; + rawPassword + &quot;'&quot;);</span>
+<span class="nc" id="L140">        System.out.println(&quot;DEBUG: UserService.verifyPassword - Stored Password: '&quot; + storedPassword + &quot;'&quot;);</span>
+<span class="nc" id="L141">        boolean matches = rawPassword.equals(storedPassword);</span>
+<span class="nc" id="L142">        System.out.println(&quot;DEBUG: UserService.verifyPassword - Passwords Match: &quot; + matches);</span>
+<span class="nc" id="L143">        return matches;</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

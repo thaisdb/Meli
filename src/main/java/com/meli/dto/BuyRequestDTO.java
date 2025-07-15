@@ -1,8 +1,6 @@
 // package: com.meli.dto
 package com.meli.dto;
 
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotNull;
 /*
  * Data Transfer Object used to carry data between processes
  * Data -> Backend
@@ -10,18 +8,25 @@ import jakarta.validation.constraints.NotNull;
  * Shaped for the resquest, it helps decouple data model from external APIs
  */
 public class BuyRequestDTO {
-    @NotNull(message = "BuyRequestDTO: Quantidade é obrigatória.")
-    @Min(value = 1, message = "BuyRequestDTO: Quantidade deve ser pelo menos 1.")
-    private int quantity;
+    private Integer id;
+    private Integer quantity;
 
-    /*
-     * Default constructor used by Jackson
-     */
+    // Construtor sem argumentos para Jackson
     public BuyRequestDTO() {
     }
 
-    public BuyRequestDTO(Integer quantity) {
+    public BuyRequestDTO(Integer id, Integer quantity) {
+        this.id = id;
         this.quantity = quantity;
+    }
+
+    // Getters e Setters
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     public Integer getQuantity() {
