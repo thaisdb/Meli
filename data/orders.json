@@ -144,4 +144,18 @@
   "shippingCost" : 0.0,
   "paymentMethod" : "PIX",
   "status" : "PLACED"
+}, {
+  "id" : 11,
+  "consumerId" : 13,
+  "sellerId" : 2,
+  "products" : {
+    "2" : 1,
+    "27" : 1
+  },
+  "shippingAddress" : "endereço",
+  "sendersAddress" : "bairro",
+  "total" : 5160.99,
+  "shippingCost" : 0.0,
+  "paymentMethod" : "CREDITO",
+  "status" : "PLACED"
 } ]

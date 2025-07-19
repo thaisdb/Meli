@@ -1,5 +1,7 @@
 com\meli\repository\ProductRepository$1.class
+com\meli\service\CartService.class
 com\meli\service\OrderService.class
+com\meli\controller\CartController.class
 com\meli\repository\OrderRepository$1.class
 com\meli\model\Product.class
 com\meli\repository\ProductRepository.class

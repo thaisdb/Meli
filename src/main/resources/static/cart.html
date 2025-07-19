@@ -100,7 +100,7 @@
 
         /* Removed all shipping progress bar related styles */
 
-        /* Estilos para o Custom Message Box - COPIADOS DE detailProduct.html */
+        /* Estilos para o Custom Message Box */
         #messageBoxOverlay {
             position: fixed;
             top: 0;
@@ -112,7 +112,6 @@
             justify-content: center;
             align-items: center;
             z-index: 1000;
-            /* Garante que o body/html não interfira com o posicionamento fixo */
             margin: 0; 
             padding: 0;
         }
@@ -124,9 +123,8 @@
             text-align: center;
             max-width: 400px;
             width: 90%;
-            /* Adicionado para garantir que o modal não seja muito grande em telas pequenas */
             max-height: 90vh; 
-            overflow-y: auto; /* Adiciona scroll se o conteúdo for muito grande */
+            overflow-y: auto; 
         }
         .app-modal-title {
             font-size: 1.8em;
@@ -192,7 +190,6 @@
                     </div>
                     <div class="flex justify-between">
                         <span>Frete</span>
-                        <!-- REINTRODUZIDO: Elemento para exibir o custo de envio -->
                         <span class="font-semibold" id="shippingCost">R$ 0,00</span> 
                     </div>
                     <div class="flex justify-between items-center pt-3 border-t border-gray-200 font-bold text-lg">
@@ -204,11 +201,9 @@
                     <button id="continuePurchaseButton" class="w-full bg-blue-600 text-white py-3 rounded-md font-semibold hover:bg-blue-700 transition duration-300">
                         Finalizar a compra
                     </button>
-                    <!-- NOVO BOTÃO: Continuar Comprando -->
                     <button id="continueShoppingButton" class="w-full bg-white text-blue-600 border border-blue-600 py-3 rounded-md font-semibold hover:bg-blue-50 transition duration-300 mt-3">
                         Continuar comprando
                     </button>
-                    <!-- Empty Cart Button -->
                     <button id="emptyCartButton" class="w-full bg-red-500 text-white py-3 rounded-md font-semibold hover:bg-red-600 transition duration-300 mt-3">
                         Esvaziar Carrinho
                     </button>
@@ -235,19 +230,50 @@
         const messageBoxMessage = document.getElementById('messageBoxMessage');
         const messageBoxCloseBtn = document.getElementById('messageBoxCloseBtn');
 
-        function showCustomMessageBox(title, message, isSuccess = true) {
+        function showCustomMessageBox(title, message, isSuccess = true, showConfirm = false, onConfirm = null) {
             messageBoxTitle.textContent = title;
             messageBoxMessage.textContent = message;
             messageBoxTitle.style.color = isSuccess ? '#00a650' : '#dc3545'; 
             messageBoxCloseBtn.style.backgroundColor = isSuccess ? '#3483fa' : '#6c757d'; 
 
-            messageBoxOverlay.classList.remove('hidden');
-        }
+            // Clear previous action buttons
+            const appModalActions = document.querySelector('.app-modal-actions');
+            appModalActions.innerHTML = '';
 
-        if (messageBoxCloseBtn) {
-            messageBoxCloseBtn.addEventListener('click', () => {
-                messageBoxOverlay.classList.add('hidden');
-            });
+            if (showConfirm) {
+                const confirmBtn = document.createElement('button');
+                confirmBtn.id = 'messageBoxConfirmBtn';
+                confirmBtn.className = 'button';
+                confirmBtn.textContent = 'Sim';
+                confirmBtn.style.backgroundColor = '#dc3545'; // Red for confirm
+                confirmBtn.addEventListener('click', () => {
+                    if (onConfirm) onConfirm();
+                    messageBoxOverlay.classList.add('hidden');
+                });
+                appModalActions.appendChild(confirmBtn);
+
+                const cancelBtn = document.createElement('button');
+                cancelBtn.id = 'messageBoxCancelBtn';
+                cancelBtn.className = 'button';
+                cancelBtn.textContent = 'Não';
+                cancelBtn.style.backgroundColor = '#6c757d'; // Grey for cancel
+                cancelBtn.addEventListener('click', () => {
+                    messageBoxOverlay.classList.add('hidden');
+                });
+                appModalActions.appendChild(cancelBtn);
+            } else {
+                const okBtn = document.createElement('button');
+                okBtn.id = 'messageBoxCloseBtn';
+                okBtn.className = 'button';
+                okBtn.textContent = 'OK';
+                okBtn.style.backgroundColor = isSuccess ? '#3483fa' : '#6c757d';
+                okBtn.addEventListener('click', () => {
+                    messageBoxOverlay.classList.add('hidden');
+                });
+                appModalActions.appendChild(okBtn);
+            }
+
+            messageBoxOverlay.classList.remove('hidden');
         }
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -257,24 +283,60 @@
             const emptyCartButton = document.getElementById('emptyCartButton');
             const continueShoppingButton = document.getElementById('continueShoppingButton');
 
-            // Load cart items from sessionStorage
-            let cartItems = JSON.parse(sessionStorage.getItem('cartItems')) || [];
-            console.log("DEBUG: cart.html: Cart items loaded from sessionStorage:", JSON.stringify(cartItems, null, 2));
+            let cartItems = []; // Agora será preenchido pelo backend
+
+            const loggedInUserId = sessionStorage.getItem('loggedInUserId'); 
+            if (!loggedInUserId) {
+                showCustomMessageBox('Aviso', 'Você precisa estar logado para ver seu carrinho.', false);
+                // Opcional: redirecionar para a página de login
+                // window.location.href = '/login.html';
+                return;
+            }
+
+            // Função para buscar os itens do carrinho do backend
+            async function fetchCartItems() {
+                try {
+                    const response = await fetch('/cart', {
+                        method: 'GET',
+                        headers: {
+                            'X-User-Id': loggedInUserId 
+                        }
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        cartItems = data; // Atualiza a variável global com os dados do backend
+                        console.log("DEBUG: cart.html: Itens do carrinho carregados do backend:", JSON.stringify(cartItems, null, 2));
+                        renderCartItems();
+                    } else {
+                        const errorData = await response.json();
+                        const errorMessage = errorData.message || 'Erro desconhecido ao carregar o carrinho.';
+                        showCustomMessageBox('Erro ao Carregar Carrinho', errorMessage, false);
+                        cartItems = []; // Limpa o carrinho no frontend em caso de erro
+                        renderCartItems();
+                    }
+                } catch (error) {
+                    console.error("FRONTEND: cart.html: Erro de rede ao buscar o carrinho:", error);
+                    showCustomMessageBox('Erro de Conexão', 'Não foi possível conectar ao servidor para carregar o carrinho. Tente novamente.', false);
+                    cartItems = [];
+                    renderCartItems();
+                }
+            }
 
             function renderCartItems() {
-                cartProductList.innerHTML = ''; // Clear existing items
+                cartProductList.innerHTML = ''; // Limpa os itens existentes
 
                 if (cartItems.length === 0) {
                     cartProductList.innerHTML = '<p class="text-center text-gray-500 py-8">Seu carrinho está vazio.</p>';
                 }
 
                 cartItems.forEach(item => {
-                    console.log("DEBUG: cart.html: Rendering item:", JSON.stringify(item, null, 2));
+                    console.log("DEBUG: cart.html: Renderizando item:", JSON.stringify(item, null, 2));
 
                     const productItemDiv = document.createElement('div');
                     productItemDiv.className = 'flex items-start py-4 border-b border-gray-200 last:border-b-0';
                     productItemDiv.innerHTML = `
-                        <input type="checkbox" class="product-checkbox mr-4 mt-1" data-product-id="${item.id}" ${item.isPreSelected ? 'checked' : ''}>
+                        <input type="checkbox" class="product-checkbox mr-4 mt-1" data-product-id="${item.id}" checked> <!-- Assume todos selecionados por padrão -->
                         <img src="${item.imageUrl || 'https://placehold.co/96x96/cccccc/333333?text=No+Image'}" alt="${item.title}" class="w-24 h-24 object-contain rounded-md mr-4">
                         <div class="flex-grow">
                             <h3 class="text-base font-medium text-gray-800 mb-1">${item.title}</h3>
@@ -284,7 +346,7 @@
                         <div class="flex flex-col items-end ml-4">
                             <div class="quantity-input mb-2">
                                 <button class="quantity-minus-btn" data-product-id="${item.id}">-</button>
-                                <input type="number" value="${item.quantity}" min="1" class="w-12 text-center quantity-input-field" data-product-id="${item.id}">
+                                <input type="number" value="${item.quantity}" min="1" class="w-12 text-center quantity-input-field" data-product-id="${item.id}" data-product-stock="${item.stock}">
                                 <button class="quantity-plus-btn" data-product-id="${item.id}">+</button>
                             </div>
                             <p class="text-2xl font-bold text-gray-900">R$ ${item.price ? item.price.toFixed(2).replace('.', ',') : 'N/A'}</p>
@@ -308,64 +370,150 @@
                     });
                 }
 
-                // Individual product checkboxes
+                // Individual product checkboxes (ainda relevantes para o cálculo do resumo)
                 document.querySelectorAll('.product-checkbox').forEach(checkbox => {
                     checkbox.addEventListener('change', updateSummaryAndShipping);
                 });
 
-                // Quantity buttons and input field (only attach if items exist)
-                if (cartItems.length > 0) {
-                    document.querySelectorAll('.quantity-minus-btn').forEach(button => {
-                        button.addEventListener('click', (event) => {
-                            const productId = parseInt(event.currentTarget.dataset.productId);
+                // Quantidade: botões de mais/menos
+                document.querySelectorAll('.quantity-minus-btn').forEach(button => {
+                    button.addEventListener('click', async (event) => {
+                        const productId = parseInt(event.currentTarget.dataset.productId);
+                        const quantityInputField = document.querySelector(`.quantity-input-field[data-product-id="${productId}"]`);
+                        let currentQuantity = parseInt(quantityInputField.value);
+                        if (currentQuantity > 1) {
+                            await updateCartItemQuantity(productId, currentQuantity - 1);
+                        }
+                    });
+                });
+
+                document.querySelectorAll('.quantity-plus-btn').forEach(button => {
+                    button.addEventListener('click', async (event) => {
+                        const productId = parseInt(event.currentTarget.dataset.productId);
+                        const quantityInputField = document.querySelector(`.quantity-input-field[data-product-id="${productId}"]`);
+                        let currentQuantity = parseInt(quantityInputField.value);
+                        const productStock = parseInt(quantityInputField.dataset.productStock); // Obter estoque do data-attribute
+                        if (currentQuantity < productStock) { // Não permitir exceder o estoque
+                            await updateCartItemQuantity(productId, currentQuantity + 1);
+                        } else {
+                            showCustomMessageBox('Aviso', `O estoque máximo para este produto é ${productStock}.`, false);
+                        }
+                    });
+                });
+
+                // Quantidade: campo de input direto
+                document.querySelectorAll('.quantity-input-field').forEach(input => {
+                    input.addEventListener('change', async (event) => {
+                        const productId = parseInt(event.currentTarget.dataset.productId);
+                        const newQuantity = parseInt(event.currentTarget.value);
+                        const productStock = parseInt(event.currentTarget.dataset.productStock);
+
+                        if (isNaN(newQuantity) || newQuantity < 1) {
+                            showCustomMessageBox('Erro', 'A quantidade deve ser um número válido e maior que zero.', false);
+                            // Reverte para a quantidade anterior no frontend se for inválido
                             const item = cartItems.find(i => i.id === productId);
-                            if (item && item.quantity > 1) {
-                                item.quantity--;
-                                sessionStorage.setItem('cartItems', JSON.stringify(cartItems)); // Save changes
-                                renderCartItems(); // Re-render to update quantity and summary
-                            }
+                            if (item) event.currentTarget.value = item.quantity;
+                            return;
+                        }
+                        if (newQuantity > productStock) {
+                            showCustomMessageBox('Aviso', `A quantidade máxima permitida é o estoque disponível: ${productStock}.`, false);
+                            event.currentTarget.value = productStock; // Ajusta para o estoque máximo
+                            await updateCartItemQuantity(productId, productStock); // Atualiza no backend com o estoque máximo
+                        } else {
+                            await updateCartItemQuantity(productId, newQuantity);
+                        }
+                    });
+                });
+
+                // Botão de Excluir Item
+                document.querySelectorAll('.delete-item-btn').forEach(button => {
+                    button.addEventListener('click', async (event) => {
+                        const productId = parseInt(event.currentTarget.dataset.productId);
+                        showCustomMessageBox('Confirmar', 'Tem certeza que deseja remover este item do seu carrinho?', false, true, async () => {
+                            await removeCartItem(productId);
                         });
+                    });
+                });
+            }
+
+            // NOVO: Função para atualizar a quantidade de um item no backend
+            async function updateCartItemQuantity(productId, newQuantity) {
+                try {
+                    const response = await fetch('/cart/set-quantity', {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-User-Id': loggedInUserId 
+                        },
+                        body: JSON.stringify({ id: productId, quantity: newQuantity })
                     });
 
-                    document.querySelectorAll('.quantity-plus-btn').forEach(button => {
-                        button.addEventListener('click', (event) => {
-                            const productId = parseInt(event.currentTarget.dataset.productId);
-                            const item = cartItems.find(i => i.id === productId);
-                            if (item) {
-                                item.quantity++;
-                                sessionStorage.setItem('cartItems', JSON.stringify(cartItems)); // Save changes
-                                renderCartItems(); // Re-render to update quantity and summary
-                            }
-                        });
+                    const responseData = await response.json();
+
+                    if (response.ok) {
+                        showCustomMessageBox('Carrinho', responseData.message || 'Quantidade atualizada!', true);
+                        await fetchCartItems(); // Recarrega o carrinho para refletir as mudanças
+                    } else {
+                        const errorMessage = responseData.message || 'Erro desconhecido ao atualizar quantidade.';
+                        showCustomMessageBox('Erro no Carrinho', errorMessage, false);
+                        console.error("FRONTEND: cart.html: Falha ao atualizar quantidade:", errorMessage);
+                        await fetchCartItems(); // Recarrega para obter o estado correto do backend
+                    }
+                } catch (error) {
+                    console.error("FRONTEND: cart.html: Erro de rede ao atualizar quantidade:", error);
+                    showCustomMessageBox('Erro de Conexão', 'Não foi possível conectar ao servidor para atualizar a quantidade. Tente novamente.', false);
+                }
+            }
+
+            // NOVO: Função para remover um item do carrinho no backend
+            async function removeCartItem(productId) {
+                try {
+                    const response = await fetch(`/cart/remove/${productId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'X-User-Id': loggedInUserId 
+                        }
                     });
 
-                    document.querySelectorAll('.quantity-input-field').forEach(input => {
-                        input.addEventListener('change', (event) => {
-                            const productId = parseInt(event.currentTarget.dataset.productId);
-                            const newQuantity = parseInt(event.currentTarget.value);
-                            const item = cartItems.find(i => i.id === productId);
-                            if (item && !isNaN(newQuantity) && newQuantity >= 1) {
-                                item.quantity = newQuantity;
-                                sessionStorage.setItem('cartItems', JSON.stringify(cartItems)); // Save changes
-                                updateSummaryAndShipping(); // Update summary without full re-render
-                            } else if (item) {
-                                event.currentTarget.value = item.quantity; // Revert to old value if invalid
-                            }
-                        });
+                    const responseData = await response.json();
+
+                    if (response.ok) {
+                        showCustomMessageBox('Carrinho', responseData.message || 'Item removido do carrinho!', true);
+                        await fetchCartItems(); // Recarrega o carrinho
+                    } else {
+                        const errorMessage = responseData.message || 'Erro desconhecido ao remover item.';
+                        showCustomMessageBox('Erro no Carrinho', errorMessage, false);
+                        console.error("FRONTEND: cart.html: Falha ao remover item:", errorMessage);
+                    }
+                } catch (error) {
+                    console.error("FRONTEND: cart.html: Erro de rede ao remover item:", error);
+                    showCustomMessageBox('Erro de Conexão', 'Não foi possível conectar ao servidor para remover o item. Tente novamente.', false);
+                }
+            }
+
+            // NOVO: Função para limpar o carrinho no backend
+            async function clearUserCart() {
+                try {
+                    const response = await fetch('/cart/clear', {
+                        method: 'DELETE',
+                        headers: {
+                            'X-User-Id': loggedInUserId 
+                        }
                     });
 
-                    // Delete item button
-                    document.querySelectorAll('.delete-item-btn').forEach(button => {
-                        button.addEventListener('click', (event) => {
-                            const productId = parseInt(event.currentTarget.dataset.productId);
-                            const index = cartItems.findIndex(item => item.id === productId);
-                            if (index !== -1) {
-                                cartItems.splice(index, 1); // Remove item from data
-                                sessionStorage.setItem('cartItems', JSON.stringify(cartItems)); // Save changes
-                                renderCartItems(); // Re-render the list
-                            }
-                        });
-                    });
+                    const responseData = await response.json();
+
+                    if (response.ok) {
+                        showCustomMessageBox('Carrinho', responseData.message || 'Carrinho esvaziado!', true);
+                        await fetchCartItems(); // Recarrega o carrinho (deve estar vazio)
+                    } else {
+                        const errorMessage = responseData.message || 'Erro desconhecido ao esvaziar carrinho.';
+                        showCustomMessageBox('Erro no Carrinho', errorMessage, false);
+                        console.error("FRONTEND: cart.html: Falha ao esvaziar carrinho:", errorMessage);
+                    }
+                } catch (error) {
+                    console.error("FRONTEND: cart.html: Erro de rede ao esvaziar carrinho:", error);
+                    showCustomMessageBox('Erro de Conexão', 'Não foi possível conectar ao servidor para esvaziar o carrinho. Tente novamente.', false);
                 }
             }
 
@@ -373,23 +521,18 @@
                 let subtotal = 0;
                 let selectedItemsCount = 0;
 
-                if (cartItems.length > 0) {
-                    document.querySelectorAll('.product-checkbox').forEach(checkbox => {
-                        if (checkbox.checked) {
-                            const productId = parseInt(checkbox.dataset.productId);
-                            const item = cartItems.find(i => i.id === productId);
-                            if (item) {
-                                subtotal += item.price * item.quantity; 
-                                selectedItemsCount++;
-                            }
-                        }
-                    });
-                }
+                // Itera sobre os cartItems que foram carregados do backend
+                cartItems.forEach(item => {
+                    // Verifica o checkbox correspondente no DOM
+                    const checkbox = document.querySelector(`.product-checkbox[data-product-id="${item.id}"]`);
+                    if (checkbox && checkbox.checked) {
+                        subtotal += item.price * item.quantity; 
+                        selectedItemsCount++;
+                    }
+                });
                 
-                // Frete é sempre R$ 0,00
                 const currentShippingCost = 0; 
 
-                // ATUALIZADO: Usando o ID correto para o elemento de custo de envio
                 const shippingCostElement = document.getElementById('shippingCost');
                 if (shippingCostElement) {
                     shippingCostElement.textContent = `R$ ${currentShippingCost.toFixed(2).replace('.', ',')}`;
@@ -419,17 +562,20 @@
 
             // --- Purchase Logic ---
             continuePurchaseButton.addEventListener('click', async () => {
-                const loggedInUserId = sessionStorage.getItem('loggedInUserId'); 
-                if (!loggedInUserId) {
+                if (!loggedInUserId) { 
                     showCustomMessageBox('Aviso', 'Você precisa estar logado para finalizar a compra.', false);
                     return;
                 }
 
+                // Primeiro, obtenha os itens mais recentes do carrinho do backend
+                // Isso garante que estamos comprando o estado mais atualizado do carrinho
+                await fetchCartItems(); 
+
                 const itemsToPurchase = [];
-                document.querySelectorAll('.product-checkbox:checked').forEach(checkbox => {
-                    const productId = parseInt(checkbox.dataset.productId);
-                    const item = cartItems.find(i => i.id === productId);
-                    if (item) {
+                // Itera sobre os itens ATUALIZADOS no `cartItems` (que veio do backend)
+                cartItems.forEach(item => {
+                    const checkbox = document.querySelector(`.product-checkbox[data-product-id="${item.id}"]`);
+                    if (checkbox && checkbox.checked) {
                         itemsToPurchase.push({
                             id: item.id,
                             quantity: item.quantity
@@ -442,10 +588,9 @@
                     return;
                 }
 
-                console.log("DEBUG: cart.html: Items to purchase (using BuyRequestDTO format):", JSON.stringify(itemsToPurchase, null, 2));
+                console.log("DEBUG: cart.html: Itens a serem comprados (formato BuyRequestDTO):", JSON.stringify(itemsToPurchase, null, 2));
 
                 try {
-                    // CHAMA O ENDPOINT /products/purchase
                     const response = await fetch('/products/purchase', {
                         method: 'POST',
                         headers: {
@@ -455,47 +600,39 @@
                         body: JSON.stringify(itemsToPurchase)
                     });
 
-                    console.log("DEBUG: cart.html: Response received. Status:", response.status, "Status Text:", response.statusText);
-                    console.log("DEBUG: cart.html: Response OK status:", response.ok);
+                    console.log("DEBUG: cart.html: Resposta recebida. Status:", response.status, "Status Text:", response.statusText);
 
                     if (response.ok) {
-                        // AGORA ESPERA UM OBJETO ORDER
                         const order = await response.json(); 
                         showCustomMessageBox('Compra Realizada!', `Seu pedido #${order.id} foi realizado com sucesso!`, true); 
                         console.log("DEBUG: cart.html: Pedido criado:", order);
 
-                        const purchasedProductIds = new Set(itemsToPurchase.map(item => item.id));
-                        cartItems = cartItems.filter(item => !purchasedProductIds.has(item.id));
-                        sessionStorage.setItem('cartItems', JSON.stringify(cartItems));
-                        renderCartItems(); 
+                        // Após a compra bem-sucedida, limpe o carrinho no backend
+                        await clearUserCart(); 
                     } else {
-                        console.log("DEBUG: cart.html: Response not OK. Status:", response.status);
+                        console.log("DEBUG: cart.html: Resposta não OK. Status:", response.status);
                         let errorMessage = 'Erro desconhecido ao finalizar a compra.';
                         try {
                             const errorData = await response.json(); 
                             errorMessage = Array.isArray(errorData) ? errorData.map(err => err.message || err).join('\n') : (errorData.message || JSON.stringify(errorData));
-                            console.log("DEBUG: cart.html: Error response parsed as JSON:", errorData);
+                            console.log("DEBUG: cart.html: Resposta de erro parseada como JSON:", errorData);
                         } catch (e) {
                             errorMessage = await response.text();
-                            console.warn("FRONTEND: cart.html: Failed to parse error response as JSON, reading as text:", errorMessage);
+                            console.warn("FRONTEND: cart.html: Falha ao parsear resposta de erro como JSON, lendo como texto:", errorMessage);
                         }
                         showCustomMessageBox('Erro na Compra', errorMessage, false); 
-                        console.error("FRONTEND: cart.html: Purchase failed:", errorMessage);
+                        console.error("FRONTEND: cart.html: Compra falhou:", errorMessage);
                     }
                 } catch (error) {
-                    console.error("FRONTEND: cart.html: Network error or unexpected promise rejection during purchase:", error);
+                    console.error("FRONTEND: cart.html: Erro de rede ou rejeição de promessa inesperada durante a compra:", error);
                     showCustomMessageBox('Erro de Conexão', 'Não foi possível conectar ao servidor para finalizar a compra. Tente novamente.', false); 
                 }
             });
 
             // --- Empty Cart Logic ---
             emptyCartButton.addEventListener('click', () => {
-                showCustomMessageBox('Confirmar', 'Tem certeza que deseja remover todos os itens do seu carrinho?', false, true, () => {
-                    cartItems = []; 
-                    sessionStorage.removeItem('cartItems'); 
-                    renderCartItems(); 
-                    console.log("DEBUG: cart.html: Carrinho esvaziado.");
-                    showCustomMessageBox('Carrinho Esvaziado', 'Todos os itens foram removidos do seu carrinho.', true); 
+                showCustomMessageBox('Confirmar', 'Tem certeza que deseja remover todos os itens do seu carrinho?', false, true, async () => {
+                    await clearUserCart(); // Chama a função para limpar o carrinho no backend
                 });
             });
 
@@ -506,8 +643,8 @@
                 });
             }
 
-            // Initial render of cart items
-            renderCartItems();
+            // Inicia o carregamento dos itens do carrinho do backend
+            fetchCartItems();
         });
     </script>
 </body>

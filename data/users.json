@@ -1,13 +1,15 @@
 [ {
-  "id" : 1,
+  "id" : 12,
   "name" : "consu",
   "email" : "consu@email",
   "cpf" : "000.111.222-33",
   "password" : "senha",
   "address" : "rua",
-  "cart" : { },
-  "type" : "consumer",
-  "preferredPaymentMethod" : "PIX"
+  "cart" : {
+    "2" : 1
+  },
+  "preferredPaymentMethod" : "PIX",
+  "type" : "consumer"
 }, {
   "id" : 2,
   "name" : "vend",
@@ -34,8 +36,8 @@
   "password" : "senha",
   "address" : "end",
   "cart" : { },
-  "type" : "consumer",
-  "preferredPaymentMethod" : "PIX"
+  "preferredPaymentMethod" : "PIX",
+  "type" : "consumer"
 }, {
   "id" : 5,
   "name" : "novo vend",
@@ -53,8 +55,8 @@
   "password" : "senha",
   "address" : "rua",
   "cart" : { },
-  "type" : "consumer",
-  "preferredPaymentMethod" : "PIX"
+  "preferredPaymentMethod" : "PIX",
+  "type" : "consumer"
 }, {
   "id" : 8,
   "name" : "consu6",
@@ -63,8 +65,8 @@
   "password" : "senha",
   "address" : "rua",
   "cart" : { },
-  "type" : "consumer",
-  "preferredPaymentMethod" : "PIX"
+  "preferredPaymentMethod" : "PIX",
+  "type" : "consumer"
 }, {
   "id" : 9,
   "name" : "vend2",
@@ -92,4 +94,26 @@
   "address" : "Endereço de envio",
   "walletBalance" : 0.0,
   "type" : "seller"
+}, {
+  "id" : 12,
+  "name" : "consu",
+  "email" : "consu@email",
+  "cpf" : "000.111.222-33",
+  "password" : "senha",
+  "address" : "rua",
+  "cart" : {
+    "2" : 1
+  },
+  "preferredPaymentMethod" : "PIX",
+  "type" : "consumer"
+}, {
+  "id" : 13,
+  "name" : "consumer",
+  "email" : "consumer@email",
+  "cpf" : "123.456.789-00",
+  "password" : "senha",
+  "address" : "endereço",
+  "cart" : { },
+  "preferredPaymentMethod" : "CREDITO",
+  "type" : "consumer"
 } ]

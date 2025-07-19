@@ -5,7 +5,7 @@
   "description" : "The iPhone 16 features a 6.1-inch OLED display, an A18 chip, and an advanced dual-camera system with a 48MP Fusion camera. It also boasts a new ultrawide camera with a wider aperture and automatic focus. The phone has a durable aerospace-grade aluminum enclosure and a color-infused glass back. It also includes a new internal design for improved heat dissipation. ",
   "imageUrl" : "/images/Iphone.jpg",
   "brand" : "Apple",
-  "stock" : 216,
+  "stock" : 215,
   "tags" : [ "apple smartphone celular iphone" ],
   "sellerId" : 2
 }, {
@@ -55,7 +55,7 @@
   "description" : "Copo térmico resistente, durável e atemporal, com preservação térmica de até 4,5 horas, isolamento a vácuo de parede dupla e um abridor de garrafas anexado à tampa.",
   "imageUrl" : "/images/stanley.jpg",
   "brand" : "Stanley",
-  "stock" : 32,
+  "stock" : 31,
   "tags" : [ "copo termico", "preto", "copo", "stanley", "termico" ],
   "sellerId" : 2
 }, {
