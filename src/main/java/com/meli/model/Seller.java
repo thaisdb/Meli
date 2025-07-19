@@ -13,27 +13,22 @@ public class Seller extends User {
     // <productId, quantity>
     private Map<Integer, Integer> inventory = new HashMap<>(); 
 
-    // Constructor
     public Seller() {
-        super(); // Call the constructor of the User superclass
+        super();
     }
 
-    // You might need a constructor to initialize fields from superclass if not already done
-    public Seller(String name, String email, String password, String address) {
-        super(name, email, password, address);
+    public Seller(String name, String email, String cpf, String password, String address) {
+        super(name, email, cpf, password, address);
     }
 
-    // Getter for walletBalance
     public double getWalletBalance() {
         return walletBalance;
     }
 
-    // Setter for walletBalance
     public void setWalletBalance(double walletBalance) {
         this.walletBalance = walletBalance;
     }
 
-    // Setter for inventory
     public void setInventory(Map<Integer, Integer> inventory) {
         this.inventory = inventory;
     }
@@ -49,7 +44,8 @@ public class Seller extends User {
 
     public void updateProductQuantity(Integer productId, int newQuantity) {
         if (newQuantity <= 0) {
-            this.inventory.remove(productId); // Remove if quantity is zero or less
+            // Remove if quantity is zero or less
+            this.inventory.remove(productId);
         } else {
             this.inventory.put(productId, newQuantity);
         }
@@ -59,7 +55,7 @@ public class Seller extends User {
         return this.inventory.getOrDefault(productId, 0);
     }
 
-    @Override // IMPORTANT: This annotation tells the compiler we are overriding a superclass method
+    @Override
     public String getType() {
         return "seller";
     }

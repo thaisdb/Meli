@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional; // Adicionar esta importação para Optional
 
 /*
  * A helper/persistence class
@@ -49,6 +50,26 @@ public class UserRepository {
     public User getById(int id) {
         return users.stream().filter(u -> u.getId() == id).findFirst().orElse(null);
     }
+
+    /*
+     * Find user by email, used to guarantee unique emails only
+     * @param email
+     * @return user if find any
+     */
+    public Optional<User> findUserByEmail(String email) {
+        return users.stream()
+                .filter(user -> user.getEmail().equalsIgnoreCase(email))
+                .findFirst();
+    }
+
+    /* Encontrar usuário por username (Adicionado para consistência com o Service)
+    public Optional<User> findByUsername(String username) {
+        return users.stream()
+                .filter(user -> user.getUsername().equalsIgnoreCase(username))
+                .findFirst();
+    }
+    */
+
 
     public void save(User user) {
         int maxId = users.stream().mapToInt(User::getId).max().orElse(0);

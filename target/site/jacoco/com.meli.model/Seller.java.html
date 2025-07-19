@@ -13,55 +13,51 @@ public class Seller extends User {
     // &lt;productId, quantity&gt;
 <span class="nc" id="L14">    private Map&lt;Integer, Integer&gt; inventory = new HashMap&lt;&gt;(); </span>
 
-    // Constructor
     public Seller() {
-<span class="nc" id="L18">        super(); // Call the constructor of the User superclass</span>
-<span class="nc" id="L19">    }</span>
+<span class="nc" id="L17">        super();</span>
+<span class="nc" id="L18">    }</span>
 
-    // You might need a constructor to initialize fields from superclass if not already done
-    public Seller(String name, String email, String password, String address) {
-<span class="nc" id="L23">        super(name, email, password, address);</span>
-<span class="nc" id="L24">    }</span>
+    public Seller(String name, String email, String cpf, String password, String address) {
+<span class="nc" id="L21">        super(name, email, cpf, password, address);</span>
+<span class="nc" id="L22">    }</span>
 
-    // Getter for walletBalance
     public double getWalletBalance() {
-<span class="nc" id="L28">        return walletBalance;</span>
+<span class="nc" id="L25">        return walletBalance;</span>
     }
 
-    // Setter for walletBalance
     public void setWalletBalance(double walletBalance) {
-<span class="nc" id="L33">        this.walletBalance = walletBalance;</span>
-<span class="nc" id="L34">    }</span>
+<span class="nc" id="L29">        this.walletBalance = walletBalance;</span>
+<span class="nc" id="L30">    }</span>
 
-    // Setter for inventory
     public void setInventory(Map&lt;Integer, Integer&gt; inventory) {
-<span class="nc" id="L38">        this.inventory = inventory;</span>
-<span class="nc" id="L39">    }</span>
+<span class="nc" id="L33">        this.inventory = inventory;</span>
+<span class="nc" id="L34">    }</span>
 
     // Methods to manage inventory quantity
     public void addProductToInventory(Integer productId, int quantity) {
-<span class="nc" id="L43">        this.inventory.put(productId, this.inventory.getOrDefault(productId, 0) + quantity);</span>
-<span class="nc" id="L44">    }</span>
+<span class="nc" id="L38">        this.inventory.put(productId, this.inventory.getOrDefault(productId, 0) + quantity);</span>
+<span class="nc" id="L39">    }</span>
 
     public void removeProductFromInventory(Integer productId) {
-<span class="nc" id="L47">        this.inventory.remove(productId);</span>
-<span class="nc" id="L48">    }</span>
+<span class="nc" id="L42">        this.inventory.remove(productId);</span>
+<span class="nc" id="L43">    }</span>
 
     public void updateProductQuantity(Integer productId, int newQuantity) {
-<span class="nc bnc" id="L51" title="All 2 branches missed.">        if (newQuantity &lt;= 0) {</span>
-<span class="nc" id="L52">            this.inventory.remove(productId); // Remove if quantity is zero or less</span>
+<span class="nc bnc" id="L46" title="All 2 branches missed.">        if (newQuantity &lt;= 0) {</span>
+            // Remove if quantity is zero or less
+<span class="nc" id="L48">            this.inventory.remove(productId);</span>
         } else {
-<span class="nc" id="L54">            this.inventory.put(productId, newQuantity);</span>
+<span class="nc" id="L50">            this.inventory.put(productId, newQuantity);</span>
         }
-<span class="nc" id="L56">    }</span>
+<span class="nc" id="L52">    }</span>
 
     public Integer getProductQuantity(Integer productId) {
-<span class="nc" id="L59">        return this.inventory.getOrDefault(productId, 0);</span>
+<span class="nc" id="L55">        return this.inventory.getOrDefault(productId, 0);</span>
     }
 
-    @Override // IMPORTANT: This annotation tells the compiler we are overriding a superclass method
+    @Override
     public String getType() {
-<span class="nc" id="L64">        return &quot;seller&quot;;</span>
+<span class="nc" id="L60">        return &quot;seller&quot;;</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

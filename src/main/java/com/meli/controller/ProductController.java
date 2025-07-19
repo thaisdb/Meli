@@ -1,6 +1,8 @@
 package com.meli.controller;
 
+import com.meli.model.Orders;
 import com.meli.model.Product;
+import com.meli.service.OrderService;
 import com.meli.service.ProductService;
 import com.meli.dto.BuyRequestDTO; // Agora com o campo 'id'
 import org.springframework.http.HttpStatus;
@@ -8,16 +10,20 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 @RestController
 @RequestMapping("/products") // Base path for all methods in this controller
 public class ProductController {
 
     private final ProductService productService;
+    private final OrderService orderService;
 
-    public ProductController(ProductService productService) {
+    public ProductController(ProductService productService, OrderService orderService) {
         this.productService = productService;
+        this.orderService = orderService;
     }
 
     /**
@@ -137,85 +143,79 @@ public class ProductController {
         }
     }
 
-    /**
-     * Endpoint to handle a single product purchase (from detailProduct.html).
-     * POST /products/{id}/buy
-     * Receives the quantity to purchase using BuyRequestDTO.
-     */
-    @PostMapping("/{id}/buy")
-    public ResponseEntity<?> buyProduct(@PathVariable int id, @RequestBody BuyRequestDTO buyRequest) {
-        Integer quantity = buyRequest.getQuantity(); // Obter a quantidade do DTO
-        System.out.println("DEBUG: ProductController - Received buy request for product ID: " + id + ", quantity: " + quantity);
-
-        if (quantity == null || quantity <= 0) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid quantity provided.");
-        }
-
-        Product product = productService.getProductById(id);
-        if (product == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Product not found.");
-        }
-
-        if (product.getStock() == null || product.getStock() < quantity) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Insufficient stock for " + product.getTitle() + ". Available: " + product.getStock() + ", Requested: " + quantity + ".");
-        }
-
-        // Decrement stock
-        product.setStock(product.getStock() - quantity);
-        productService.updateProduct(id, product); // Use updateProduct to save the new stock
-        System.out.println("DEBUG: ProductController - Decremented stock for product " + product.getTitle() + " (ID: " + id + ") by " + quantity + ". New stock: " + product.getStock());
-
-        return ResponseEntity.ok(product); // Return the updated product
-    }
-
-
-    /**
-     * Endpoint to handle a bulk purchase (from cart.html).
+   /**
+     * Endpoint unificado para lidar com a compra de um ou múltiplos produtos.
      * POST /products/purchase
-     * Receives a list of BuyRequestDTOs.
+     * Recebe uma lista de BuyRequestDTOs e o ID do consumidor logado.
+     * Mantém a lógica de validação de estoque e decremento, e então chama OrderService para criar o pedido.
      */
     @PostMapping("/purchase")
-    public ResponseEntity<?> purchaseProducts(@RequestBody List<BuyRequestDTO> purchaseItems) { // Alterado para List<BuyRequestDTO>
-        System.out.println("DEBUG: ProductController - Received bulk purchase request for " + purchaseItems.size() + " items.");
+    public ResponseEntity<?> purchaseProducts(@RequestBody List<BuyRequestDTO> purchaseItems,
+                                            @RequestHeader("X-User-Id") int loggedInConsumerId) { 
+        System.out.println("DEBUG: ProductController - Received purchase request for " + purchaseItems.size() + " items, by consumer ID: " + loggedInConsumerId);
+        
         List<String> errors = new ArrayList<>();
 
-        for (BuyRequestDTO item : purchaseItems) { // Iterar sobre BuyRequestDTO
+        // Validação básica da lista de itens
+        if (purchaseItems == null || purchaseItems.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Arrays.asList("Nenhum item selecionado para compra."));
+        }
+
+        // 1. Lógica de validação e decremento de estoque (MANTIDA AQUI)
+        for (BuyRequestDTO item : purchaseItems) { 
             try {
-                Integer productId = item.getId(); // Obter ID do DTO
-                Integer quantity = item.getQuantity(); // Obter quantidade do DTO
+                Integer productId = item.getId(); 
+                Integer quantity = item.getQuantity(); 
 
                 if (productId == null || quantity == null || quantity <= 0) {
-                    errors.add("Invalid item data: ID or quantity missing/invalid for an item.");
-                    continue;
+                    errors.add("Dados de item inválidos: ID ou quantidade ausente/inválida para um item.");
+                    continue; 
                 }
 
                 Product product = productService.getProductById(productId);
                 if (product == null) {
-                    errors.add("Product with ID " + productId + " not found.");
-                    continue;
+                    errors.add("Produto com ID " + productId + " não encontrado.");
+                    continue; 
                 }
 
                 if (product.getStock() == null || product.getStock() < quantity) {
-                    errors.add("Insufficient stock for product " + product.getTitle() + " (ID: " + productId + "). Available: " + product.getStock() + ", Requested: " + quantity + ".");
-                    continue;
+                    errors.add("Estoque insuficiente para o produto " + product.getTitle() + " (ID: " + productId + "). Disponível: " + product.getStock() + ", Solicitado: " + quantity + ".");
+                    continue; 
                 }
 
                 // Decrement stock
                 product.setStock(product.getStock() - quantity);
-                productService.updateProduct(productId, product); // Use updateProduct to save the new stock
-                System.out.println("DEBUG: ProductController - Decremented stock for product " + product.getTitle() + " (ID: " + productId + ") by " + quantity + ". New stock: " + product.getStock());
+                productService.updateProduct(productId, product); 
+                System.out.println("DEBUG: ProductController - Estoque decrementado para o produto " + product.getTitle() + " (ID: " + productId + ") por " + quantity + ". Novo estoque: " + product.getStock());
 
             } catch (Exception e) {
-                errors.add("Error processing item: " + e.getMessage());
-                System.err.println("ERROR: ProductController - General error in bulk purchase: " + e.getMessage());
+                errors.add("Erro ao processar item: " + e.getMessage());
+                System.err.println("ERROR: ProductController - Erro geral na compra de item: " + e.getMessage());
                 e.printStackTrace();
             }
         }
 
-        if (errors.isEmpty()) {
-            return ResponseEntity.ok("Purchase completed successfully.");
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
+        // 2. Se houver erros na validação ou processamento individual, retorna-os como JSON
+        if (!errors.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors); 
+        }
+
+        // 3. Se não houver erros, chama OrderService para criar o pedido
+        try {
+            Optional<Orders> createdOrder = orderService.createProductOrder(purchaseItems, loggedInConsumerId);
+
+            if (createdOrder.isPresent()) {
+                return ResponseEntity.ok(createdOrder.get()); // Retorna o objeto Orders criado (JSON)
+            } else {
+                // Se o OrderService retornar Optional.empty(), significa que houve um erro na criação do pedido
+                // (ex: consumidor/vendedor não encontrado, ou validação interna do OrderService).
+                // O OrderService já imprime logs de erro mais específicos.
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Arrays.asList("Falha ao criar o pedido. Verifique os dados do usuário ou a consistência dos produtos."));
+            }
+        } catch (Exception e) {
+            System.err.println("ERROR: ProductController - Erro ao chamar OrderService para criar o pedido: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Arrays.asList("Erro interno ao finalizar a compra: " + e.getMessage()));
         }
     }
 }

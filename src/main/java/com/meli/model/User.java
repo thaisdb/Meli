@@ -20,6 +20,7 @@ public abstract class User {
     private int id;
     private String name;
     private String email;
+    private String cpf;
     private String password; // In a real app, this would be hashed
     private String address;
 
@@ -28,9 +29,10 @@ public abstract class User {
     }
 
     // Parameterized constructor for convenience
-    public User(String name, String email, String password, String address) {
+    public User(String name, String email, String cpf, String password, String address) {
         this.name = name;
         this.email = email;
+        this.cpf = cpf;
         this.password = password;
         this.address = address;
     }
@@ -58,6 +60,14 @@ public abstract class User {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getCpf() {
+        return cpf;
+    }
+
+    public void setCpf(String cpf) {
+        this.cpf = cpf;
     }
 
     public String getPassword() {

@@ -1,147 +1,491 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Detalhes do Produto</title>
-  <link rel="stylesheet" type="text/css" href="/css/page.css">
-    <!-- Font Awesome for icons - for login icon-->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <!-- Link to the header.js script -->
-    <script src="header.js" defer></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalhes do Produto</title>
+    <link rel="stylesheet" type="text/css" href="/css/page.css">
+    <!-- Font Awesome for icons - for login icon-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Link to the header.js script -->
+    <script src="header.js" defer></script>
+    <style>
+        /* Adicione ou ajuste estilos conforme necessário para o layout do seu produto */
+        .product-detail {
+            display: flex;
+            flex-wrap: wrap; /* Permite que os itens quebrem para a próxima linha em telas menores */
+            gap: 20px;
+            max-width: 1000px; /* Ajuste conforme o layout desejado */
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .product-image-section {
+            flex: 1 1 400px; /* Base para a seção da imagem */
+            max-width: 50%; /* Limita a largura para não ocupar tudo em telas grandes */
+            box-sizing: border-box;
+            padding-right: 20px; /* Espaçamento entre as seções */
+        }
+        .product-image-section img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            object-fit: contain; /* Ajusta a imagem dentro do contêiner */
+            border: 1px solid #eee;
+        }
+        .product-meta-details {
+            margin-top: 15px;
+            font-size: 0.9em;
+            color: #666;
+        }
+        .product-meta-details label {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .info-and-purchase-card {
+            flex: 1 1 400px; /* Base para a seção de informações e compra */
+            max-width: 50%; /* Limita a largura */
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .product-main-info .title {
+            font-size: 2.2em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .product-main-info .price {
+            font-size: 2em;
+            color: #3483fa;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        .stock-info {
+            font-size: 1.1em;
+            color: #555;
+            margin-bottom: 20px;
+        }
+        .stock-info.low-stock {
+            color: #dc3545; /* Vermelho para baixo estoque */
+            font-weight: bold;
+        }
+
+        .purchase-box {
+            border: 1px solid #eee;
+            padding: 20px;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .purchase-box label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            display: block;
+        }
+        .quantity-controls {
+            display: flex;
+            align-items: center; /* Garante alinhamento vertical central */
+            gap: 10px; /* Mantém o espaçamento entre os elementos */
+        }
+        .quantity-controls button {
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 8px 15px;
+            cursor: pointer;
+            font-size: 1.2em; 
+            line-height: 1; 
+            height: 40px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+        }
+        .quantity-controls button:hover:not(:disabled) {
+            background-color: #e0e0e0;
+        }
+        .quantity-controls input {
+            width: 60px;
+            text-align: center;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1em;
+            height: 40px; 
+            box-sizing: border-box; 
+            line-height: 1; 
+            -moz-appearance: textfield; 
+        }
+        .quantity-controls input::-webkit-outer-spin-button,
+        .quantity-controls input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .button.buy-button {
+            background-color: #3483fa;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: bold;
+            transition: background-color 0.2s ease;
+        }
+        .button.buy-button:hover:not(:disabled) {
+            background-color: #2968c8;
+        }
+        .button.buy-button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        .button.light-blue-button {
+            background-color: #e0f0ff; /* Um azul mais claro */
+            color: #3483fa;
+            border: 1px solid #3483fa;
+        }
+        .button.light-blue-button:hover:not(:disabled) {
+            background-color: #cce0ff;
+        }
+        .back-link {
+            display: block;
+            margin-top: 20px;
+            text-align: center;
+            color: #3483fa;
+            text-decoration: none;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Estilos para o Custom Message Box */
+        #messageBoxOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .app-modal-content {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+        .app-modal-title {
+            font-size: 1.8em;
+            margin-bottom: 15px;
+        }
+        .app-modal-message {
+            font-size: 1.1em;
+            margin-bottom: 25px;
+            color: #666;
+        }
+        .app-modal-actions button {
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+            border: none;
+            color: white;
+        }
+        .hidden {
+            display: none;
+        }
+
+        /* Media queries para responsividade */
+        @media (max-width: 768px) {
+            .product-detail {
+                flex-direction: column;
+                padding: 15px;
+            }
+            .product-image-section, .info-and-purchase-card {
+                max-width: 100%;
+                padding-right: 0;
+            }
+            .product-image-section {
+                order: 1; 
+            }
+            .info-and-purchase-card {
+                order: 2; 
+            }
+            .product-main-info .title {
+                font-size: 1.8em;
+            }
+            .product-main-info .price {
+                font-size: 1.5em;
+            }
+        }
+    </style>
 </head>
 
 <body data-title="Products" data-show-profile-icon="true">
-  <div id="header-placeholder"></div>
+    <div id="header-placeholder"></div>
 
-  <div class="product-detail" id="productDetail">
-    <p>Carregando produto...</p>
-  </div>
+    <div class="product-detail" id="productDetail">
+        <p>Carregando produto...</p>
+    </div>
 
-  <script>
-    function getQueryParam(name) {
-      const params = new URLSearchParams(window.location.search);
-      return params.get(name);
-    }
+    <!-- Custom Message Box for Success/Error -->
+    <div id="messageBoxOverlay" class="hidden">
+        <div class="app-modal-content">
+            <h2 id="messageBoxTitle" class="app-modal-title"></h2>
+            <p id="messageBoxMessage" class="app-modal-message"></p>
+            <div class="app-modal-actions">
+                <button id="messageBoxCloseBtn" class="button">OK</button>
+            </div>
+        </div>
+    </div>
 
-    const productId = getQueryParam("id");
-    const url = `/products/${productId}`;
+    <script>
+        // Custom message box functions (re-used from other pages)
+        const messageBoxOverlay = document.getElementById('messageBoxOverlay');
+        const messageBoxTitle = document.getElementById('messageBoxTitle');
+        const messageBoxMessage = document.getElementById('messageBoxMessage');
+        const messageBoxCloseBtn = document.getElementById('messageBoxCloseBtn');
 
-    let currentProductData = null; // Variável para armazenar os dados do produto
+        function showCustomMessageBox(title, message, isSuccess = true) {
+            messageBoxTitle.textContent = title;
+            messageBoxMessage.textContent = message;
+            messageBoxTitle.style.color = isSuccess ? '#00a650' : '#dc3545'; 
+            messageBoxCloseBtn.style.backgroundColor = isSuccess ? '#3483fa' : '#6c757d'; 
 
-    fetch(url)
-      .then(response => {
-        if (!response.ok) throw new Error("Produto não encontrado");
-        return response.json();
-      })
-      .then(product => {
-        currentProductData = product; // Armazena os dados do produto
+            messageBoxOverlay.classList.remove('hidden');
+        }
 
-        const container = document.getElementById("productDetail");
-        const imageUrl = product.imageUrl || 'https://placehold.co/600x400?text=Sem+Imagem';
-
-        container.innerHTML = `
-            <div class="product-image-section">
-                <img src="${imageUrl}" alt="${product.title}" onerror="this.onerror=null;this.src='https://placehold.co/600x400/cccccc/333333?text=Imagem+Nao+Encontrada';"><br><br>
-                <div class="product-meta-details">
-                    <div class="brand"><label>Marca:</label> ${product.brand || 'Desconhecida'}</div><br>
-                    <div class="description"><label>Descrição:</label><br> ${product.description || 'Sem descrição disponível.'}</div>
-                </div>
-            </div>
-            <div class="info-and-purchase-card"> <!-- This is the inner card -->
-                <div class="product-main-info"> <!-- Group for title, price, stock -->
-                    <div class="title">${product.title}</div>
-                    <div class="price">R$ ${product.price.toFixed(2)}</div>
-                    <div class="stock-info">Em estoque: <span id="stock">${product.stock}</span></div>
-                </div>
-                <div class="purchase-box">
-                    <label for="quantity">Quantity:</label>
-                    <input type="number" id="quantity" value="1" min="1" max="${product.stock}"/>
-                    <button class="button" id="buy-button">Comprar</button>
-                    <button class="button light-blue-button" id="addToCartButton">Adicionar ao carrinho</button>
-                </div>
-                <p id="buy-message" style="color: green;"></p>
-                <a href="/home.html" class="back-link">← Voltar para lista</a>
-            </div>
-        `;
-
-        // Event listener for "Comprar" button
-        document.getElementById('buy-button').addEventListener('click', async () => {
-          const quantity = parseInt(document.getElementById('quantity').value);
-          const resMessage = document.getElementById('buy-message');
-
-          const response = await fetch(`/products/${productId}/buy`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ quantity })
-          });
-
-          if (response.ok) {
-            const updatedProduct = await response.json();
-            resMessage.textContent = "Compra realizada com sucesso!";
-            resMessage.style.color = "green";
-            document.getElementById('stock').textContent = updatedProduct.stock;
-            document.getElementById('quantity').max = updatedProduct.stock;
-          } else {
-            const errorText = await response.text();
-            resMessage.textContent = errorText || "Erro ao realizar compra.";
-            resMessage.style.color = "red";
-          }
-        });
-
-        // Add event listener for "Adicionar ao carrinho" button
-        const addToCartButton = document.getElementById('addToCartButton');
-        if (addToCartButton) {
-            addToCartButton.addEventListener('click', () => {
-                handleAddToCart(currentProductData); 
+        if (messageBoxCloseBtn) {
+            messageBoxCloseBtn.addEventListener('click', () => {
+                messageBoxOverlay.classList.add('hidden');
             });
-        } else {
-            console.error("FRONTEND: detailProduct.html: Botão 'Adicionar ao carrinho' não encontrado após renderização.");
         }
 
-      })
-      .catch(error => {
-        document.getElementById("productDetail").innerHTML = `<p>${error.message}</p>`;
-      });
+        document.addEventListener('DOMContentLoaded', async () => {
+            const productId = new URLSearchParams(window.location.search).get('id');
+            const loggedInUserId = sessionStorage.getItem('loggedInUserId'); 
+            
+            let currentProductData = null; 
 
-    async function handleAddToCart(product) {
-        if (!window.loggedInUserId) {
-            alert('Você precisa estar logado para adicionar produtos ao carrinho.');
-            window.location.href = '/login.html';
-            return;
-        }
+            if (!productId) {
+                showCustomMessageBox('Erro', 'ID do produto não fornecido na URL.', false);
+                return;
+            }
 
-        let cartItems = JSON.parse(sessionStorage.getItem('cartItems')) || [];
-        console.log("DEBUG: detailProduct.html: Cart items BEFORE adding:", JSON.stringify(cartItems, null, 2));
+            async function loadAndRenderProductDetails() {
+                const url = `/products/${productId}`;
+                try {
+                    const response = await fetch(url);
+                    if (!response.ok) {
+                        const errorText = await response.text();
+                        throw new Error(errorText || "Produto não encontrado");
+                    }
+                    const product = await response.json();
+                    currentProductData = product; 
 
-        const existingItemIndex = cartItems.findIndex(item => item.id === product.id);
-        const quantityInput = document.getElementById('quantity');
-        const quantityToAdd = parseInt(quantityInput ? quantityInput.value : 1) || 1;
+                    const container = document.getElementById("productDetail");
+                    const imageUrl = product.imageUrl || 'https://placehold.co/600x400/cccccc/333333?text=Sem+Imagem';
 
-        if (existingItemIndex > -1) {
-            cartItems[existingItemIndex].quantity = (cartItems[existingItemIndex].quantity || 0) + quantityToAdd;
-            console.log(`DEBUG: detailProduct.html: Updated quantity for product ${product.id} to ${cartItems[existingItemIndex].quantity}.`);
-        } else {
-            cartItems.push({
-                id: product.id,
-                title: product.title,
-                imageUrl: product.imageUrl,
-                price: product.price,
-                stock: product.stock,
-                quantity: quantityToAdd,
-                isFull: true,
-                isPreSelected: true
-            });
-            console.log(`DEBUG: detailProduct.html: Added new product ${product.id} with quantity ${quantityToAdd}.`);
-        }
+                    container.innerHTML = `
+                        <div class="product-image-section">
+                            <img src="${imageUrl}" alt="${product.title}" onerror="this.onerror=null;this.src='https://placehold.co/600x400/cccccc/333333?text=Imagem+Nao+Encontrada';"><br><br>
+                            <div class="product-meta-details">
+                                <div class="brand"><label>Marca:</label> ${product.brand || 'Desconhecida'}</div><br>
+                                <div class="description"><label>Descrição:</label><br> ${product.description || 'Sem descrição disponível.'}</div>
+                                <div class="tags"><label>Tags:</label> ${product.tags ? product.tags.join(', ') : 'N/A'}</div>
+                            </div>
+                        </div>
+                        <div class="info-and-purchase-card">
+                            <div class="product-main-info">
+                                <div class="title">${product.title}</div>
+                                <div class="price">R$ ${product.price.toFixed(2).replace('.', ',')}</div>
+                                <div class="stock-info">Em estoque: <span id="stock">${product.stock}</span></div>
+                            </div>
+                            <div class="purchase-box">
+                                <label for="quantity">Quantidade:</label>
+                                <div class="quantity-controls">
+                                    <button id="decreaseQuantity">-</button>
+                                    <input type="number" id="quantityInput" value="1" min="1" max="${product.stock}" readonly/>
+                                    <button id="increaseQuantity">+</button>
+                                </div>
+                                <button class="button buy-button" id="buy-button" disabled>Comprar</button>
+                                <button class="button light-blue-button" id="addToCartButton">Adicionar ao carrinho</button>
+                            </div>
+                            <p id="buy-message" style="margin-top: 10px; text-align: center;"></p>
+                            <a href="/home.html" class="back-link">← Voltar para lista</a>
+                        </div>
+                    `;
 
-        sessionStorage.setItem('cartItems', JSON.stringify(cartItems));
-        console.log("DEBUG: detailProduct.html: Cart items AFTER adding and saving:", JSON.stringify(cartItems, null, 2));
+                    const buyButton = document.getElementById('buy-button');
+                    const quantityInput = document.getElementById('quantityInput');
+                    const decreaseQuantityBtn = document.getElementById('decreaseQuantity');
+                    const increaseQuantityBtn = document.getElementById('increaseQuantity');
+                    const productStockElement = document.getElementById('stock'); 
+                    const buyMessage = document.getElementById('buy-message');
 
-        alert('Produto adicionado ao carrinho!');
-        window.location.href = '/cart.html';
-    }
-  </script>
+                    function updateQuantityButtons() {
+                        const currentQuantity = parseInt(quantityInput.value);
+                        decreaseQuantityBtn.disabled = currentQuantity <= 1;
+                        increaseQuantityBtn.disabled = currentQuantity >= currentProductData.stock;
+                    }
+
+                    function updateBuyButtonState() {
+                        if (!loggedInUserId) { 
+                            buyButton.disabled = true;
+                            buyMessage.textContent = 'Você precisa estar logado para comprar.';
+                            buyMessage.style.color = 'red';
+                            return;
+                        }
+
+                        if (currentProductData.stock <= 0) {
+                            productStockElement.classList.add('low-stock');
+                            productStockElement.textContent = 'Esgotado';
+                            buyButton.disabled = true;
+                            quantityInput.disabled = true;
+                            decreaseQuantityBtn.disabled = true;
+                            increaseQuantityBtn.disabled = true;
+                            buyMessage.textContent = 'Produto esgotado.';
+                            buyMessage.style.color = 'red';
+                        } else {
+                            productStockElement.classList.remove('low-stock');
+                            buyButton.disabled = false; 
+                            quantityInput.disabled = false;
+                            buyMessage.textContent = ''; 
+                            updateQuantityButtons(); 
+                        }
+                    }
+
+                    decreaseQuantityBtn.addEventListener('click', () => {
+                        let currentQuantity = parseInt(quantityInput.value);
+                        if (currentQuantity > 1) {
+                            quantityInput.value = currentQuantity - 1;
+                            updateQuantityButtons();
+                        }
+                    });
+
+                    increaseQuantityBtn.addEventListener('click', () => {
+                        let currentQuantity = parseInt(quantityInput.value);
+                        if (currentQuantity < currentProductData.stock) {
+                            quantityInput.value = currentQuantity + 1;
+                            updateQuantityButtons();
+                        }
+                    });
+
+                    buyButton.addEventListener('click', async () => {
+                        const quantityToBuy = parseInt(quantityInput.value);
+
+                        if (quantityToBuy <= 0 || quantityToBuy > currentProductData.stock) {
+                            showCustomMessageBox('Erro de Compra', 'Quantidade inválida ou insuficiente em estoque.', false);
+                            return;
+                        }
+
+                        try {
+                            // CHAMA O ENDPOINT /products/purchase
+                            const response = await fetch('/products/purchase', { 
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-User-Id': loggedInUserId // Envia o ID do consumidor logado
+                                },
+                                // Envia os dados como uma lista de BuyRequestDTO de um único item
+                                body: JSON.stringify([{ id: parseInt(productId), quantity: quantityToBuy }]) 
+                            });
+
+                            if (response.ok) {
+                                // AGORA ESPERA UM OBJETO ORDER
+                                const order = await response.json();
+                                showCustomMessageBox('Compra Realizada!', `Seu pedido #${order.id} foi realizado com sucesso!`, true);
+                                console.log("DEBUG: detailProduct.html: Pedido criado:", order);
+                                await loadAndRenderProductDetails(); // Recarrega para atualizar o estoque
+                            } else {
+                                let errorMessage = 'Falha ao finalizar a compra.';
+                                try {
+                                    // Tenta parsear como JSON (lista de erros ou objeto de erro)
+                                    const errorData = await response.json(); 
+                                    errorMessage = Array.isArray(errorData) ? errorData.join('\n') : (errorData.message || JSON.stringify(errorData));
+                                } catch (e) {
+                                    // Se não for JSON, lê como texto simples
+                                    errorMessage = await response.text();
+                                }
+                                showCustomMessageBox('Erro de Compra', errorMessage, false);
+                                console.error('Erro ao finalizar compra:', errorMessage);
+                            }
+                        } catch (error) {
+                            console.error('Erro de rede ao finalizar compra:', error);
+                            showCustomMessageBox('Erro de Rede', `Ocorreu um erro inesperado ao finalizar a compra: ${error.message}`, false);
+                        }
+                    });
+
+                    const addToCartButton = document.getElementById('addToCartButton');
+                    if (addToCartButton) {
+                        addToCartButton.addEventListener('click', () => {
+                            handleAddToCart(currentProductData); 
+                        });
+                    } else {
+                        console.error("FRONTEND: detailProduct.html: Botão 'Adicionar ao carrinho' não encontrado após renderização.");
+                    }
+
+                    updateBuyButtonState(); 
+                } catch (error) {
+                    document.getElementById("productDetail").innerHTML = `<p style="color: red;">Erro ao carregar produto: ${error.message}</p>`;
+                    console.error("FRONTEND: detailProduct.html: Erro no carregamento inicial do produto:", error);
+                    showCustomMessageBox('Erro', 'Ocorreu um erro ao carregar os detalhes do produto.', false);
+                }
+            }
+
+            async function handleAddToCart(product) {
+                if (!loggedInUserId) { 
+                    showCustomMessageBox('Aviso', 'Você precisa estar logado para adicionar produtos ao carrinho.', false);
+                    return;
+                }
+
+                let cartItems = JSON.parse(sessionStorage.getItem('cartItems')) || [];
+                console.log("DEBUG: detailProduct.html: Cart items BEFORE adding:", JSON.stringify(cartItems, null, 2));
+
+                const existingItemIndex = cartItems.findIndex(item => item.id === product.id);
+                const quantityInput = document.getElementById('quantityInput'); 
+                const quantityToAdd = parseInt(quantityInput ? quantityInput.value : 1) || 1;
+
+                if (existingItemIndex > -1) {
+                    cartItems[existingItemIndex].quantity = (cartItems[existingItemIndex].quantity || 0) + quantityToAdd;
+                    console.log(`DEBUG: detailProduct.html: Updated quantity for product ${product.id} to ${cartItems[existingItemIndex].quantity}.`);
+                } else {
+                    cartItems.push({
+                        id: product.id,
+                        title: product.title,
+                        imageUrl: product.imageUrl,
+                        price: product.price,
+                        stock: product.stock,
+                        quantity: quantityToAdd,
+                        isFull: true,
+                        isPreSelected: true
+                    });
+                    console.log(`DEBUG: detailProduct.html: Added new product ${product.id} with quantity ${quantityToAdd}.`);
+                }
+
+                sessionStorage.setItem('cartItems', JSON.stringify(cartItems));
+                console.log("DEBUG: detailProduct.html: Cart items AFTER adding and saving:", JSON.stringify(cartItems, null, 2));
+
+                showCustomMessageBox('Carrinho', 'Produto adicionado ao carrinho!', true);
+                window.location.href = '/cart.html'; 
+            }
+
+            await loadAndRenderProductDetails();
+        });
+    </script>
 
 </body>
 </html>

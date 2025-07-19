@@ -169,8 +169,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 logoutButton.addEventListener('click', () => {
                     sessionStorage.removeItem('loggedInUserId');
                     sessionStorage.removeItem('loggedInUserType');
+                    sessionStorage.removeItem('cartItems'); // Clear cart on logout
                     console.log("header.js: User logged out. Session cleared.");
-                    window.location.href = '/login.html'; // Redirect to login page after logout
+                    window.location.href = '/login.html'; // Redirect to login page
                 });
             }
 

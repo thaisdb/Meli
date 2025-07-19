@@ -20,61 +20,71 @@ public abstract class User {
     private int id;
     private String name;
     private String email;
+    private String cpf;
     private String password; // In a real app, this would be hashed
     private String address;
 
     // No-argument constructor is essential for Jackson deserialization
-<span class="nc" id="L27">    public User() {</span>
-<span class="nc" id="L28">    }</span>
+<span class="nc" id="L28">    public User() {</span>
+<span class="nc" id="L29">    }</span>
 
     // Parameterized constructor for convenience
-<span class="nc" id="L31">    public User(String name, String email, String password, String address) {</span>
-<span class="nc" id="L32">        this.name = name;</span>
-<span class="nc" id="L33">        this.email = email;</span>
-<span class="nc" id="L34">        this.password = password;</span>
-<span class="nc" id="L35">        this.address = address;</span>
-<span class="nc" id="L36">    }</span>
+<span class="nc" id="L32">    public User(String name, String email, String cpf, String password, String address) {</span>
+<span class="nc" id="L33">        this.name = name;</span>
+<span class="nc" id="L34">        this.email = email;</span>
+<span class="nc" id="L35">        this.cpf = cpf;</span>
+<span class="nc" id="L36">        this.password = password;</span>
+<span class="nc" id="L37">        this.address = address;</span>
+<span class="nc" id="L38">    }</span>
 
     // Getters and Setters
     public int getId() {
-<span class="nc" id="L40">        return id;</span>
+<span class="nc" id="L42">        return id;</span>
     }
 
     public void setId(int id) {
-<span class="nc" id="L44">        this.id = id;</span>
-<span class="nc" id="L45">    }</span>
+<span class="nc" id="L46">        this.id = id;</span>
+<span class="nc" id="L47">    }</span>
 
     public String getName() {
-<span class="nc" id="L48">        return name;</span>
+<span class="nc" id="L50">        return name;</span>
     }
 
     public void setName(String name) {
-<span class="nc" id="L52">        this.name = name;</span>
-<span class="nc" id="L53">    }</span>
+<span class="nc" id="L54">        this.name = name;</span>
+<span class="nc" id="L55">    }</span>
 
     public String getEmail() {
-<span class="nc" id="L56">        return email;</span>
+<span class="nc" id="L58">        return email;</span>
     }
 
     public void setEmail(String email) {
-<span class="nc" id="L60">        this.email = email;</span>
-<span class="nc" id="L61">    }</span>
+<span class="nc" id="L62">        this.email = email;</span>
+<span class="nc" id="L63">    }</span>
+
+    public String getCpf() {
+<span class="nc" id="L66">        return cpf;</span>
+    }
+
+    public void setCpf(String cpf) {
+<span class="nc" id="L70">        this.cpf = cpf;</span>
+<span class="nc" id="L71">    }</span>
 
     public String getPassword() {
-<span class="nc" id="L64">        return password;</span>
+<span class="nc" id="L74">        return password;</span>
     }
 
     public void setPassword(String password) {
-<span class="nc" id="L68">        this.password = password;</span>
-<span class="nc" id="L69">    }</span>
+<span class="nc" id="L78">        this.password = password;</span>
+<span class="nc" id="L79">    }</span>
 
     public String getAddress() {
-<span class="nc" id="L72">        return address;</span>
+<span class="nc" id="L82">        return address;</span>
     }
 
     public void setAddress(String address) {
-<span class="nc" id="L76">        this.address = address;</span>
-<span class="nc" id="L77">    }</span>
+<span class="nc" id="L86">        this.address = address;</span>
+<span class="nc" id="L87">    }</span>
 
     // Abstract method to be implemented by subclasses to return their type
     public abstract String getType(); // THIS IS THE METHOD CAUSING THE ERROR

@@ -97,7 +97,7 @@
         border: 1px solid #ddd;
         border-radius: 8px;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        min-width: 180px;
+        min-width: 150px;
         z-index: 100; /* Ensure it's above other content */
         display: flex;
         flex-direction: column;
@@ -113,11 +113,10 @@
         gap: 10px;
         background-color: white; /* Explicitly white background */
         border: none; /* Remove button default border */
-        width: 100%; /* Make button fill item width */
         text-align: left; /* Align text to left for buttons */
         cursor: pointer;
         transition: background-color 0.2s ease, color 0.2s ease;
-        font-size: 1em; /* Set font size to 1em */
+        font-size: 0.7em; /* Set font size to 1em */
         font-family: 'Inter', sans-serif; /* Set font family to Inter */
     }
 
@@ -191,7 +190,7 @@
             margin: 0 auto; /* Center horizontally */
             width: fit-content; /* Adjust width to content */
             padding: 0; /* Remove padding */
-            font-size: 1.5em; /* Smaller icon on mobile */
+            font-size: 1.0em; /* Smaller icon on mobile */
         }
     }
 </style>
@@ -214,7 +213,9 @@
         <i class="fas fa-user-circle profile-icon-fa"></i> <!-- The actual Font Awesome user icon -->
         <!-- Dropdown Menu (hidden by default) -->
         <div class="dropdown-menu hidden" id="profileDropdown">
-            <!-- Removed the user greeting span -->
+            <a href="/cart.html" id="cartLink" class="dropdown-item">
+                <i class="fas fa-shopping-cart"></i> Carrinho
+            </a>
             <a href="#" id="configLink" class="dropdown-item">
                 <i class="fas fa-cog"></i> Configurações
             </a>

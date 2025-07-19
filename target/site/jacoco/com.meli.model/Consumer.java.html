@@ -2,47 +2,57 @@
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.util.HashMap;
-import java.util.Map; // Import Map interface
+import java.util.Map;
 
-@JsonTypeName(&quot;consumer&quot;) // This links to the &quot;consumer&quot; type in User's JsonSubTypes
+// This links to the &quot;consumer&quot; type in User's JsonSubTypes
+@JsonTypeName(&quot;consumer&quot;)
 public class Consumer extends User {
 
-    // Corrected: Using HashMap&lt;Integer, Integer&gt; for cart
 <span class="nc" id="L11">    private Map&lt;Integer, Integer&gt; cart = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L12">    private PaymentMethod preferredPaymentMethod = PaymentMethod.PIX;</span>
 
     // No-argument constructor is essential for Jackson deserialization
     public Consumer() {
-<span class="nc" id="L15">        super(); // Call the no-arg constructor of the User superclass</span>
-<span class="nc" id="L16">    }</span>
+        // Call the no-arg constructor of the User superclass
+<span class="nc" id="L17">        super();</span>
+        // cart = new HashMap&lt;&gt;();
+        // preferredPaymentMethod = PaymentMethod.PIX;
+<span class="nc" id="L20">    }</span>
 
     // Parameterized constructor for convenience
-    public Consumer(String name, String email, String password, String address) {
-<span class="nc" id="L20">        super(name, email, password, address);</span>
-<span class="nc" id="L21">    }</span>
+    public Consumer(String name, String email, String cpf, String password, String address) {
+<span class="nc" id="L24">        super(name, email, cpf, password, address);</span>
+<span class="nc" id="L25">    }</span>
 
-    // Getter for cart
     public Map&lt;Integer, Integer&gt; getCart() {
-<span class="nc" id="L25">        return cart;</span>
+<span class="nc" id="L28">        return cart;</span>
     }
 
-    // Setter for cart
     public void setCart(Map&lt;Integer, Integer&gt; cart) {
-<span class="nc" id="L30">        this.cart = cart;</span>
-<span class="nc" id="L31">    }</span>
+<span class="nc" id="L32">        this.cart = cart;</span>
+<span class="nc" id="L33">    }</span>
 
     // Methods to manage cart (using Integer productId)
     public void addProductToCart(Integer productId, int quantity) {
-<span class="nc" id="L35">        this.cart.put(productId, this.cart.getOrDefault(productId, 0) + quantity);</span>
-<span class="nc" id="L36">    }</span>
+<span class="nc" id="L37">        this.cart.put(productId, this.cart.getOrDefault(productId, 0) + quantity);</span>
+<span class="nc" id="L38">    }</span>
 
     public void removeProductFromCart(Integer productId) {
-<span class="nc" id="L39">        this.cart.remove(productId);</span>
-<span class="nc" id="L40">    }</span>
+<span class="nc" id="L41">        this.cart.remove(productId);</span>
+<span class="nc" id="L42">    }</span>
 
-    @Override // IMPORTANT: This annotation tells the compiler we are overriding a superclass method
+    @Override
     public String getType() {
-<span class="nc" id="L44">        return &quot;consumer&quot;;</span>
+<span class="nc" id="L46">        return &quot;consumer&quot;;</span>
     }
+
+    public PaymentMethod getPreferredPaymentMethod() {
+<span class="nc" id="L50">        return preferredPaymentMethod;</span>
+    }
+
+    public void setPreferredPaymentMethod(PaymentMethod preferredPaymentMethod) {
+<span class="nc" id="L54">        this.preferredPaymentMethod = preferredPaymentMethod;</span>
+<span class="nc" id="L55">    }</span>
 
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

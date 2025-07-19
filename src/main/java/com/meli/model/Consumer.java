@@ -2,30 +2,32 @@ package com.meli.model;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.util.HashMap;
-import java.util.Map; // Import Map interface
+import java.util.Map;
 
-@JsonTypeName("consumer") // This links to the "consumer" type in User's JsonSubTypes
+// This links to the "consumer" type in User's JsonSubTypes
+@JsonTypeName("consumer")
 public class Consumer extends User {
 
-    // Corrected: Using HashMap<Integer, Integer> for cart
     private Map<Integer, Integer> cart = new HashMap<>();
+    private PaymentMethod preferredPaymentMethod = PaymentMethod.PIX;
 
     // No-argument constructor is essential for Jackson deserialization
     public Consumer() {
-        super(); // Call the no-arg constructor of the User superclass
+        // Call the no-arg constructor of the User superclass
+        super();
+        // cart = new HashMap<>();
+        // preferredPaymentMethod = PaymentMethod.PIX;
     }
 
     // Parameterized constructor for convenience
-    public Consumer(String name, String email, String password, String address) {
-        super(name, email, password, address);
+    public Consumer(String name, String email, String cpf, String password, String address) {
+        super(name, email, cpf, password, address);
     }
 
-    // Getter for cart
     public Map<Integer, Integer> getCart() {
         return cart;
     }
 
-    // Setter for cart
     public void setCart(Map<Integer, Integer> cart) {
         this.cart = cart;
     }
@@ -39,9 +41,17 @@ public class Consumer extends User {
         this.cart.remove(productId);
     }
 
-    @Override // IMPORTANT: This annotation tells the compiler we are overriding a superclass method
+    @Override
     public String getType() {
         return "consumer";
+    }
+
+    public PaymentMethod getPreferredPaymentMethod() {
+        return preferredPaymentMethod;
+    }
+
+    public void setPreferredPaymentMethod(PaymentMethod preferredPaymentMethod) {
+        this.preferredPaymentMethod = preferredPaymentMethod;
     }
 
 }
