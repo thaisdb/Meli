@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pt"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UserController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Prototype</a> &gt; <a href="index.source.html" class="el_package">com.meli.controller</a> &gt; <span class="el_source">UserController.java</span></div><h1>UserController.java</h1><pre class="source lang-java linenums">package com.meli.controller;
+
+import com.meli.model.User;
+import com.meli.service.UserService;
+import com.meli.dto.LoginRequestDTO; // Certifique-se de que este DTO está correto
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Optional; // Importar Optional
+
+/*
+ * Handles /signup, /login, etc.
+ */
+@RestController
+@RequestMapping(&quot;/users&quot;)
+public class UserController {
+
+    private final UserService userService;
+
+    // Constructor injection (required for Spring Boot)
+<span class="nc" id="L24">    public UserController(UserService userService) {</span>
+<span class="nc" id="L25">        this.userService = userService;</span>
+<span class="nc" id="L26">    }</span>
+
+    /**
+     * Get all users
+     */
+    @GetMapping
+    public List&lt;User&gt; getAllUsers() {
+<span class="nc" id="L33">        return userService.getAllUsers();</span>
+    }
+
+    /**
+     * Get user by ID
+     */
+    @GetMapping(&quot;/{id}&quot;)
+    public ResponseEntity&lt;?&gt; getUserById(@PathVariable int id) {
+<span class="nc" id="L41">        User user = userService.getUserById(id);</span>
+<span class="nc bnc" id="L42" title="All 2 branches missed.">        if (user != null) {</span>
+<span class="nc" id="L43">            return ResponseEntity.ok(user);</span>
+        } else {
+<span class="nc" id="L45">            return ResponseEntity.status(HttpStatus.NOT_FOUND)</span>
+<span class="nc" id="L46">                                 .body(&quot;Usuário com ID &quot; + id + &quot; não foi encontrado.&quot;);</span>
+        }
+    }
+
+    /**
+     * Register new user (Consumer or Seller depending on JSON type)
+     */
+    @PostMapping(&quot;/register&quot;)
+    public ResponseEntity&lt;?&gt; registerUser(@RequestBody User user) {
+<span class="nc bnc" id="L55" title="All 4 branches missed.">        if (user.getName() == null || user.getName().isEmpty() ||</span>
+<span class="nc bnc" id="L56" title="All 4 branches missed.">            user.getPassword() == null || user.getPassword().isEmpty() ||</span>
+<span class="nc bnc" id="L57" title="All 4 branches missed.">            user.getEmail() == null || user.getEmail().isEmpty() ||</span>
+<span class="nc bnc" id="L58" title="All 4 branches missed.">            user.getCpf() == null || user.getCpf().isEmpty() ||</span>
+<span class="nc bnc" id="L59" title="All 4 branches missed.">            user.getAddress() == null || user.getAddress().isEmpty() ||</span>
+<span class="nc bnc" id="L60" title="All 4 branches missed.">            user.getType() == null || user.getType().isEmpty()) { // Usar getType() para o tipo de usuário</span>
+<span class="nc" id="L61">            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(&quot;Todos os campos (nome, email, cpf, senha, endereço, tipo) são obrigatórios.&quot;);</span>
+        }
+
+<span class="nc" id="L64">        Optional&lt;User&gt; createdUser = userService.registerUser(user); // Agora retorna Optional</span>
+<span class="nc bnc" id="L65" title="All 2 branches missed.">        if (createdUser.isPresent()) {</span>
+<span class="nc" id="L66">            return ResponseEntity.status(HttpStatus.CREATED).body(createdUser.get());</span>
+        } else {
+<span class="nc" id="L68">            return ResponseEntity.status(HttpStatus.CONFLICT).body(&quot;Email já cadastrado. Por favor, use outro email.&quot;);</span>
+        }
+    }
+
+    /**
+     * Authenticate user and return user details for redirection.
+     * This method will handle the login logic.
+     */
+    @PostMapping(value = &quot;/login&quot;, consumes = &quot;application/json&quot;) 
+    public ResponseEntity&lt;?&gt; loginUser(@RequestBody LoginRequestDTO loginRequest) {
+<span class="nc" id="L78">        Optional&lt;User&gt; foundUser = userService.loginUser(loginRequest.getEmail(), loginRequest.getPassword());</span>
+<span class="nc bnc" id="L79" title="All 2 branches missed.">        if (foundUser.isPresent()) {</span>
+<span class="nc" id="L80">            return ResponseEntity.ok(foundUser.get());</span>
+        } else {
+<span class="nc" id="L82">            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)</span>
+<span class="nc" id="L83">                                 .body(&quot;Credenciais inválidas. Verifique seu email e senha.&quot;);</span>
+        }
+    }   
+
+    /**
+     * Update user by ID
+     */
+    @PutMapping(&quot;/{id}&quot;)
+    public ResponseEntity&lt;?&gt; updateUser(@PathVariable int id, @RequestBody User userDetails) {
+<span class="nc bnc" id="L92" title="All 4 branches missed.">        if (userDetails.getName() == null || userDetails.getName().isEmpty() ||</span>
+<span class="nc bnc" id="L93" title="All 4 branches missed.">            userDetails.getEmail() == null || userDetails.getEmail().isEmpty() ||</span>
+<span class="nc bnc" id="L94" title="All 4 branches missed.">            userDetails.getCpf() == null || userDetails.getCpf().isEmpty() ||</span>
+<span class="nc bnc" id="L95" title="All 4 branches missed.">            userDetails.getAddress() == null || userDetails.getAddress().isEmpty()) {</span>
+<span class="nc" id="L96">            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(&quot;Nome, email, cpf e endereço são obrigatórios para atualização.&quot;);</span>
+        }
+
+<span class="nc" id="L99">        Optional&lt;User&gt; updatedUser = userService.updateUser(userDetails); // Agora retorna Optional</span>
+<span class="nc bnc" id="L100" title="All 2 branches missed.">        if (updatedUser.isPresent()) {</span>
+<span class="nc" id="L101">            return ResponseEntity.ok(updatedUser.get());</span>
+        } else {
+<span class="nc bnc" id="L103" title="All 2 branches missed.">            if (userService.getUserById(id) == null) {</span>
+<span class="nc" id="L104">                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(&quot;Usuário com ID &quot; + id + &quot; não encontrado para atualização.&quot;);</span>
+<span class="nc bnc" id="L105" title="All 2 branches missed.">            } else if (userService.findByEmail(userDetails.getEmail()) != null &amp;&amp; </span>
+<span class="nc bnc" id="L106" title="All 2 branches missed.">                       userService.getUserById(id) != null &amp;&amp; // Garante que o usuário original existe</span>
+<span class="nc bnc" id="L107" title="All 2 branches missed.">                       !userService.getUserById(id).getEmail().equalsIgnoreCase(userDetails.getEmail())) {</span>
+<span class="nc" id="L108">                return ResponseEntity.status(HttpStatus.CONFLICT).body(&quot;Email já cadastrado para outro usuário. Por favor, use outro email.&quot;);</span>
+            }
+<span class="nc" id="L110">            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(&quot;Falha na atualização do usuário. Verifique os dados e tente novamente.&quot;);</span>
+        }
+    }
+
+    /**
+     * Delete user by ID
+     */
+    @DeleteMapping(&quot;/{id}&quot;)
+    public ResponseEntity&lt;String&gt; deleteUserById(@PathVariable int id) {
+<span class="nc" id="L119">        boolean removed = userService.deleteUserById(id);</span>
+<span class="nc bnc" id="L120" title="All 2 branches missed.">        if (removed) {</span>
+<span class="nc" id="L121">            return ResponseEntity.ok(&quot;Usuário removido com sucesso.&quot;);</span>
+        } else {
+<span class="nc" id="L123">            return ResponseEntity.status(HttpStatus.NOT_FOUND)</span>
+<span class="nc" id="L124">                                 .body(&quot;Usuário com ID &quot; + id + &quot; não encontrado.&quot;);</span>
+        }
+    }
+
+    /**
+     * Find user by email
+     */
+    @GetMapping(&quot;/email/{email}&quot;)
+    public ResponseEntity&lt;?&gt; findByEmail(@PathVariable String email) {
+<span class="nc" id="L133">        User user = userService.findByEmail(email);</span>
+<span class="nc bnc" id="L134" title="All 2 branches missed.">        if (user != null) {</span>
+<span class="nc" id="L135">            return ResponseEntity.ok(user);</span>
+        } else {
+<span class="nc" id="L137">            return ResponseEntity.status(HttpStatus.NOT_FOUND)</span>
+<span class="nc" id="L138">                                 .body(&quot;Usuário com email &quot; + email + &quot; não encontrado.&quot;);</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

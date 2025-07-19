@@ -14,6 +14,7 @@ import org.springframework.web.filter.HiddenHttpMethodFilter;
 public class PrototypeApplication 
 {
     public static void main(String[] args) {
+        System.out.println("Application Working Directory: " + System.getProperty("user.dir"));
         SpringApplication.run(PrototypeApplication.class, args);
     }
 
@@ -22,3 +23,4 @@ public class PrototypeApplication
         return new HiddenHttpMethodFilter();
     }
 }
+

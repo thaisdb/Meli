@@ -1,130 +1,371 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Sign Up</title>
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: Arial, sans-serif;
-      background-color: #f5f5f5;
-    }
-
-    .signup-container {
-      width: 100%;
-      max-width: 500px;
-      margin: 60px auto;
-      padding: 30px;
-      background-color: white;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-      border-radius: 10px;
-    }
-
-    h2 {
-      text-align: center;
-      margin-bottom: 24px;
-    }
-
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      margin-bottom: 16px;
-    }
-
-    .form-group label {
-      font-weight: bold;
-      margin-bottom: 6px;
-    }
-
-    .form-group input[type="text"],
-    .form-group input[type="email"],
-    .form-group input[type="password"] {
-      padding: 10px;
-      font-size: 16px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-    }
-
-    .role-toggle {
-      display: flex;
-      gap: 20px;
-      margin-top: 6px;
-    }
-
-    .role-toggle label {
-      font-weight: normal;
-      font-size: 14px;
-    }
-
-    .signup-button {
-      width: 100%;
-      padding: 12px;
-      background-color: #3483fa;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      font-size: 16px;
-      cursor: pointer;
-    }
-
-    .signup-button:hover {
-      background-color: #2968c8;
-    }
-
-    .login-link {
-      display: block;
-      text-align: center;
-      margin-top: 15px;
-      color: #3483fa;
-      text-decoration: none;
-    }
-
-    .login-link:hover {
-      text-decoration: underline;
-    }
-  </style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sign Up</title>
+    <link rel="stylesheet" type="text/css" href="/css/page.css">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Link to the header.js script -->
+    <script src="header.js" defer></script>
+    <style>
+        /* Adicione este estilo para o select, se o seu page.css não o estilizar automaticamente */
+        /* Ele tenta imitar o estilo de um input de texto padrão */
+        .signup-container select {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box; /* Garante que padding e border sejam incluídos na largura */
+            font-size: 1rem;
+            background-color: #fff; /* Fundo branco para o select */
+            appearance: none; /* Remove o estilo padrão do sistema operacional para o select */
+            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%20viewBox%3D%220%200%20292.4%20292.4%22%3E%3Cpath%20fill%3D%22%23000000%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13%205.7L146.2%20204.7%2018.3%2075.1a17.6%2017.6%200%200%200-25.5%2023.7l138.4%20138.4c.7%201.2%201.7%202.1%202.8%202.7.7.4%201.4.7%202.2%201%201.8.8%203.7%201.2%205.7%201.2s3.9-.4%205.7-1.2c.8-.3%201.5-.6%202.2-1%201.1-.6%202.1-1.5%202.8-2.7l138.4-138.4a17.6%2017.6%200%200%200-13-30.7z%22%2F%3E%3C%2Fsvg%3E');
+            background-repeat: no-repeat;
+            background-position: right 10px top 50%;
+            background-size: 12px auto;
+            cursor: pointer;
+        }
+    </style>
 </head>
-<body>
 
-  <div class="signup-container">
-    <h2>Create an Account</h2>
-    <form action="/register" method="post">
-      <!-- ID is auto-generated and not shown -->
+<body data-title="Sign Up" data-show-profile-icon="false" data-show-search-bar="false">
+    <div class="header-placeholder"></div>
 
-      <div class="form-group">
-        <label for="name">Full Name</label>
-        <input type="text" id="name" name="name" required />
-      </div>
+    <div class="signup-container">
+        <h2>Crie uma conta</h2>
+        <form id="signupForm">
+            <div class="form-group">
+                <label for="name">Nome:</label>
+                <input type="text" id="name" name="name" required />
+            </div>
 
-      <div class="form-group">
-        <label for="email">Email Address</label>
-        <input type="email" id="email" name="email" required />
-      </div>
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required />
+                <p id="emailError" class="text-red-500 text-sm mt-1 hidden">Este email já está cadastrado.</p>
+            </div>
 
-      <div class="form-group">
-        <label for="password">Password</label>
-        <input type="password" id="password" name="password" required />
-      </div>
+            <div class="form-group">
+                <label for="cpf">Cpf:</label>
+                <input type="text" id="cpf" name="cpf" 
+                         pattern="\d{3}\.\d{3}\.\d{3}-\d{2}" 
+                         placeholder="123.456.789-00" required />
+                <p id="cpfError" class="text-red-500 text-sm mt-1 hidden">Formato de CPF inválido. Use XXX.XXX.XXX-XX</p>
+            </div>
 
-      <div class="form-group">
-        <label for="address">Address</label>
-        <input type="text" id="address" name="address" required />
-      </div>
+            <div class="form-group">
+                <label for="password">Senha:</label>
+                <input type="password" id="password" name="password" required />
+            </div>
 
-      <div class="form-group">
-        <label>Account Type</label>
-        <div class="role-toggle">
-          <label><input type="radio" name="accountType" value="consumer" checked /> Consumer</label>
-          <label><input type="radio" name="accountType" value="seller" /> Seller</label>
+            <div class="form-group">
+                <label for="confirmPassword">Confirmar Senha:</label>
+                <input type="password" id="confirmPassword" name="confirmPassword" required />
+            </div>
+
+            <div class="form-group">
+                <label for="address">Endereço:</label>
+                <input type="text" id="address" name="address" required />
+            </div>
+
+            <div class="form-group">
+                <label>Tipo de conta:</label>
+                <div class="toggle-container">
+                    <span class="label">Consumidor</span>
+                    <label class="switch">
+                        <input type="checkbox" id="accountTypeToggle">
+                        <span class="slider round"></span>
+                    </label>
+                    <span class="label">Vendedor</span>
+                </div>
+            </div>
+
+            <!-- CAMPO DE PAGAMENTO: O div já tem form-group, vamos estilizar o select diretamente -->
+            <div class="form-group" id="preferredPaymentMethodGroup" style="display: block;">
+                <label for="preferredPaymentMethod">Método de Pagamento Preferido:</label>
+                <select id="preferredPaymentMethod" name="preferredPaymentMethod" required>
+                    <option value="">Selecione...</option>
+                    <option value="BOLETO">Boleto</option>
+                    <option value="CREDITO">Crédito</option>
+                    <option value="DEBITO">Débito</option>
+                    <option value="PIX">Pix</option>
+                </select>
+            </div>
+
+            <button type="submit" class="button" id="signupButton" disabled>Sign Up</button><br><br>
+            <button class="button light-blue-button" onclick="location.href='/login.html'" type="button">Já tem uma conta? Log in</button>
+
+        </form>
+    </div>
+
+    <!-- Custom Message Box for Success/Error - Uses app-modal classes -->
+    <div id="messageBoxOverlay" class="app-modal-overlay hidden">
+        <div class="app-modal-content">
+            <h2 id="messageBoxTitle" class="app-modal-title"></h2>
+            <p id="messageBoxMessage" class="app-modal-message"></p>
+            <div class="app-modal-actions">
+                <button id="messageBoxCloseBtn" class="button">OK</button>
+            </div>
         </div>
-      </div>
+    </div>
 
-      <button type="submit" class="signup-button">Sign Up</button>
-      <a class="login-link" href="/login">Already have an account? Log in</a>
-    </form>
-  </div>
+    <script>
+        // Custom message box functions (re-used from other pages)
+        const messageBoxOverlay = document.getElementById('messageBoxOverlay');
+        const messageBoxTitle = document.getElementById('messageBoxTitle');
+        const messageBoxMessage = document.getElementById('messageBoxMessage');
+        const messageBoxCloseBtn = document.getElementById('messageBoxCloseBtn');
 
+        function showCustomMessageBox(title, message, isSuccess = true) {
+            messageBoxTitle.textContent = title;
+            messageBoxMessage.textContent = message;
+            // Apply colors based on success/error
+            messageBoxTitle.style.color = isSuccess ? '#00a650' : '#dc3545'; // Green for success, red for error
+            messageBoxCloseBtn.style.backgroundColor = isSuccess ? '#3483fa' : '#6c757d'; // Blue for success, grey for error
+
+            messageBoxOverlay.classList.remove('hidden');
+        }
+
+        if (messageBoxCloseBtn) {
+            messageBoxCloseBtn.addEventListener('click', () => {
+                messageBoxOverlay.classList.add('hidden');
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const signupForm = document.getElementById('signupForm');
+            const accountTypeToggle = document.getElementById('accountTypeToggle');
+            const emailInput = document.getElementById('email');
+            const emailError = document.getElementById('emailError');
+            const signupButton = document.getElementById('signupButton');
+            const passwordInput = document.getElementById('password');
+            const confirmPasswordInput = document.getElementById('confirmPassword');
+            const cpfInput = document.getElementById('cpf');
+            const cpfError = document.getElementById('cpfError');
+            const nameInput = document.getElementById('name');
+            const addressInput = document.getElementById('address');
+            
+            const preferredPaymentMethodGroup = document.getElementById('preferredPaymentMethodGroup');
+            const preferredPaymentMethodInput = document.getElementById('preferredPaymentMethod');
+
+
+            let isEmailUnique = false; 
+
+            function updateSignupButtonState() {
+                const formValidity = signupForm.checkValidity(); 
+                const passwordsMatch = passwordInput.value === confirmPasswordInput.value;
+                
+                const nameIsValid = nameInput.checkValidity();
+                const emailIsValid = emailInput.checkValidity();
+                const cpfIsValid = cpfInput.checkValidity();
+                const passwordIsValid = passwordInput.checkValidity();
+                const confirmPasswordIsValid = confirmPasswordInput.checkValidity();
+                const addressIsValid = addressInput.checkValidity();
+
+                let preferredPaymentMethodIsValid = true;
+                if (accountTypeToggle.checked === false) { // Se for Consumidor
+                    preferredPaymentMethodIsValid = preferredPaymentMethodInput.checkValidity();
+                }
+
+                console.log("--- Updating Button State ---");
+                console.log("isEmailUnique:", isEmailUnique);
+                console.log("formValidity (all required fields + patterns):", formValidity);
+                console.log("passwordsMatch:", passwordsMatch);
+                console.log("Individual field validity:");
+                console.log("  Name valid:", nameIsValid);
+                console.log("  Email valid:", emailIsValid);
+                console.log("  CPF valid:", cpfIsValid);
+                console.log("  Password valid:", passwordIsValid);
+                console.log("  Confirm Password valid:", confirmPasswordIsValid);
+                console.log("  Address valid:", addressIsValid);
+                console.log("  Preferred Payment Method valid (if Consumer):", preferredPaymentMethodIsValid); 
+                
+                const allConditionsMet = isEmailUnique && formValidity && passwordsMatch && preferredPaymentMethodIsValid; 
+
+                console.log("Combined condition (isEmailUnique && formValidity && passwordsMatch && preferredPaymentMethodIsValid):", allConditionsMet);
+
+                signupButton.disabled = !allConditionsMet;
+                console.log("Signup button disabled state set to:", signupButton.disabled);
+                console.log("-----------------------------");
+            }
+
+            async function validateEmailUniqueness() {
+                const email = emailInput.value.trim(); 
+                if (!email) {
+                    emailError.classList.add('hidden');
+                    isEmailUnique = false;
+                    updateSignupButtonState(); 
+                    return;
+                }
+
+                try {
+                    const response = await fetch(`/users/email/${email}`);
+                    if (response.ok) {
+                        emailError.textContent = 'Este email já está cadastrado.';
+                        emailError.classList.remove('hidden');
+                        isEmailUnique = false;
+                    } else if (response.status === 404) {
+                        emailError.classList.add('hidden');
+                        isEmailUnique = true;
+                    } else {
+                        const errorText = await response.text();
+                        emailError.textContent = `Erro ao verificar email: ${errorText}`;
+                        emailError.classList.remove('hidden');
+                        isEmailUnique = false;
+                        console.error("FRONTEND: signup.html: Erro ao verificar unicidade do email:", errorText);
+                    }
+                } catch (error) {
+                    console.error("FRONTEND: signup.html: Erro de rede ao verificar email:", error);
+                    emailError.textContent = 'Erro de conexão ao verificar email. Tente novamente.';
+                    emailError.classList.remove('hidden');
+                    isEmailUnique = false;
+                } finally {
+                    updateSignupButtonState(); 
+                }
+            }
+
+            emailInput.addEventListener('blur', validateEmailUniqueness);
+            
+            signupForm.querySelectorAll('input').forEach(input => {
+                input.addEventListener('input', () => {
+                    if (input.id === 'email') {
+                         emailError.classList.add('hidden'); 
+                         isEmailUnique = false; 
+                    }
+                    if (input.id === 'cpf') {
+                        if (cpfInput.checkValidity()) {
+                            cpfError.classList.add('hidden');
+                        } else {
+                            cpfError.classList.remove('hidden');
+                        }
+                    }
+                    updateSignupButtonState();
+                });
+            });
+
+            accountTypeToggle.addEventListener('change', () => {
+                if (accountTypeToggle.checked) { // Se for Vendedor
+                    preferredPaymentMethodGroup.style.display = 'none';
+                    preferredPaymentMethodInput.removeAttribute('required');
+                    preferredPaymentMethodInput.value = ''; 
+                } else { // Se for Consumidor
+                    preferredPaymentMethodGroup.style.display = 'block';
+                    preferredPaymentMethodInput.setAttribute('required', 'required');
+                }
+                updateSignupButtonState(); 
+            });
+
+            preferredPaymentMethodInput.addEventListener('change', updateSignupButtonState);
+
+
+            updateSignupButtonState(); 
+            if (accountTypeToggle.checked) { 
+                preferredPaymentMethodGroup.style.display = 'none';
+                preferredPaymentMethodInput.removeAttribute('required');
+                preferredPaymentMethodInput.value = ''; 
+            } else { 
+                preferredPaymentMethodGroup.style.display = 'block';
+                preferredPaymentMethodInput.setAttribute('required', 'required');
+            }
+
+
+            if (signupForm) {
+                signupForm.addEventListener('submit', async (event) => {
+                    event.preventDefault();
+
+                    await validateEmailUniqueness();
+                    if (!isEmailUnique) {
+                        showCustomMessageBox('Erro de Registro', 'Por favor, corrija os erros no formulário (email já cadastrado).', false);
+                        return;
+                    }
+                    
+                    if (passwordInput.value !== confirmPasswordInput.value) {
+                        showCustomMessageBox('Erro de Registro', 'As senhas não coincidem.', false);
+                        return;
+                    }
+
+                    if (!signupForm.checkValidity()) {
+                        showCustomMessageBox('Erro de Registro', 'Por favor, preencha todos os campos obrigatórios corretamente.', false);
+                        return;
+                    }
+
+
+                    const name = document.getElementById('name').value;
+                    const email = document.getElementById('email').value;
+                    const cpf = document.getElementById('cpf').value;
+                    const password = document.getElementById('password').value;
+                    const address = document.getElementById('address').value;
+                    const userType = accountTypeToggle.checked ? "seller" : "consumer"; 
+                    let preferredPaymentMethod = null; 
+
+                    if (userType === "consumer") {
+                        preferredPaymentMethod = preferredPaymentMethodInput.value;
+                        if (!preferredPaymentMethod) { 
+                            showCustomMessageBox('Erro de Registro', 'Por favor, selecione um método de pagamento preferido.', false);
+                            return;
+                        }
+                    }
+
+                    let userData = {
+                        name: name,
+                        email: email,
+                        cpf: cpf,
+                        password: password,
+                        address: address,
+                        type: userType
+                    };
+
+                    if (userType === "consumer") {
+                        userData.preferredPaymentMethod = preferredPaymentMethod;
+                    }
+
+                    console.log("FRONTEND: signup.html: User data being sent:", userData);
+
+                    try {
+                        const response = await fetch('/users/register', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(userData)
+                        });
+
+                        if (response.ok) {
+                            console.log("FRONTEND: signup.html: Usuário registrado com sucesso!");
+                            showCustomMessageBox('Registro Concluído!', 'Usuário registrado com sucesso. Você será redirecionado para a página de login.', true);
+                            signupForm.reset();
+                            isEmailUnique = false;
+                            updateSignupButtonState();
+                            
+                            setTimeout(() => {
+                                window.location.href = '/login.html';
+                            }, 2000); 
+                        } else {
+                            const errorText = await response.text();
+                            let errorMessage = `Erro: ${response.status} ${response.statusText}`;
+                            try {
+                                const errorJson = JSON.parse(errorText);
+                                errorMessage = `Erro: ${errorJson.message || errorJson.error || JSON.stringify(errorJson)}`;
+                            } catch (e) {
+                                errorMessage = `Erro: ${errorText}`;
+                            }
+                            console.error("FRONTEND: signup.html: Falha no registro. Status:", response.status, "Erro:", errorText);
+                            showCustomMessageBox('Falha no Registro', errorMessage, false);
+                        }
+                    } catch (error) {
+                        console.error("FRONTEND: signup.html: Erro de rede ou inesperado durante o registro:", error);
+                        showCustomMessageBox('Erro de Rede', `Ocorreu um erro inesperado: ${error.message}`, false);
+                    }
+                });
+            } else {
+                console.error("FRONTEND: signup.html: signupForm element not found.");
+            }
+        });
+    </script>
 </body>
+
 </html>

@@ -29,15 +29,27 @@ com.meli.controller
 com.meli.dto
 com.meli.model
 com.meli
+com.meli.repository
 com.meli.service
 'C:/Users/thaisdb/Desktop/Code/prototype/src/main/java/com/meli/controller/ProductController.java'
+'C:/Users/thaisdb/Desktop/Code/prototype/src/main/java/com/meli/controller/UserController.java'
 'C:/Users/thaisdb/Desktop/Code/prototype/src/main/java/com/meli/dto/BuyRequestDTO.java'
+'C:/Users/thaisdb/Desktop/Code/prototype/src/main/java/com/meli/dto/LoginRequestDTO.java'
+'C:/Users/thaisdb/Desktop/Code/prototype/src/main/java/com/meli/dto/UserRequestDTO.java'
 'C:/Users/thaisdb/Desktop/Code/prototype/src/main/java/com/meli/model/Consumer.java'
+'C:/Users/thaisdb/Desktop/Code/prototype/src/main/java/com/meli/model/Orders.java'
+'C:/Users/thaisdb/Desktop/Code/prototype/src/main/java/com/meli/model/OrderStatus.java'
+'C:/Users/thaisdb/Desktop/Code/prototype/src/main/java/com/meli/model/PaymentMethod.java'
 'C:/Users/thaisdb/Desktop/Code/prototype/src/main/java/com/meli/model/Product.java'
 'C:/Users/thaisdb/Desktop/Code/prototype/src/main/java/com/meli/model/Seller.java'
 'C:/Users/thaisdb/Desktop/Code/prototype/src/main/java/com/meli/model/User.java'
 'C:/Users/thaisdb/Desktop/Code/prototype/src/main/java/com/meli/PrototypeApplication.java'
+'C:/Users/thaisdb/Desktop/Code/prototype/src/main/java/com/meli/repository/OrderRepository.java'
+'C:/Users/thaisdb/Desktop/Code/prototype/src/main/java/com/meli/repository/ProductRepository.java'
+'C:/Users/thaisdb/Desktop/Code/prototype/src/main/java/com/meli/repository/UserRepository.java'
+'C:/Users/thaisdb/Desktop/Code/prototype/src/main/java/com/meli/service/OrderService.java'
 'C:/Users/thaisdb/Desktop/Code/prototype/src/main/java/com/meli/service/ProductService.java'
+'C:/Users/thaisdb/Desktop/Code/prototype/src/main/java/com/meli/service/UserService.java'
 C:\Users\thaisdb\.m2\repository\org\springframework\boot\spring-boot-starter-web\3.2.4\spring-boot-starter-web-3.2.4.jar = 1752408424798
 C:\Users\thaisdb\.m2\repository\org\springframework\boot\spring-boot-starter\3.2.4\spring-boot-starter-3.2.4.jar = 1752408424860
 C:\Users\thaisdb\.m2\repository\org\springframework\boot\spring-boot\3.2.4\spring-boot-3.2.4.jar = 1752408425176
@@ -78,18 +90,18 @@ C:\Users\thaisdb\.m2\repository\jakarta\validation\jakarta.validation-api\3.0.2\
 C:\Users\thaisdb\.m2\repository\org\jboss\logging\jboss-logging\3.5.3.Final\jboss-logging-3.5.3.Final.jar = 1752012457815
 C:\Users\thaisdb\.m2\repository\com\fasterxml\classmate\1.6.0\classmate-1.6.0.jar = 1752408612956
 C:\Users\thaisdb\Desktop\Code\prototype\src\main\java = 1752012224297
-C:\Users\thaisdb\Desktop\Code\prototype\target\generated-sources\annotations = 1752442949005
-C:\Users\thaisdb\Desktop\Code\prototype\target\site\apidocs\allclasses-index.html = 1752442953947
-C:\Users\thaisdb\Desktop\Code\prototype\target\site\apidocs\allpackages-index.html = 1752442953949
-C:\Users\thaisdb\Desktop\Code\prototype\target\site\apidocs\element-list = 1752442953819
-C:\Users\thaisdb\Desktop\Code\prototype\target\site\apidocs\help-doc.html = 1752442953977
-C:\Users\thaisdb\Desktop\Code\prototype\target\site\apidocs\index-all.html = 1752442953971
-C:\Users\thaisdb\Desktop\Code\prototype\target\site\apidocs\index.html = 1752442953930
-C:\Users\thaisdb\Desktop\Code\prototype\target\site\apidocs\member-search-index.js = 1752442953955
-C:\Users\thaisdb\Desktop\Code\prototype\target\site\apidocs\module-search-index.js = 1752442953952
-C:\Users\thaisdb\Desktop\Code\prototype\target\site\apidocs\overview-summary.html = 1752442953974
-C:\Users\thaisdb\Desktop\Code\prototype\target\site\apidocs\overview-tree.html = 1752442953923
-C:\Users\thaisdb\Desktop\Code\prototype\target\site\apidocs\package-search-index.js = 1752442953953
-C:\Users\thaisdb\Desktop\Code\prototype\target\site\apidocs\search.html = 1752442953972
-C:\Users\thaisdb\Desktop\Code\prototype\target\site\apidocs\tag-search-index.js = 1752442953956
-C:\Users\thaisdb\Desktop\Code\prototype\target\site\apidocs\type-search-index.js = 1752442953954
+C:\Users\thaisdb\Desktop\Code\prototype\target\generated-sources\annotations = 1752959588066
+C:\Users\thaisdb\Desktop\Code\prototype\target\site\apidocs\allclasses-index.html = 1752959593868
+C:\Users\thaisdb\Desktop\Code\prototype\target\site\apidocs\allpackages-index.html = 1752959593870
+C:\Users\thaisdb\Desktop\Code\prototype\target\site\apidocs\element-list = 1752959593660
+C:\Users\thaisdb\Desktop\Code\prototype\target\site\apidocs\help-doc.html = 1752959593910
+C:\Users\thaisdb\Desktop\Code\prototype\target\site\apidocs\index-all.html = 1752959593901
+C:\Users\thaisdb\Desktop\Code\prototype\target\site\apidocs\index.html = 1752959593852
+C:\Users\thaisdb\Desktop\Code\prototype\target\site\apidocs\member-search-index.js = 1752959593876
+C:\Users\thaisdb\Desktop\Code\prototype\target\site\apidocs\module-search-index.js = 1752959593872
+C:\Users\thaisdb\Desktop\Code\prototype\target\site\apidocs\overview-summary.html = 1752959593906
+C:\Users\thaisdb\Desktop\Code\prototype\target\site\apidocs\overview-tree.html = 1752959593846
+C:\Users\thaisdb\Desktop\Code\prototype\target\site\apidocs\package-search-index.js = 1752959593873
+C:\Users\thaisdb\Desktop\Code\prototype\target\site\apidocs\search.html = 1752959593903
+C:\Users\thaisdb\Desktop\Code\prototype\target\site\apidocs\tag-search-index.js = 1752959593877
+C:\Users\thaisdb\Desktop\Code\prototype\target\site\apidocs\type-search-index.js = 1752959593874

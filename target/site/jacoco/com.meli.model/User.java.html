@@ -1,53 +1,92 @@
 <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pt"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>User.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Prototype</a> &gt; <a href="index.source.html" class="el_package">com.meli.model</a> &gt; <span class="el_source">User.java</span></div><h1>User.java</h1><pre class="source lang-java linenums">package com.meli.model;
+
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
+/*
+ * Base class for all user types (Consumer, Seller).
+ * Uses Jackson annotations for polymorphic deserialization based on the 'type' field.
+ */
 @JsonTypeInfo(
-  use = JsonTypeInfo.Id.NAME,
-  include = JsonTypeInfo.As.PROPERTY,
-  property = &quot;type&quot;
+    use = JsonTypeInfo.Id.NAME,
+    include = JsonTypeInfo.As.PROPERTY,
+    property = &quot;type&quot;
 )
 @JsonSubTypes({
-  @JsonSubTypes.Type(value = Consumer.class, name = &quot;consumer&quot;),
-  @JsonSubTypes.Type(value = Seller.class, name = &quot;seller&quot;)
+    @JsonSubTypes.Type(value = Consumer.class, name = &quot;consumer&quot;),
+    @JsonSubTypes.Type(value = Seller.class, name = &quot;seller&quot;)
 })
-
-<span class="nc" id="L15">public abstract class User {</span>
+public abstract class User {
     private int id;
     private String name;
     private String email;
-    private String password;
+    private String cpf;
+    private String password; // In a real app, this would be hashed
     private String address;
 
+    // No-argument constructor is essential for Jackson deserialization
+<span class="nc" id="L28">    public User() {</span>
+<span class="nc" id="L29">    }</span>
+
+    // Parameterized constructor for convenience
+<span class="nc" id="L32">    public User(String name, String email, String cpf, String password, String address) {</span>
+<span class="nc" id="L33">        this.name = name;</span>
+<span class="nc" id="L34">        this.email = email;</span>
+<span class="nc" id="L35">        this.cpf = cpf;</span>
+<span class="nc" id="L36">        this.password = password;</span>
+<span class="nc" id="L37">        this.address = address;</span>
+<span class="nc" id="L38">    }</span>
+
+    // Getters and Setters
     public int getId() {
-<span class="nc" id="L23">        return id;</span>
+<span class="nc" id="L42">        return id;</span>
     }
+
     public void setId(int id) {
-<span class="nc" id="L26">        this.id = id;</span>
-<span class="nc" id="L27">    }</span>
+<span class="nc" id="L46">        this.id = id;</span>
+<span class="nc" id="L47">    }</span>
+
     public String getName() {
-<span class="nc" id="L29">        return name;</span>
+<span class="nc" id="L50">        return name;</span>
     }
+
     public void setName(String name) {
-<span class="nc" id="L32">        this.name = name;</span>
-<span class="nc" id="L33">    }</span>
+<span class="nc" id="L54">        this.name = name;</span>
+<span class="nc" id="L55">    }</span>
+
     public String getEmail() {
-<span class="nc" id="L35">        return email;</span>
+<span class="nc" id="L58">        return email;</span>
     }
+
     public void setEmail(String email) {
-<span class="nc" id="L38">        this.email = email;</span>
-<span class="nc" id="L39">    }</span>
+<span class="nc" id="L62">        this.email = email;</span>
+<span class="nc" id="L63">    }</span>
+
+    public String getCpf() {
+<span class="nc" id="L66">        return cpf;</span>
+    }
+
+    public void setCpf(String cpf) {
+<span class="nc" id="L70">        this.cpf = cpf;</span>
+<span class="nc" id="L71">    }</span>
+
     public String getPassword() {
-<span class="nc" id="L41">        return password;</span>
+<span class="nc" id="L74">        return password;</span>
     }
+
     public void setPassword(String password) {
-<span class="nc" id="L44">        this.password = password;</span>
-<span class="nc" id="L45">    }</span>
+<span class="nc" id="L78">        this.password = password;</span>
+<span class="nc" id="L79">    }</span>
+
     public String getAddress() {
-<span class="nc" id="L47">        return address;</span>
+<span class="nc" id="L82">        return address;</span>
     }
+
     public void setAddress(String address) {
-<span class="nc" id="L50">        this.address = address;</span>
-<span class="nc" id="L51">    }</span>
+<span class="nc" id="L86">        this.address = address;</span>
+<span class="nc" id="L87">    }</span>
+
+    // Abstract method to be implemented by subclasses to return their type
+    public abstract String getType(); // THIS IS THE METHOD CAUSING THE ERROR
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

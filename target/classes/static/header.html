@@ -1,6 +1,227 @@
-<body>
-  <header>
-	<img src="https://http2.mlstatic.com/frontend-assets/ml-web-navigation/ui-navigation/6.6.130/mercadolibre/pt_logo_large_plus@2x.webp">
-    <h1>Detalhes do Produto</h1>
-  </header>
-</body> 
+<!-- header.html -->
+<!-- IMPORTANT: Font Awesome CDN link is now in main pages (e.g., home.html, manageProducts.html) -->
+<style>
+    /* Basic styling for the header */
+    .main-header {
+        display: flex;
+        justify-content: space-between; /* Distribute items with space between them */
+        align-items: center; /* Vertically centers all direct children */
+        padding: 15px 20px; /* Padding for overall spacing */
+        background-color: #ffe600; /* Mercado Livre yellow */
+        font-family: 'Inter', sans-serif;
+        border-radius: 0; /* No border-radius for the header itself */
+        margin-bottom: 20px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Subtle shadow for the header */
+        min-height: 60px; /* Ensure a minimum height for consistent layout */
+    }
+
+    .main-header .logo {
+        height: 34px; /* Adjusted logo size */
+        width: 134px; /* Adjusted logo width */
+        flex-shrink: 0; /* Prevent logo from shrinking */
+        margin-right: 20px; /* Space between logo and search bar */
+        margin-left: 50px;
+    }
+
+    .main-header .logo img {
+        height: 100%; /* Make image fill the logo container */
+        width: 100%;
+        object-fit: contain; /* Ensure image fits without cropping */
+        border-radius: 4px; /* Apply border-radius to the image itself */
+    }
+
+    /* Styles for the search bar container within the header */
+    .header-search-bar {
+        flex-grow: 1; /* Allow search bar to take available space */
+        max-width: 600px; /* Max width for the search bar */
+        margin: 0 20px; /* Horizontal margin to separate from logo/profile */
+        position: relative; /* For positioning the search icon inside */
+        display: flex; /* Use flex to align input and icon */
+        align-items: center;
+        background-color: white; /* White background as per image */
+        box-shadow: 0 1px 4px rgba(0,0,0,0.1); /* Subtle shadow as per image */
+        height: 40px; /* Fixed height for the search bar */
+        overflow: hidden; /* Hide anything overflowing the rounded corners */
+    }
+
+    .header-search-bar input[type="text"] {
+        flex-grow: 1; /* Input takes all available space */
+        padding: 8px 15px; /* Padding inside the input */
+        border: none; /* No border for the input itself */
+        outline: none; /* Remove outline on focus */
+        font-size: 1em;
+        background-color: transparent; /* Transparent background to show parent white */
+        height: 100%; /* Make input fill container height */
+        box-sizing: border-box; /* Include padding in height */
+    }
+
+    .header-search-bar .search-icon {
+        padding: 0 15px; /* Padding around the icon */
+        font-size: 1.2em;
+        color: #666; /* Grey color for the icon */
+        cursor: pointer;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        border-left: 1px solid #eee; /* Light separator line */
+    }
+
+    .header-search-bar .search-icon:hover {
+        color: #333; /* Slightly darker on hover */
+    }
+
+    .profile-icon-container {
+        cursor: pointer;
+        display: flex; /* Ensure it's a flex container for centering its content if needed */
+        font-size: 1.8em;
+        color: #00009C; /* Dark blue for the icon */
+        padding: 5px;
+        border-radius: 4px; /* Apply border-radius */
+        transition: background-color 0.3s ease;
+        flex-shrink: 0; /* Prevent profile icon from shrinking */
+        margin-left: 20px; /* Space between search bar and profile icon */
+        margin-right: 50px;
+        position: relative; /* CRITICAL: For positioning the dropdown menu */
+    }
+
+    .profile-icon-container:hover {
+        background-color: rgba(0, 0, 0, 0.05); /* Subtle dark background on hover */
+    }
+
+    /* --- NEW: Dropdown Menu Styles (Inline) --- */
+    .dropdown-menu {
+        position: absolute;
+        top: 100%; /* Position below the icon container */
+        right: 0; /* Align to the right of the icon container */
+        background-color: #fff;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        min-width: 150px;
+        z-index: 100; /* Ensure it's above other content */
+        display: flex;
+        flex-direction: column;
+        overflow: hidden; /* Ensures rounded corners are respected for items */
+    }
+
+    .dropdown-item {
+        padding: 12px 15px;
+        text-decoration: none;
+        color: #333;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background-color: white; /* Explicitly white background */
+        border: none; /* Remove button default border */
+        text-align: left; /* Align text to left for buttons */
+        cursor: pointer;
+        transition: background-color 0.2s ease, color 0.2s ease;
+        font-size: 0.7em; /* Set font size to 1em */
+        font-family: 'Inter', sans-serif; /* Set font family to Inter */
+    }
+
+    .dropdown-item:hover {
+        background-color: #e3f2fd; /* Light blue on hover (from add to cart button) */
+        color: #333; /* Keep text color consistent or adjust if needed for contrast */
+    }
+
+    .dropdown-item i {
+        font-size: 1.1em; /* Icon size within dropdown items */
+        color: #666; /* Default icon color */
+    }
+
+    .dropdown-item:hover i {
+        color: #333; /* Icon color on hover (match text) */
+    }
+
+    /* Style for the logout button within the dropdown */
+    .dropdown-item.logout-button {
+        background-color: white; /* Start with white background */
+        color: #dc3545; /* Red text for logout */
+        margin-top: 5px; /* Small space above logout button */
+        border-top: 1px solid #eee; /* Separator */
+    }
+
+    .dropdown-item.logout-button:hover {
+        background-color: #e3f2fd; /* Light blue on hover */
+        color: #c82333; /* Darker red text on hover */
+    }
+
+    .dropdown-item.logout-button i {
+        color: #dc3545; /* Red icon for logout button */
+    }
+    .dropdown-item.logout-button:hover i {
+        color: #c82333; /* Darker red icon on hover */
+    }
+
+
+    /* Utility class to hide elements */
+    .hidden {
+        display: none !important;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) { /* Adjusted breakpoint for better mobile layout */
+        .main-header {
+            flex-direction: column; /* Stack items vertically on small screens */
+            text-align: center;
+            gap: 10px; /* Space between stacked items */
+            padding: 15px;
+            min-height: auto; /* Remove min-height when stacked */
+        }
+        .main-header .logo {
+            position: static; /* Put logo back in normal flow */
+            transform: none;
+            margin: 0; /* Remove specific margins */
+            width: auto; /* Allow width to be determined by content */
+            justify-content: center; /* Center content if it's a flex container */
+            display: flex; /* Ensure it's a flex container for centering */
+            margin-bottom: 10px; /* Add some space below logo when stacked */
+        }
+        .header-search-bar {
+            width: 90%; /* Take more width when stacked */
+            margin: 10px 0; /* Add vertical margin when stacked */
+            max-width: none; /* Remove max-width constraint */
+        }
+        /* Adjust positioning for profile icon on small screens */
+        .profile-icon-container {
+            position: static; /* Remove absolute positioning */
+            transform: none;
+            margin: 0 auto; /* Center horizontally */
+            width: fit-content; /* Adjust width to content */
+            padding: 0; /* Remove padding */
+            font-size: 1.0em; /* Smaller icon on mobile */
+        }
+    }
+</style>
+
+<header class="main-header">
+    <a href="/" class="logo">
+        <img src="https://http2.mlstatic.com/frontend-assets/ml-web-navigation/ui-navigation/6.6.130/mercadolibre/pt_logo_large_plus@2x.webp" alt="Mercado Livre Logo">
+    </a>
+    
+    <!-- Search Bar - Now the central element -->
+    <div class="header-search-bar">
+        <input type="text" id="headerTagSearchInput" placeholder="Buscar produtos, marcas e muito mais...">
+        <div class="search-icon" id="headerSearchIcon">
+            <i class="fas fa-search"></i>
+        </div>
+    </div>
+
+    <!-- Profile Icon Container - This is the clickable area -->
+    <div class="profile-icon-container" id="profile-icon-container">
+        <i class="fas fa-user-circle profile-icon-fa"></i> <!-- The actual Font Awesome user icon -->
+        <!-- Dropdown Menu (hidden by default) -->
+        <div class="dropdown-menu hidden" id="profileDropdown">
+            <a href="/cart.html" id="cartLink" class="dropdown-item">
+                <i class="fas fa-shopping-cart"></i> Carrinho
+            </a>
+            <a href="#" id="configLink" class="dropdown-item">
+                <i class="fas fa-cog"></i> Configurações
+            </a>
+            <button id="logoutButton" class="dropdown-item logout-button">
+                <i class="fas fa-sign-out-alt"></i> Sair
+            </button>
+        </div>
+    </div>
+</header>

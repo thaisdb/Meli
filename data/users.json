@@ -1,0 +1,95 @@
+[ {
+  "id" : 1,
+  "name" : "consu",
+  "email" : "consu@email",
+  "cpf" : "000.111.222-33",
+  "password" : "senha",
+  "address" : "rua",
+  "cart" : { },
+  "type" : "consumer",
+  "preferredPaymentMethod" : "PIX"
+}, {
+  "id" : 2,
+  "name" : "vend",
+  "email" : "vend@email",
+  "cpf" : "000.111.222-33",
+  "password" : "senha",
+  "address" : "bairro",
+  "walletBalance" : 0.0,
+  "type" : "seller"
+}, {
+  "id" : 3,
+  "name" : "seller2",
+  "email" : "seller2@email",
+  "cpf" : "000.111.222-33",
+  "password" : "senha",
+  "address" : "rua",
+  "walletBalance" : 0.0,
+  "type" : "seller"
+}, {
+  "id" : 4,
+  "name" : "conta",
+  "email" : "novoemail@email",
+  "cpf" : "000.111.222-33",
+  "password" : "senha",
+  "address" : "end",
+  "cart" : { },
+  "type" : "consumer",
+  "preferredPaymentMethod" : "PIX"
+}, {
+  "id" : 5,
+  "name" : "novo vend",
+  "email" : "novovend@email",
+  "cpf" : "555.666.888-7",
+  "password" : "senha",
+  "address" : "end",
+  "walletBalance" : 0.0,
+  "type" : "seller"
+}, {
+  "id" : 7,
+  "name" : "consu5",
+  "email" : "consu5@email",
+  "cpf" : "000.111.222-33",
+  "password" : "senha",
+  "address" : "rua",
+  "cart" : { },
+  "type" : "consumer",
+  "preferredPaymentMethod" : "PIX"
+}, {
+  "id" : 8,
+  "name" : "consu6",
+  "email" : "consu6@email",
+  "cpf" : "111.444.555-66",
+  "password" : "senha",
+  "address" : "rua",
+  "cart" : { },
+  "type" : "consumer",
+  "preferredPaymentMethod" : "PIX"
+}, {
+  "id" : 9,
+  "name" : "vend2",
+  "email" : "vend2@email",
+  "cpf" : "113.333.555-56",
+  "password" : "senha",
+  "address" : "rua",
+  "walletBalance" : 0.0,
+  "type" : "seller"
+}, {
+  "id" : 10,
+  "name" : "vend10",
+  "email" : "vend10@email.com",
+  "cpf" : "000.222.111-45",
+  "password" : "senha",
+  "address" : "rua",
+  "walletBalance" : 0.0,
+  "type" : "seller"
+}, {
+  "id" : 11,
+  "name" : "vendedor12",
+  "email" : "vend12@email",
+  "cpf" : "123.456.789-00",
+  "password" : "senha",
+  "address" : "Endereço de envio",
+  "walletBalance" : 0.0,
+  "type" : "seller"
+} ]

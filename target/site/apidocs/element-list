@@ -2,4 +2,5 @@ com.meli
 com.meli.controller
 com.meli.dto
 com.meli.model
+com.meli.repository
 com.meli.service

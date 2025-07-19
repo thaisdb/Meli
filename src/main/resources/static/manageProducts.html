@@ -1,125 +1,258 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <title>Product List</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
-    }
-
-    table {
-      border-collapse: collapse;
-      width: 100%;
-      margin-top: 20px;
-    }
-
-    th, td {
-      padding: 8px 12px;
-      border: 1px solid #ccc;
-      text-align: left;
-    }
-
-    th {
-      background-color: #f4f4f4;
-    }
-
-    button {
-      padding: 4px 10px;
-      background-color: #e74c3c;
-      color: white;
-      border: none;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background-color: #c0392b;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Products</title>
+    <link rel="stylesheet" type="text/css" href="/css/page.css">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Link to the header.js script -->
+    <script src="header.js" defer></script>
 </head>
-<body>
 
-  <h1>Product List</h1>
-  <table id="productTable">
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>Title</th>
-        <th>Price</th>
-        <th>Description</th>
-        <th>Brand</th>
-        <th>Stock</th>
-        <th>Action</th>
-      </tr>
-    </thead>
-    <tbody>
-      <!-- Product rows go here -->
-    </tbody>
-  </table>
+<body data-title="Manage Products" data-show-profile-icon="true" data-show-search-bar="true">
+    <div class="header-placeholder"></div>
 
-  <script>
-    function formatProductPrice(price) {
-      if (price !== null && price !== undefined && price !== '') {
-          return new Intl.NumberFormat('pt-BR', {
-              style: 'currency',
-              currency: 'BRL',
-              minimumFractionDigits: 2,
-          }).format(price);
-      }
-      return ''; // Return empty string if price is not valid
-    }
-    
-    function fetchProducts() {
-    fetch('/products')
-        .then(response => response.json())
-        .then(products => {
-        const tbody = document.querySelector('#productTable tbody');
-        tbody.innerHTML = ''; // Clear existing rows
-        products.forEach(product => {
-            const formattedPrice = formatProductPrice(product.price);
-            const row = document.createElement('tr');
-            row.innerHTML = `
-            <td>${product.id}</td>
-            <td>${product.title ?? ''}</td>
-            <td>${formattedPrice ?? ''}</td>
-            <td>${product.description ?? ''}</td>
-            <td>${product.brand ?? ''}</td>
-            <td>${product.stock ?? ''}</td>
-            <td>
-                <button onclick="location.href='editProduct.html?id=${product.id}'">Update</button>
-                <button onclick="deleteProduct(${product.id}, this)">Delete</button>
-            </td>
-            `;
-            tbody.appendChild(row);
+    <div class="product-list-table-card">
+        <h1>Product Management</h1>
+
+        <div class="add-product-button-container">
+            <!-- Pass loggedInUserId to addProduct.html -->
+            <button class="add-product-button" onclick="location.href='/addProduct.html?sellerId=' + window.loggedInUserId">
+                <i class="fas fa-plus-circle"></i> Add New Product
+            </button>
+        </div>
+
+        <table class="product-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Title</th>
+                    <th>Price</th>
+                    <th>Description</th>
+                    <th>Brand</th>
+                    <th>Stock</th>
+                    <th>Tags</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Product rows will be inserted here by JavaScript -->
+            </tbody>
+        </table>
+
+        <div class="pagination-controls">
+            <button class="pagination-button" id="prevPageBtn" disabled>&laquo; Previous</button>
+            <div class="page-numbers" id="pageNumbers">
+                <!-- Page number buttons will be inserted here -->
+            </div>
+            <button class="pagination-button" id="nextPageBtn">Next &raquo;</button>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="confirmDeleteModalOverlay" class="confirm-modal-overlay hidden app-modal-overlay">
+        <div class="confirm-modal-content app-modal-content">
+            <h2 class="confirm-modal-title app-modal-title">Confirm Deletion</h2>
+            <p class="confirm-modal-message app-modal-message">Are you sure you want to delete product ID <span
+                    id="productIdToDelete" class="product-id-to-delete"></span>?</p>
+            <div class="confirm-modal-actions app-modal-actions">
+                <button id="confirmDeleteBtn" class="button confirm-delete-btn">Delete</button>
+                <button id="cancelDeleteBtn" class="button cancel-delete-btn">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables for pagination
+        let currentPage = 1;
+        const productsPerPage = 5; // Number of products to display per page
+        let allProducts = []; // To store all fetched products for pagination
+
+        // DOM elements for the delete confirmation modal
+        let confirmDeleteModalOverlay;
+        let productIdToDeleteSpan;
+        let confirmDeleteBtn;
+        let cancelDeleteBtn;
+
+        // DEBUGGING: Log session data immediately when this script starts
+        console.log("FRONTEND: manageProducts.html: Initial check - window.loggedInUserId:", window.loggedInUserId);
+        console.log("FRONTEND: manageProducts.html: Initial check - window.loggedInUserType:", window.loggedInUserType);
+
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Check if user is logged in and is a seller
+            if (!window.loggedInUserId || window.loggedInUserType !== 'seller') {
+                console.error("FRONTEND: manageProducts.html: Access Denied - User is not a seller or not logged in.");
+                alert('Access Denied: You must be logged in as a seller to manage products.');
+                window.location.href = '/login.html'; // Redirect to login if not a seller
+                return;
+            } else {
+                console.log("FRONTEND: manageProducts.html: Access Granted - User is a seller.");
+            }
+
+            // Initialize modal elements
+            confirmDeleteModalOverlay = document.getElementById('confirmDeleteModalOverlay');
+            productIdToDeleteSpan = document.getElementById('productIdToDelete');
+            confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+            cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
+
+            // Event listeners for delete confirmation modal buttons
+            if (confirmDeleteBtn) {
+                confirmDeleteBtn.addEventListener('click', deleteProductConfirmed);
+            }
+            if (cancelDeleteBtn) {
+                cancelDeleteBtn.addEventListener('click', hideConfirmDeleteModal);
+            }
+
+            // Initial fetch of products for the logged-in seller
+            fetchProducts();
+
+            // Pagination button event listeners
+            document.getElementById('prevPageBtn').addEventListener('click', () => {
+                if (currentPage > 1) {
+                    currentPage--;
+                    displayProducts();
+                }
+            });
+
+            document.getElementById('nextPageBtn').addEventListener('click', () => {
+                const totalPages = Math.ceil(allProducts.length / productsPerPage);
+                if (currentPage < totalPages) {
+                    currentPage++;
+                    displayProducts();
+                }
+            });
         });
-        });
-    }
 
-    function deleteProduct(id, button) {
-      if (!confirm(`Are you sure you want to delete product ID ${id}?`)) return;
-
-      fetch(`/products/${id}`, {
-        method: 'DELETE'
-      })
-      .then(response => {
-        if (response.ok) {
-          // Remove row from table
-          const row = button.closest('tr');
-          row.remove();
-        } else {
-          alert('Failed to delete product.');
+        // Function to fetch products for the logged-in seller
+        async function fetchProducts() {
+            try {
+                // Fetch products specifically for the logged-in seller
+                const response = await fetch(`/products/seller/${window.loggedInUserId}`); // Changed endpoint
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                allProducts = await response.json();
+                console.log("FRONTEND: manageProducts.html: Products fetched for seller:", allProducts);
+                displayProducts(); // Display products after fetching
+            } catch (error) {
+                console.error('FRONTEND: manageProducts.html: Error fetching products:', error);
+                alert('Failed to load products: ' + error.message);
+            }
         }
-      })
-      .catch(error => {
-        console.error('Delete error:', error);
-        alert('Error deleting product.');
-      });
-    }
 
-    // Initial load
-    fetchProducts();
-  </script>
+        function displayProducts() {
+            const tbody = document.querySelector('.product-table tbody');
+            tbody.innerHTML = ''; // Clear existing rows
 
+            const startIndex = (currentPage - 1) * productsPerPage;
+            const endIndex = startIndex + productsPerPage;
+            const productsToDisplay = allProducts.slice(startIndex, endIndex);
+
+            productsToDisplay.forEach(product => {
+                const row = tbody.insertRow();
+                row.insertCell().textContent = product.id;
+                row.insertCell().textContent = product.title;
+                row.insertCell().textContent = product.price.toFixed(2);
+                row.insertCell().textContent = product.description;
+                row.insertCell().textContent = product.brand;
+                row.insertCell().textContent = product.stock;
+                row.insertCell().textContent = product.tags ? product.tags.join(', ') : '';
+
+                const actionsCell = row.insertCell();
+                const editButton = document.createElement('button');
+                editButton.className = 'button'; // Use existing button style
+                editButton.innerHTML = '<i class="fas fa-edit"></i> Edit';
+                // Pass sellerId to editProduct.html
+                editButton.onclick = () => location.href = `/editProduct.html?id=${product.id}&sellerId=${window.loggedInUserId}`;
+                actionsCell.appendChild(editButton);
+
+                const deleteButton = document.createElement('button');
+                deleteButton.className = 'button delete-button'; // Use existing button style
+                deleteButton.innerHTML = '<i class="fas fa-trash-alt"></i> Delete';
+                deleteButton.onclick = () => showConfirmDeleteModal(product.id);
+                actionsCell.appendChild(deleteButton);
+            });
+
+            updatePaginationControls();
+        }
+
+        function updatePaginationControls() {
+            const totalPages = Math.ceil(allProducts.length / productsPerPage);
+            document.getElementById('prevPageBtn').disabled = currentPage === 1;
+            document.getElementById('nextPageBtn').disabled = currentPage === totalPages || allProducts.length === 0;
+
+            const pageNumbersContainer = document.getElementById('pageNumbers');
+            pageNumbersContainer.innerHTML = ''; // Clear existing page number buttons
+
+            // Display page numbers
+            for (let i = 1; i <= totalPages; i++) {
+                const pageButton = document.createElement('button');
+                pageButton.className = 'page-number-button';
+                if (i === currentPage) {
+                    pageButton.classList.add('active');
+                }
+                pageButton.textContent = i;
+                pageButton.addEventListener('click', () => {
+                    currentPage = i;
+                    displayProducts();
+                });
+                pageNumbersContainer.appendChild(pageButton);
+            }
+        }
+
+        // --- Delete Confirmation Modal Functions ---
+        let currentProductIdToDelete = null;
+
+        function showConfirmDeleteModal(productId) {
+            currentProductIdToDelete = productId;
+            productIdToDeleteSpan.textContent = productId;
+            confirmDeleteModalOverlay.classList.remove('hidden');
+        }
+
+        function hideConfirmDeleteModal() {
+            confirmDeleteModalOverlay.classList.add('hidden');
+            currentProductIdToDelete = null;
+        }
+
+        async function deleteProductConfirmed() {
+            if (currentProductIdToDelete === null) return;
+
+            try {
+                const response = await fetch(`/products/${currentProductIdToDelete}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-User-Id': window.loggedInUserId // Send logged-in user ID for backend validation
+                    }
+                });
+
+                if (response.ok) {
+                    console.log(`FRONTEND: manageProducts.html: Product ${currentProductIdToDelete} deleted successfully.`);
+                    hideConfirmDeleteModal();
+                    fetchProducts(); // Re-fetch and display products after deletion
+                } else {
+                    const errorText = await response.text();
+                    let errorMessage = `Error: ${response.status} ${response.statusText}`;
+                    try {
+                        const errorJson = JSON.parse(errorText);
+                        errorMessage = `Error: ${errorJson.message || errorJson.error || JSON.stringify(errorJson)}`;
+                    } catch (e) {
+                        errorMessage = `Error: ${errorText}`;
+                    }
+                    console.error('FRONTEND: manageProducts.html: Failed to delete product. Server response:', errorText);
+                    alert('Failed to delete product: ' + errorMessage);
+                    hideConfirmDeleteModal();
+                }
+            } catch (error) {
+                console.error('FRONTEND: manageProducts.html: Network error during deletion:', error);
+                alert('Network error during deletion: ' + error.message);
+                hideConfirmDeleteModal();
+            }
+        }
+    </script>
 </body>
+
 </html>

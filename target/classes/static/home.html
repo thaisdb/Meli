@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Keep viewport for responsiveness -->
+    <title>Home - Mercado Livre</title> <!-- Keep updated title -->
+    <link rel="stylesheet" type="text/css" href="/css/page.css">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Link to the header.js script -->
+    <script src="header.js" defer></script>
+</head>
+
+<!-- Keep body data attributes for header.js -->
+<body data-title="Mercado Livre" data-show-profile-icon="true" data-show-search-bar="true">
+    <div class="header-placeholder"></div>
+
+
+    <div class="container" id="productContainer">
+        <!-- Products will be loaded here by JavaScript -->
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const productContainer = document.getElementById('productContainer');
+
+            // Function to fetch and display products
+            async function fetchAndDisplayProducts(searchTags = '') {
+                productContainer.innerHTML = 'Loading products...'; 
+
+                let url = '/products'; // Default to fetching all products
+
+                if (searchTags) {
+                    // Assuming a search endpoint, if you have one. Otherwise, this might need adjustment.
+                    url = `/products/search?tags=${encodeURIComponent(searchTags)}`; 
+                }
+
+                try {
+                    const response = await fetch(url);
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    const products = await response.json();
+                    
+                    // DEBUG LOG: Show the raw products array received by the frontend
+                    console.log("FRONTEND: home.html: Raw products array received:", products);
+
+                    productContainer.innerHTML = ''; // Clear loading message
+
+                    if (products.length === 0) {
+                        productContainer.innerHTML = "<p>No products found.</p>";
+                        return;
+                    }
+
+                    products.forEach(product => {
+                        const card = document.createElement('div');
+                        card.className = 'card product-list-table-card'; 
+                        const imageUrl = product.imageUrl || '/images/placeholder.png'; // Use a placeholder if no image URL
+
+                        card.innerHTML = `
+                            <a href="/detailProduct.html?id=${product.id}" style="text-decoration: none; color: inherit;">
+                                <img src="${imageUrl}" alt="${product.title}">
+                                <div class="card-content">
+                                    <div class="title">${product.title}</div>
+                                    <div class="price">R$ ${product.price ? product.price.toFixed(2) : 'N/A'}</div>
+                                    <div class="brand">Marca: ${product.brand || 'Desconhecida'}</div>
+                                </div>
+                            </a>
+                        `;
+                        productContainer.appendChild(card);
+                    });
+
+                    // Add event listeners for "Add to Cart" buttons
+                    document.querySelectorAll('.add-to-cart-button').forEach(button => {
+                        button.addEventListener('click', (event) => {
+                            const productId = event.currentTarget.dataset.productId;
+                            alert(`Product ${productId} added to cart (functionality not fully implemented yet)!`);
+                            console.log(`Add to cart clicked for product ID: ${productId}`);
+                        });
+                    });
+
+                } catch (error) {
+                    console.error('FRONTEND: home.html: Error fetching products:', error);
+                    productContainer.innerHTML = `<p>Failed to load products: ${error.message}</p>`; // RESTORED: Error message
+                }
+            }
+
+            // Initial load of all products
+            fetchAndDisplayProducts();
+
+            // Listen for custom productSearch event from header.js
+            window.addEventListener('productSearch', (event) => {
+                const searchTags = event.detail.searchTags;
+                console.log("FRONTEND: home.html: Received search event with tags:", searchTags);
+                fetchAndDisplayProducts(searchTags);
+            });
+        });
+    </script>
+</body>
+
+</html>

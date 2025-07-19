@@ -1,105 +1,222 @@
-<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pt"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ProductController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Prototype</a> &gt; <a href="index.source.html" class="el_package">com.meli.controller</a> &gt; <span class="el_source">ProductController.java</span></div><h1>ProductController.java</h1><pre class="source lang-java linenums">/**
- * Centralized entry point that handles web requests ans responses
- */
-package com.meli.controller;
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pt"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ProductController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Prototype</a> &gt; <a href="index.source.html" class="el_package">com.meli.controller</a> &gt; <span class="el_source">ProductController.java</span></div><h1>ProductController.java</h1><pre class="source lang-java linenums">package com.meli.controller;
 
-import java.util.List;
-import java.util.Map;
-
+import com.meli.model.Orders;
+import com.meli.model.Product;
+import com.meli.service.OrderService;
+import com.meli.service.ProductService;
+import com.meli.dto.BuyRequestDTO; // Agora com o campo 'id'
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import com.meli.dto.BuyRequestDTO;
-import com.meli.model.Product;
-import com.meli.service.ProductService;
+import java.util.List;
+import java.util.Optional;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 @RestController
-@RequestMapping(&quot;/products&quot;)
+@RequestMapping(&quot;/products&quot;) // Base path for all methods in this controller
 public class ProductController {
 
     private final ProductService productService;
+    private final OrderService orderService;
 
-<span class="nc" id="L30">    public ProductController(ProductService productService) {</span>
-<span class="nc" id="L31">        this.productService = productService;</span>
-<span class="nc" id="L32">    }</span>
+<span class="nc" id="L24">    public ProductController(ProductService productService, OrderService orderService) {</span>
+<span class="nc" id="L25">        this.productService = productService;</span>
+<span class="nc" id="L26">        this.orderService = orderService;</span>
+<span class="nc" id="L27">    }</span>
 
-    @GetMapping
-    public List&lt;Product&gt; getAllProducts() {
-<span class="nc" id="L36">        return productService.getAll();</span>
-    }
-
-    @GetMapping(&quot;/{id}&quot;)
-    public ResponseEntity&lt;?&gt; getProductById(@PathVariable(&quot;id&quot;) int id) {
-<span class="nc" id="L41">        Product product = productService.getProductById(id);</span>
-<span class="nc bnc" id="L42" title="All 2 branches missed.">        if (product != null) {</span>
-<span class="nc" id="L43">            return ResponseEntity.ok(product);</span>
-        } else {
-<span class="nc" id="L45">            return ResponseEntity.status(HttpStatus.NOT_FOUND)</span>
-<span class="nc" id="L46">                                 .body(&quot;Produto com ID &quot; + id + &quot; não foi encontrado.&quot;);</span>
-        }
-    }
-
-    @PostMapping
-    public ResponseEntity&lt;Product&gt; addProduct(@RequestBody Product product) {
-<span class="nc" id="L52">        Product createdProduct = productService.addProduct(product);</span>
-<span class="nc" id="L53">        return ResponseEntity.status(HttpStatus.CREATED).body(createdProduct);</span>
+    /**
+     * Get ALL products.
+     * GET /products
+     * This endpoint is for general viewing (e.g., home page).
+     */
+    @GetMapping // Maps to /products
+    public ResponseEntity&lt;List&lt;Product&gt;&gt; getAllProducts() {
+<span class="nc" id="L36">        System.out.println(&quot;DEBUG: ProductController - Fetching all products.&quot;);</span>
+<span class="nc" id="L37">        List&lt;Product&gt; products = productService.getAllProducts();</span>
+<span class="nc" id="L38">        products.removeIf(p -&gt; p.getStock().equals(0));</span>
+<span class="nc" id="L39">        return ResponseEntity.ok(products);</span>
     }
 
     /**
-     * Put method used to update products
-     * 
-     * @param id product's unique id
-     * @param updatedProduct Product with updated information
-     * @return HTTP 200 OK if product is succefully updated,
-     *         400 Not Found if product ID is not found
-     *         or 500 Internal Server Error if product failed to update
+     * Get products belonging to a specific seller.
+     * GET /products/seller/{sellerId}
+     */
+    @GetMapping(&quot;/seller/{sellerId}&quot;) // Correctly mapped to /products/seller/{sellerId}
+    public ResponseEntity&lt;List&lt;Product&gt;&gt; getProductsBySeller(@PathVariable int sellerId) {
+<span class="nc" id="L48">        System.out.println(&quot;DEBUG: ProductController - Fetching products for sellerId: &quot; + sellerId);</span>
+<span class="nc" id="L49">        List&lt;Product&gt; products = productService.getProductsBySellerId(sellerId);</span>
+<span class="nc" id="L50">        return ResponseEntity.ok(products);</span>
+    }
+
+    /**
+     * Get a single product by ID (no seller scope here, for general product viewing if needed)
+     * This can be used by consumers or for internal lookups.
+     * GET /products/{id}
+     */
+    @GetMapping(&quot;/{id}&quot;)
+    public ResponseEntity&lt;Product&gt; getProductById(@PathVariable int id) {
+<span class="nc" id="L60">        Product product = productService.getProductById(id);</span>
+<span class="nc bnc" id="L61" title="All 2 branches missed.">        if (product != null) {</span>
+<span class="nc" id="L62">            return ResponseEntity.ok(product);</span>
+        } else {
+<span class="nc" id="L64">            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();</span>
+        }
+    }
+
+    /**
+     * Add a new product.
+     * POST /products
+     * Requires X-User-Id header for validation.
+     */
+    @PostMapping
+    public ResponseEntity&lt;?&gt; addProduct(@RequestBody Product product,
+                                        @RequestHeader(&quot;X-User-Id&quot;) int loggedInUserId) {
+        // Validate that the sellerId in the product matches the logged-in user
+<span class="nc bnc" id="L77" title="All 2 branches missed.">        if (product.getSellerId() != loggedInUserId) {</span>
+<span class="nc" id="L78">            return ResponseEntity.status(HttpStatus.FORBIDDEN)</span>
+<span class="nc" id="L79">                                 .body(&quot;Unauthorized: Product sellerId does not match logged-in user.&quot;);</span>
+        }
+<span class="nc" id="L81">        Product createdProduct = productService.addProduct(product);</span>
+<span class="nc" id="L82">        return ResponseEntity.status(HttpStatus.CREATED).body(createdProduct);</span>
+    }
+
+    /**
+     * Update an existing product.
+     * PUT /products/{id}
+     * Requires X-User-Id header for validation.
      */
     @PutMapping(&quot;/{id}&quot;)
-    public ResponseEntity&lt;String&gt; updateProduct(@PathVariable int id, @RequestBody Product updatedProduct) {
-        try {
-<span class="nc" id="L68">            boolean updated = productService.updateProduct(id, updatedProduct);</span>
-<span class="nc bnc" id="L69" title="All 2 branches missed.">            if (updated) {</span>
-<span class="nc" id="L70">                return ResponseEntity.ok(&quot;Produto atualizado com sucesso.&quot;);</span>
-            } else {
-<span class="nc" id="L72">                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(&quot;UpdateProduct: Produto não encontrado&quot;);</span>
-            }
-<span class="nc" id="L74">        } catch (Exception e) {</span>
-<span class="nc" id="L75">            e.printStackTrace();</span>
-<span class="nc" id="L76">            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(&quot;UpdateProduct: Failed to update product.&quot;);</span>
+    public ResponseEntity&lt;?&gt; updateProduct(@PathVariable int id,
+                                           @RequestBody Product product,
+                                           @RequestHeader(&quot;X-User-Id&quot;) int loggedInUserId) {
+        // First, check if the product exists and get its original sellerId
+<span class="nc" id="L95">        Product existingProduct = productService.getProductById(id);</span>
+<span class="nc bnc" id="L96" title="All 2 branches missed.">        if (existingProduct == null) {</span>
+<span class="nc" id="L97">            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(&quot;Product not found.&quot;);</span>
+        }
+
+        // Validate that the logged-in user owns this product
+<span class="nc bnc" id="L101" title="All 2 branches missed.">        if (existingProduct.getSellerId() != loggedInUserId) {</span>
+<span class="nc" id="L102">            return ResponseEntity.status(HttpStatus.FORBIDDEN)</span>
+<span class="nc" id="L103">                                 .body(&quot;Unauthorized: You do not own this product.&quot;);</span>
+        }
+
+        // Ensure the ID and sellerId are not changed via the request body
+<span class="nc" id="L107">        product.setId(id); // Use path variable ID</span>
+<span class="nc" id="L108">        product.setSellerId(existingProduct.getSellerId()); // Preserve original sellerId</span>
+
+<span class="nc" id="L110">        Product updatedProduct = productService.updateProduct(id, product);</span>
+<span class="nc bnc" id="L111" title="All 2 branches missed.">        if (updatedProduct != null) {</span>
+<span class="nc" id="L112">            return ResponseEntity.ok(updatedProduct);</span>
+        } else {
+<span class="nc" id="L114">            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(&quot;Failed to update product.&quot;);</span>
         }
     }
 
-    /*
-     * Why Post instead of Put:
-     * You're not just updating the product; you're performing a specific action (a &quot;purchase&quot;) on it,
-     * which has its own logic and side effects:
-     * You're not replacing the entire product.
-     * The action is contextual: it depends on business logic (stock check, validation).
-     * You’re not sending the whole product, only a quantity — that's not a full update.
+    /**
+     * Delete a product by ID.
+     * DELETE /products/{id}
+     * Requires X-User-Id header for validation.
      */
-    @PostMapping(&quot;/{id}/buy&quot;)
-    public ResponseEntity&lt;?&gt; buyProduct(@PathVariable int id, @RequestBody BuyRequestDTO request) {
-        try {
-<span class="nc" id="L91">            int quantity = request.getQuantity();</span>
-<span class="nc" id="L92">            Product updated = productService.buyProduct(id, quantity);</span>
-<span class="nc" id="L93">            return ResponseEntity.ok(updated);</span>
-<span class="nc" id="L94">        } catch (IllegalArgumentException e) {</span>
-<span class="nc" id="L95">            return ResponseEntity.badRequest().body(e.getMessage());</span>
+    @DeleteMapping(&quot;/{id}&quot;)
+    public ResponseEntity&lt;?&gt; deleteProduct(@PathVariable int id,
+                                           @RequestHeader(&quot;X-User-Id&quot;) int loggedInUserId) {
+        // First, check if the product exists and get its original sellerId
+<span class="nc" id="L127">        Product existingProduct = productService.getProductById(id);</span>
+<span class="nc bnc" id="L128" title="All 2 branches missed.">        if (existingProduct == null) {</span>
+<span class="nc" id="L129">            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(&quot;Product not found.&quot;);</span>
+        }
+
+        // Validate that the logged-in user owns this product
+<span class="nc bnc" id="L133" title="All 2 branches missed.">        if (existingProduct.getSellerId() != loggedInUserId) {</span>
+<span class="nc" id="L134">            return ResponseEntity.status(HttpStatus.FORBIDDEN)</span>
+<span class="nc" id="L135">                                 .body(&quot;Unauthorized: You do not own this product.&quot;);</span>
+        }
+
+<span class="nc" id="L138">        boolean deleted = productService.deleteProduct(id);</span>
+<span class="nc bnc" id="L139" title="All 2 branches missed.">        if (deleted) {</span>
+<span class="nc" id="L140">            return ResponseEntity.noContent().build();</span>
+        } else {
+<span class="nc" id="L142">            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(&quot;Failed to delete product.&quot;);</span>
         }
     }
 
+   /**
+     * Endpoint unificado para lidar com a compra de um ou múltiplos produtos.
+     * POST /products/purchase
+     * Recebe uma lista de BuyRequestDTOs e o ID do consumidor logado.
+     * Mantém a lógica de validação de estoque e decremento, e então chama OrderService para criar o pedido.
+     */
+    @PostMapping(&quot;/purchase&quot;)
+    public ResponseEntity&lt;?&gt; purchaseProducts(@RequestBody List&lt;BuyRequestDTO&gt; purchaseItems,
+                                            @RequestHeader(&quot;X-User-Id&quot;) int loggedInConsumerId) { 
+<span class="nc" id="L155">        System.out.println(&quot;DEBUG: ProductController - Received purchase request for &quot; + purchaseItems.size() + &quot; items, by consumer ID: &quot; + loggedInConsumerId);</span>
+        
+<span class="nc" id="L157">        List&lt;String&gt; errors = new ArrayList&lt;&gt;();</span>
 
-    @DeleteMapping(&quot;/{id}&quot;)
-    public void deleteProduct(@PathVariable int id) {
-<span class="nc" id="L102">        productService.deleteById(id);</span>
-<span class="nc" id="L103">    }</span>
+        // Validação básica da lista de itens
+<span class="nc bnc" id="L160" title="All 4 branches missed.">        if (purchaseItems == null || purchaseItems.isEmpty()) {</span>
+<span class="nc" id="L161">            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Arrays.asList(&quot;Nenhum item selecionado para compra.&quot;));</span>
+        }
+
+        // 1. Lógica de validação e decremento de estoque (MANTIDA AQUI)
+<span class="nc bnc" id="L165" title="All 2 branches missed.">        for (BuyRequestDTO item : purchaseItems) { </span>
+            try {
+<span class="nc" id="L167">                Integer productId = item.getId(); </span>
+<span class="nc" id="L168">                Integer quantity = item.getQuantity(); </span>
+
+<span class="nc bnc" id="L170" title="All 6 branches missed.">                if (productId == null || quantity == null || quantity &lt;= 0) {</span>
+<span class="nc" id="L171">                    errors.add(&quot;Dados de item inválidos: ID ou quantidade ausente/inválida para um item.&quot;);</span>
+<span class="nc" id="L172">                    continue; </span>
+                }
+
+<span class="nc" id="L175">                Product product = productService.getProductById(productId);</span>
+<span class="nc bnc" id="L176" title="All 2 branches missed.">                if (product == null) {</span>
+<span class="nc" id="L177">                    errors.add(&quot;Produto com ID &quot; + productId + &quot; não encontrado.&quot;);</span>
+<span class="nc" id="L178">                    continue; </span>
+                }
+
+<span class="nc bnc" id="L181" title="All 4 branches missed.">                if (product.getStock() == null || product.getStock() &lt; quantity) {</span>
+<span class="nc" id="L182">                    errors.add(&quot;Estoque insuficiente para o produto &quot; + product.getTitle() + &quot; (ID: &quot; + productId + &quot;). Disponível: &quot; + product.getStock() + &quot;, Solicitado: &quot; + quantity + &quot;.&quot;);</span>
+<span class="nc" id="L183">                    continue; </span>
+                }
+
+                // Decrement stock
+<span class="nc" id="L187">                product.setStock(product.getStock() - quantity);</span>
+<span class="nc" id="L188">                productService.updateProduct(productId, product); </span>
+<span class="nc" id="L189">                System.out.println(&quot;DEBUG: ProductController - Estoque decrementado para o produto &quot; + product.getTitle() + &quot; (ID: &quot; + productId + &quot;) por &quot; + quantity + &quot;. Novo estoque: &quot; + product.getStock());</span>
+
+<span class="nc" id="L191">            } catch (Exception e) {</span>
+<span class="nc" id="L192">                errors.add(&quot;Erro ao processar item: &quot; + e.getMessage());</span>
+<span class="nc" id="L193">                System.err.println(&quot;ERROR: ProductController - Erro geral na compra de item: &quot; + e.getMessage());</span>
+<span class="nc" id="L194">                e.printStackTrace();</span>
+<span class="nc" id="L195">            }</span>
+<span class="nc" id="L196">        }</span>
+
+        // 2. Se houver erros na validação ou processamento individual, retorna-os como JSON
+<span class="nc bnc" id="L199" title="All 2 branches missed.">        if (!errors.isEmpty()) {</span>
+<span class="nc" id="L200">            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors); </span>
+        }
+
+        // 3. Se não houver erros, chama OrderService para criar o pedido
+        try {
+<span class="nc" id="L205">            Optional&lt;Orders&gt; createdOrder = orderService.createProductOrder(purchaseItems, loggedInConsumerId);</span>
+
+<span class="nc bnc" id="L207" title="All 2 branches missed.">            if (createdOrder.isPresent()) {</span>
+<span class="nc" id="L208">                return ResponseEntity.ok(createdOrder.get()); // Retorna o objeto Orders criado (JSON)</span>
+            } else {
+                // Se o OrderService retornar Optional.empty(), significa que houve um erro na criação do pedido
+                // (ex: consumidor/vendedor não encontrado, ou validação interna do OrderService).
+                // O OrderService já imprime logs de erro mais específicos.
+<span class="nc" id="L213">                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Arrays.asList(&quot;Falha ao criar o pedido. Verifique os dados do usuário ou a consistência dos produtos.&quot;));</span>
+            }
+<span class="nc" id="L215">        } catch (Exception e) {</span>
+<span class="nc" id="L216">            System.err.println(&quot;ERROR: ProductController - Erro ao chamar OrderService para criar o pedido: &quot; + e.getMessage());</span>
+<span class="nc" id="L217">            e.printStackTrace();</span>
+<span class="nc" id="L218">            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Arrays.asList(&quot;Erro interno ao finalizar a compra: &quot; + e.getMessage()));</span>
+        }
+    }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>
