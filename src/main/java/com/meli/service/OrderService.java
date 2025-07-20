@@ -12,7 +12,7 @@ import com.meli.repository.UserRepository;
 import com.meli.dto.BuyRequestDTO;
 import com.meli.dto.OrderProductDetailDTO;
 import com.meli.dto.OrderSummaryDTO;
-import com.meli.dto.SellerOrderDTO; // Importar SellerOrderDTO
+import com.meli.dto.SellerOrderDTO;
 
 import org.springframework.stereotype.Service;
 
@@ -65,7 +65,7 @@ public class OrderService {
             itemsBySeller.computeIfAbsent(product.getSellerId(), k -> new ArrayList<>()).add(item);
         }
 
-        Order createdOrder = null; // Para retornar o primeiro pedido criado, ou o último, dependendo da necessidade
+        Order createdOrder = null;
 
         for (Map.Entry<Integer, List<BuyRequestDTO>> entry : itemsBySeller.entrySet()) {
             int sellerId = entry.getKey();
@@ -77,14 +77,12 @@ public class OrderService {
                 System.err.println("ERROR: OrderService - Vendedor com ID " + sellerId + " não encontrado ou não é do tipo Vendedor.");
                 return Optional.empty();
             }
-            // Seller seller = (Seller) sellerUser; // Não usado diretamente aqui, mas pode ser para outras validações
 
             Map<Integer, Integer> productsInOrder = new HashMap<>();
             double totalAmount = 0.0;
 
             for (BuyRequestDTO item : sellerSpecificItems) {
                 Product product = productService.getProductById(item.getId());
-                // Já verificamos se o produto existe e pertence ao vendedor antes de agrupar
                 productsInOrder.put(item.getId(), item.getQuantity());
                 totalAmount += product.getPrice() * item.getQuantity(); // Usar preço atual do produto
             }

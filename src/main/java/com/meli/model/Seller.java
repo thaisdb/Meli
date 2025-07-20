@@ -9,7 +9,6 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 @JsonTypeName("seller") // This links to the "seller" type in User's JsonSubTypes
 public class Seller extends User {
 
-    private double walletBalance = 0;
     // <productId, quantity>
     private Map<Integer, Integer> inventory = new HashMap<>(); 
 
@@ -19,14 +18,6 @@ public class Seller extends User {
 
     public Seller(String name, String email, String cpf, String password, String address) {
         super(name, email, cpf, password, address);
-    }
-
-    public double getWalletBalance() {
-        return walletBalance;
-    }
-
-    public void setWalletBalance(double walletBalance) {
-        this.walletBalance = walletBalance;
     }
 
     public void setInventory(Map<Integer, Integer> inventory) {

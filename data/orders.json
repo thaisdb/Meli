@@ -226,4 +226,18 @@
   "paymentMethod" : "CREDITO",
   "status" : "COMPLETED",
   "timestamp" : 1753023985.356576200
+}, {
+  "id" : 16,
+  "consumerId" : 13,
+  "sellerId" : 2,
+  "products" : {
+    "2" : 1
+  },
+  "shippingAddress" : null,
+  "sendersAddress" : null,
+  "total" : 5000.0,
+  "shippingCost" : 0.0,
+  "paymentMethod" : "CREDITO",
+  "status" : "COMPLETED",
+  "timestamp" : 1753037810.447219400
 } ]

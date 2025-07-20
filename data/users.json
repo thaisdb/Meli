@@ -6,7 +6,8 @@
   "password" : "senha",
   "address" : "rua",
   "cart" : {
-    "2" : 1
+    "2" : 1,
+    "8" : 2
   },
   "preferredPaymentMethod" : "PIX",
   "type" : "consumer"
@@ -113,7 +114,9 @@
   "cpf" : "123.456.789-00",
   "password" : "senha",
   "address" : "endereço",
-  "cart" : { },
+  "cart" : {
+    "2" : 1
+  },
   "preferredPaymentMethod" : "CREDITO",
   "type" : "consumer"
 } ]
