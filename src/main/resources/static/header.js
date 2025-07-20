@@ -2,10 +2,12 @@
 // Retrieve user info from sessionStorage immediately when the script is parsed
 let loggedInUserId = sessionStorage.getItem('loggedInUserId');
 let loggedInUserType = sessionStorage.getItem('loggedInUserType');
+let loggedInUserName = sessionStorage.getItem('loggedInUserName'); // Certifique-se de que este também é global
 
 // Make these global so other scripts can access them immediately
 window.loggedInUserId = loggedInUserId;
 window.loggedInUserType = loggedInUserType;
+window.loggedInUserName = loggedInUserName; // Torna o nome também global
 
 document.addEventListener('DOMContentLoaded', () => {
     // Function to load the header HTML
@@ -32,8 +34,9 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log("header.js: loadHeader: headerElement found:", !!headerElement);
 
             // Find the target element where the header should be inserted
-            const headerPlaceholder = document.querySelector('.header-placeholder');
-            console.log("header.js: loadHeader: headerPlaceholder found (by class):", !!headerPlaceholder);
+            // CORREÇÃO AQUI: Usar getElementById para corresponder ao HTML
+            const headerPlaceholder = document.getElementById('header-placeholder'); 
+            console.log("header.js: loadHeader: headerPlaceholder found (by ID):", !!headerPlaceholder);
 
             if (headerPlaceholder) {
                 // Insert the style into the head if it's not already there
@@ -46,7 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 headerPlaceholder.replaceWith(headerElement);
                 console.log("header.js: loadHeader: Header content replaced placeholder.");
             } else {
-                console.warn("header.js: No element with class 'header-placeholder' found. Prepending header to body.");
+                console.warn("header.js: No element with ID 'header-placeholder' found. Prepending header to body."); // Mensagem de aviso atualizada
                 if (styleElement && !document.head.querySelector(`style[data-header-style]`)) {
                     styleElement.setAttribute('data-header-style', 'true');
                     document.head.appendChild(styleElement);
@@ -129,23 +132,39 @@ document.addEventListener('DOMContentLoaded', () => {
         const configLink = document.getElementById('configLink');
         const logoutButton = document.getElementById('logoutButton');
 
+        // NOVO: Obter referências aos links de carrinho e pedidos
+        const cartLink = document.getElementById('cartLink');
+        const consumersOrdersLink = document.getElementById('consumersOrdersLink');
+
         if (!profileIconContainer) {
             console.warn("header.js: Profile icon container not found. Cannot initialize profile behavior.");
             return;
         }
 
-        if (loggedInUserId) { // User is logged in: Show dropdown on click
+        // Use the global loggedInUserId e loggedInUserType
+        if (window.loggedInUserId) { // User is logged in: Show dropdown on click
             console.log("header.js: User is logged in. Initializing profile dropdown behavior.");
             
             // Set config link
             if (configLink) {
-                configLink.href = `/updateProfile.html?userId=${loggedInUserId}`;
+                configLink.href = `/updateProfile.html?userId=${window.loggedInUserId}`;
             }
 
             // Ensure dropdown is hidden initially
             if (profileDropdown) {
                 profileDropdown.classList.add('hidden');
             }
+
+            // --- INÍCIO DA LÓGICA PARA VISIBILIDADE CONDICIONAL DOS LINKS ---
+            if (window.loggedInUserType === 'consumer') {
+                if (cartLink) cartLink.classList.remove('hidden'); // Mostrar carrinho
+                if (consumersOrdersLink) consumersOrdersLink.classList.remove('hidden'); // Mostrar pedidos
+            } else {
+                // Para vendedores ou outros tipos, ocultar esses links
+                if (cartLink) cartLink.classList.add('hidden'); // Ocultar carrinho
+                if (consumersOrdersLink) consumersOrdersLink.classList.add('hidden'); // Ocultar pedidos
+            }
+            // --- FIM DA LÓGICA PARA VISIBILIDADE CONDICIONAL DOS LINKS ---
 
             // Attach click listener to toggle dropdown
             profileIconContainer.addEventListener('click', (event) => {
@@ -168,6 +187,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (logoutButton) {
                 logoutButton.addEventListener('click', () => {
                     sessionStorage.removeItem('loggedInUserId');
+                    sessionStorage.removeItem('loggedInUserName');
                     sessionStorage.removeItem('loggedInUserType');
                     sessionStorage.removeItem('cartItems'); // Clear cart on logout
                     console.log("header.js: User logged out. Session cleared.");
@@ -181,6 +201,10 @@ document.addEventListener('DOMContentLoaded', () => {
             if (profileDropdown) {
                 profileDropdown.classList.add('hidden');
             }
+            // Também ocultar links de carrinho e pedidos se não estiver logado
+            if (cartLink) cartLink.classList.add('hidden');
+            if (consumersOrdersLink) consumersOrdersLink.classList.add('hidden');
+
             // Remove any existing click listeners to avoid conflicts (important for re-renders)
             // Clone the element to remove all previous listeners, then re-add to DOM
             const oldProfileIconContainer = profileIconContainer;

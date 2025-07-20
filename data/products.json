@@ -5,18 +5,18 @@
   "description" : "The iPhone 16 features a 6.1-inch OLED display, an A18 chip, and an advanced dual-camera system with a 48MP Fusion camera. It also boasts a new ultrawide camera with a wider aperture and automatic focus. The phone has a durable aerospace-grade aluminum enclosure and a color-infused glass back. It also includes a new internal design for improved heat dissipation. ",
   "imageUrl" : "/images/Iphone.jpg",
   "brand" : "Apple",
-  "stock" : 215,
-  "tags" : [ "apple smartphone celular iphone" ],
+  "stock" : 213,
+  "category" : "Eletrônicos",
   "sellerId" : 2
 }, {
   "id" : 1,
   "title" : "Triologia Senhor dos Aneis edição de luxo",
   "price" : 990.1,
-  "description" : "Edição em Ingles; Uma suntuosa edição em capa dura do clássico conto épico de aventuras de Tolkien, totalmente ilustrado em cores pela primeira vez pelo próprio autor. Este volume de luxo é encadernado em quatro partes e inclui muitos recursos especiais exclusivos desta edição.  Desde sua primeira publicação em 1954, O Senhor dos Anéis tem sido um livro estimado por todos. Imerso em magia e sobrenatural incomparáveis, sua fantasia arrebatadora e aventura épica tocou os corações de jovens e adultos. Mais de 100 milhões de cópias de suas muitas edições foram vendidas em todo o mundo, e edições ocasionais de colecionadores tornam-se itens valiosos e valiosos de publicação.  Esta edição de capa dura em um volume contém o texto completo, totalmente corrigido e refeito, impresso em vermelho e preto e apresenta, pela primeira vez, trinta ilustrações coloridas, mapas e esboços desenhados pelo próprio Tolkien enquanto compunha esta obra épica. Entre elas, estão as páginas do Livro de Mazarbul, maravilhosos fac-símiles criados por Tolkien para acompanhar o famoso capítulo \"A Ponte de Khazad-dûm\". Também estão presentes dois mapas desdobráveis removíveis, desenhados por Christopher Tolkien, que revelam todos os detalhes da Terra-média.  Esta edição de luxo muito especial é encadernada em quatro partes, com nervuras em relevo na lombada e estampada em duas folhas. As páginas têm bordas douradas e contêm detalhes especiais exclusivos desta edição.",
+  "description" : "Edição em Ingles; Uma suntuosa edição em capa dura do clássico conto épico de aventuras de Tolkien, totalmente ilustrado em cores pela primeira vez pelo próprio autor. Este volume de luxo é encadernado em quatro partes e inclui muitos recursos especiais exclusivos desta edição. Desde sua primeira publicação em 1954, O Senhor dos Anéis tem sido um livro estimado por todos. Imerso em magia e sobrenatural incomparáveis, sua fantasia arrebatadora e aventura épica tocou os corações de jovens e adultos. Mais de 100 milhões de cópias de suas muitas edições foram vendidas em todo o mundo, e edições ocasionais de colecionadores tornam-se itens valiosos e valiosos de publicação. Esta edição de capa dura em um volume contém o texto completo, totalmente corrigido e refeito, impresso em vermelho e preto e apresenta, pela primeira vez, trinta ilustrações coloridas, mapas e esboços desenhados pelo próprio Tolkien enquanto compunha esta obra épica. Entre elas, estão as páginas do Livro de Mazarbul, maravilhosos fac-símiles criados por Tolkien para acompanhar o famoso capítulo \"A Ponte de Khazad-dûm\". Também estão presentes dois mapas desdobráveis removíveis, desenhados por Christopher Tolkien, que revelam todos os detalhes da Terra-média. Esta edição de luxo muito especial é encadernada em quatro partes, com nervuras em relevo na lombada e estampada em duas folhas. As páginas têm bordas douradas e contêm detalhes especiais exclusivos desta edição.",
   "imageUrl" : "/images/Senhor dos Aneis de luxo.jpg",
   "brand" : "Editora: William Morrow & Company",
-  "stock" : 9,
-  "tags" : [ "ingles", "livro", "ediçao de luxo", "tolkien" ],
+  "stock" : 8,
+  "category" : "Livros",
   "sellerId" : 2
 }, {
   "id" : 5,
@@ -26,7 +26,7 @@
   "imageUrl" : "/images/DND2024.jpg",
   "brand" : "Editora: Wizards of the Coast",
   "stock" : 20,
-  "tags" : [ "fantasia livro rpg dnd" ],
+  "category" : "Jogos de RPG",
   "sellerId" : 2
 }, {
   "id" : 8,
@@ -36,7 +36,7 @@
   "imageUrl" : "/images/diceSet.webp",
   "brand" : "Homebrew",
   "stock" : 8,
-  "tags" : [ "d20", "dice", "rpg", "dnd" ],
+  "category" : "Acessórios de Jogos",
   "sellerId" : 2
 }, {
   "id" : 16,
@@ -46,7 +46,7 @@
   "imageUrl" : "/images/Patinete.png",
   "brand" : "Joog",
   "stock" : 18,
-  "tags" : [ "radical", "esporte", "brinquedo" ],
+  "category" : "Esportes e Lazer",
   "sellerId" : 2
 }, {
   "id" : 27,
@@ -56,7 +56,7 @@
   "imageUrl" : "/images/stanley.jpg",
   "brand" : "Stanley",
   "stock" : 31,
-  "tags" : [ "copo termico", "preto", "copo", "stanley", "termico" ],
+  "category" : "Utensílios Domésticos",
   "sellerId" : 2
 }, {
   "id" : 28,
@@ -66,7 +66,7 @@
   "imageUrl" : "",
   "brand" : "",
   "stock" : 0,
-  "tags" : [ "newtag" ],
+  "category" : null,
   "sellerId" : 3
 }, {
   "id" : 29,
@@ -76,7 +76,7 @@
   "imageUrl" : null,
   "brand" : null,
   "stock" : 0,
-  "tags" : [ "apple" ],
+  "category" : null,
   "sellerId" : 3
 }, {
   "id" : 30,
@@ -86,6 +86,26 @@
   "imageUrl" : null,
   "brand" : null,
   "stock" : 0,
-  "tags" : [ ],
+  "category" : null,
   "sellerId" : 3
+}, {
+  "id" : 31,
+  "title" : "Trilogia O Problema dos 3 Corpos",
+  "price" : 225.99,
+  "description" : "Coleção Especial da trilogia que inspirou a série O Problema dos 3 Corpos, da Netflix - dos mesmos criadores de Game Of Thrones.\n\nPrincipal obra do autor chinês Cixin Liu, vencedor dos prêmios Yinhe (nove vezes), maior prêmio de ficção científica da China, Hugo e Locus, consagrando-o como o primeiro autor não anglófono a vencer o prêmio Hugo de melhor romance.\n\nEsta história se tornou best-sellerdo New York Times e do Wall Street Journal, e foi indicada por personalidades como Barack Obama e Mark Zuckerberg.\n\nO problema dos três corpos: Primeiro livro da trilogia, China, final dos anos 1960. Enquanto o país inteiro está sendo devastado pela violência da Revolução Cultural, um pequeno grupo de astrofísicos, militares e engenheiros começa um projeto ultrassecreto envolvendo ondas sonoras e seres extraterrestres. Uma decisão tomada por um desses cientistas mudará para sempre o destino da humanidade e, cinquenta anos depois, uma civilização alienígena a beira do colapso planeja uma invasão. O problema dos três corpos é uma crônica da marcha humana em direção aos confins do universo. Uma clássica história de ficção científica, no melhor estilo de Arthur C. Clarke. Um jogo envolvente em que a humanidade tem tudo a perder.\n\nA floresta sombria: Segundo livro da trilogia, A floresta sombria é um livro incrivelmente forte e original. Depois de O problema dos três corpos , a humanidade se prepara para a iminente invasão alienígena. A Organização Terra-Trissolaris - formada por habitantes da Terra que traíram seus iguais para se associar aos alienígenas - pode ter sido derrotada, mas a presença de partículas subatômicas, os sófons, revela todo o conhecimento da humanidade para os invasores, e as defesas terráqueas são um livro aberto para os trissolarianos. Nesse contexto, em que só a mente humana é segura, é montado o Projeto Barreiras: quatro pessoas serão encarregadas de pensar em uma estratégia para a salvação do mundo. A Barreira está completamente isolada, protegendo seus pensamentos do restante da humanidade, mas até que ponto é possível guardar um segredo?\n\nO fim da morte: Terceiro livro da trilogia, com O fim da morte, a aclamada trilogia do autor chinês mais vendido e premiado da ficção científica chega ao fim. \n\nNeste terceiro volume, meio século se passou desde a Batalha do Fim do Mundo, e a Terra conquistou um frágil acordo para manter os invasores trissolarianos encurralados. Com ele, uma nova era de paz e prosperidade tem início, e Luo Ji - o homem que elaborou o acordo, agora conhecido como Portador da Espada - tem que carregar nas costas a vida de duas civilizações. Enquanto isso, Cheng Xin, uma engenheira aeroespacial do início do século XXI, desperta da hibernação nessa nova época. Luo Ji está velho, e um novo Portador da Espada deve tomar seu lugar. Será que Cheng Xin é capaz de suportar a responsabilidade de manter a Terra em segurança? E por que um antigo projeto, da época da Crise Trissolariana, não sai de sua mente? O destino da humanidade está em jogo - estará nosso destino nas estrelas, ou permaneceremos no berço de nossa civilização até o fim?",
+  "imageUrl" : "/images/3Corpos.webp",
+  "brand" : "Editora : Suma",
+  "stock" : 47,
+  "category" : "Livros",
+  "sellerId" : 5
+}, {
+  "id" : 32,
+  "title" : "Patins Freestyle Urban Traxart Volt+ 3",
+  "price" : 1200.49,
+  "description" : "Patins Freestyle Urban Traxart Volt+ 3. Esse é um modelo que vem com a bota do Volt, e com base de 3 rodas de 110mm para você curtir com bastante velocidade e performance. Suporta até 120kg.\n\nModelo em bota rígida com protetor dianteiro para slide, e acolchoamento extra no calcanhar para absorção de impactos. Na bota, destaque para o rebite lateral em parafuso, para que o patinador possa ajustar o cuff, e fivela do peito do pé de precisão. A base é de alumínio CNC, uma opção mais resistente com furação universal 165mm e distância 243mm, que comporta 3 rodas de 110mm. As rodas são de poliuretano (PU), em 110mm com dureza 85A SHR. Leva rolamentos ABEC-9 Cromo para você curtir com mais velocidade.",
+  "imageUrl" : "/images/Patins.webp",
+  "brand" : "Traxart",
+  "stock" : 77,
+  "category" : "Esportes e Lazer",
+  "sellerId" : 5
 } ]

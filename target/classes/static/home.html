@@ -26,14 +26,14 @@
             const productContainer = document.getElementById('productContainer');
 
             // Function to fetch and display products
-            async function fetchAndDisplayProducts(searchTags = '') {
+            async function fetchAndDisplayProducts(searchTerm = '') { // Renomeado para searchTerm para clareza
                 productContainer.innerHTML = 'Loading products...'; 
 
                 let url = '/products'; // Default to fetching all products
 
-                if (searchTags) {
-                    // Assuming a search endpoint, if you have one. Otherwise, this might need adjustment.
-                    url = `/products/search?tags=${encodeURIComponent(searchTags)}`; 
+                if (searchTerm) {
+                    // AGORA: Sempre chama o endpoint de busca geral com o parâmetro 'term'
+                    url = `/products/search?term=${encodeURIComponent(searchTerm)}`; 
                 }
 
                 try {
@@ -63,8 +63,9 @@
                                 <img src="${imageUrl}" alt="${product.title}">
                                 <div class="card-content">
                                     <div class="title">${product.title}</div>
-                                    <div class="price">R$ ${product.price ? product.price.toFixed(2) : 'N/A'}</div>
+                                    <div class="price">R$ ${product.price ? product.price.toFixed(2).replace('.', ',') : 'N/A'}</div>
                                     <div class="brand">Marca: ${product.brand || 'Desconhecida'}</div>
+                                    <div class="category">Categoria: ${product.category || 'N/A'}</div> <!-- Exibe a categoria -->
                                 </div>
                             </a>
                         `;
@@ -75,7 +76,9 @@
                     document.querySelectorAll('.add-to-cart-button').forEach(button => {
                         button.addEventListener('click', (event) => {
                             const productId = event.currentTarget.dataset.productId;
-                            alert(`Product ${productId} added to cart (functionality not fully implemented yet)!`);
+                            // Usar showCustomMessageBox em vez de alert
+                            // alert(`Product ${productId} added to cart (functionality not fully implemented yet)!`);
+                            showCustomMessageBox('Carrinho', `Produto ${productId} adicionado ao carrinho (funcionalidade não totalmente implementada ainda)!`, true);
                             console.log(`Add to cart clicked for product ID: ${productId}`);
                         });
                     });
@@ -91,11 +94,52 @@
 
             // Listen for custom productSearch event from header.js
             window.addEventListener('productSearch', (event) => {
-                const searchTags = event.detail.searchTags;
-                console.log("FRONTEND: home.html: Received search event with tags:", searchTags);
-                fetchAndDisplayProducts(searchTags);
+                const searchTerm = event.detail.searchTags; // header.js ainda envia como 'searchTags', mas tratamos como termo geral
+                console.log("FRONTEND: home.html: Received search event with term:", searchTerm);
+                fetchAndDisplayProducts(searchTerm);
             });
         });
+
+        // Custom Message Box functions (adicionadas aqui para garantir que home.html as tenha, se não vierem de outro script)
+        const messageBoxOverlay = document.createElement('div');
+        messageBoxOverlay.id = 'messageBoxOverlay';
+        messageBoxOverlay.className = 'hidden';
+        messageBoxOverlay.innerHTML = `
+            <div class="app-modal-content">
+                <h2 id="messageBoxTitle" class="app-modal-title"></h2>
+                <p id="messageBoxMessage" class="app-modal-message"></p>
+                <div class="app-modal-actions">
+                    <button id="messageBoxCloseBtn" class="button">OK</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(messageBoxOverlay);
+
+        const messageBoxTitle = document.getElementById('messageBoxTitle');
+        const messageBoxMessage = document.getElementById('messageBoxMessage');
+        const messageBoxCloseBtn = document.getElementById('messageBoxCloseBtn');
+
+        function showCustomMessageBox(title, message, isSuccess = true, callback = null) {
+            messageBoxTitle.textContent = title;
+            messageBoxMessage.textContent = message;
+            messageBoxTitle.style.color = isSuccess ? '#00a650' : '#dc3545'; 
+            messageBoxCloseBtn.style.backgroundColor = isSuccess ? '#3483fa' : '#6c757d'; 
+
+            messageBoxOverlay.classList.remove('hidden');
+
+            if (callback) {
+                messageBoxCloseBtn.onclick = () => {
+                    messageBoxOverlay.classList.add('hidden');
+                    callback(); 
+                    messageBoxCloseBtn.onclick = null; 
+                };
+            } else {
+                messageBoxCloseBtn.onclick = () => {
+                    messageBoxOverlay.classList.add('hidden');
+                    messageBoxCloseBtn.onclick = null;
+                };
+            }
+        }
     </script>
 </body>
 

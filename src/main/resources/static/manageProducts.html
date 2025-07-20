@@ -1,258 +1,573 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Products</title>
+    <title>Gerenciar Produtos</title>
     <link rel="stylesheet" type="text/css" href="/css/page.css">
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- IMPORTANT: Tailwind CSS CDN for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts - Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <!-- Link to the header.js script -->
     <script src="header.js" defer></script>
+    <style>
+        /* Ensure Inter font is applied to the body */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f5f5f5; /* Light grey background for the page */
+        }
+
+        /* Basic styling for tables, matching existing product table style */
+        .table-container {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px; /* Space between tables */
+        }
+
+        .table-container h2 {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        .data-table th, .data-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .data-table th {
+            background-color: #f8f8f8;
+            color: #333;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.9em;
+        }
+
+        .data-table tbody tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        .data-table .action-buttons button {
+            background-color: #3483fa;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9em;
+            margin-right: 5px;
+            transition: background-color 0.2s ease;
+        }
+
+        .data-table .action-buttons button:hover {
+            background-color: #2968c8;
+        }
+
+        .data-table .action-buttons button.delete-button {
+            background-color: #dc3545;
+        }
+
+        .data-table .action-buttons button.delete-button:hover {
+            background-color: #c82333;
+        }
+
+        .no-data-message {
+            text-align: center;
+            color: #666;
+            padding: 30px;
+            font-style: italic;
+        }
+
+        /* Styles for the sum row */
+        .data-table tfoot tr {
+            background-color: #e0f0ff; /* Light blue background for sum row */
+            font-weight: bold;
+            border-top: 2px solid #3483fa; /* Stronger border above sum */
+        }
+        .data-table tfoot td {
+            padding: 15px;
+            font-size: 1.1em;
+            color: #333;
+        }
+        .data-table tfoot td:last-child {
+            text-align: right;
+            color: #3483fa; /* Blue color for total sum */
+        }
+        .data-table .product-list-cell ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .data-table .product-list-cell li {
+            margin-bottom: 5px;
+            font-size: 0.95em;
+            color: #555;
+        }
+        .data-table .product-list-cell li:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Styles for scrollable table body */
+        #sellerOrdersTable {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 0; 
+        }
+
+        #sellerOrdersTable thead, #sellerOrdersTable tfoot {
+            display: table;
+            width: calc(100% - var(--scrollbar-width, 0px));
+            table-layout: fixed;
+        }
+
+        #sellerOrdersTable tbody {
+            display: block;
+            max-height: calc(10 * 45px); /* Adjust 45px based on your estimated row height */
+            overflow-y: auto;
+            width: 100%;
+        }
+        
+        #sellerOrdersTable tbody tr {
+            display: table;
+            width: 100%;
+            table-layout: fixed;
+        }
+
+        /* Adjust column widths for seller orders table */
+        #sellerOrdersTable th:nth-child(1), #sellerOrdersTable td:nth-child(1) { width: 10%; } /* ID Pedido */
+        #sellerOrdersTable th:nth-child(2), #sellerOrdersTable td:nth-child(2) { width: 10%; } /* ID Consumidor */
+        #sellerOrdersTable th:nth-child(3), #sellerOrdersTable td:nth-child(3) { width: 15%; } /* Data/Hora */
+        #sellerOrdersTable th:nth-child(4), #sellerOrdersTable td:nth-child(4) { width: 40%; } /* Produtos */
+        #sellerOrdersTable th:nth-child(5), #sellerOrdersTable td:nth-child(5) { width: 10%; } /* Status */
+        #sellerOrdersTable th:nth-child(6), #sellerOrdersTable td:nth-child(6) { width: 15%; } /* Total */
+
+        /* Adjust column widths for products table (assuming it also needs fixed header/body/footer) */
+        #productsTable {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 0;
+        }
+
+        #productsTable thead {
+            display: table;
+            width: calc(100% - var(--scrollbar-width, 0px));
+            table-layout: fixed;
+        }
+
+        #productsTable tbody {
+            display: block;
+            max-height: calc(10 * 45px); /* Same height for consistency */
+            overflow-y: auto;
+            width: 100%;
+        }
+        
+        #productsTable tbody tr {
+            display: table;
+            width: 100%;
+            table-layout: fixed;
+        }
+
+        #productsTable th:nth-child(1), #productsTable td:nth-child(1) { width: 10%; } /* ID */
+        #productsTable th:nth-child(2), #productsTable td:nth-child(2) { width: 35%; } /* Título */
+        #productsTable th:nth-child(3), #productsTable td:nth-child(3) { width: 15%; } /* Preço */
+        #productsTable th:nth-child(4), #productsTable td:nth-child(4) { width: 10%; } /* Estoque */
+        #productsTable th:nth-child(5), #productsTable td:nth-child(5) { width: 30%; } /* Ações */
+
+
+        /* Custom Message Box for Success/Error */
+        #messageBoxOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            margin: 0; 
+            padding: 0;
+        }
+        .app-modal-content {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            max-height: 90vh; 
+            overflow-y: auto; 
+        }
+        .app-modal-title {
+            font-size: 1.8em;
+            margin-bottom: 15px;
+        }
+        .app-modal-message {
+            font-size: 1.1em;
+            margin-bottom: 25px;
+            color: #666;
+        }
+        .app-modal-actions button {
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+            border: none;
+            color: white;
+            margin: 0 5px; /* Spacing between buttons */
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
 </head>
+<body data-title="Gerenciar Produtos" data-show-profile-icon="true">
+    <div id="header-placeholder"></div>
 
-<body data-title="Manage Products" data-show-profile-icon="true" data-show-search-bar="true">
-    <div class="header-placeholder"></div>
-
-    <div class="product-list-table-card">
-        <h1>Product Management</h1>
-
-        <div class="add-product-button-container">
-            <!-- Pass loggedInUserId to addProduct.html -->
-            <button class="add-product-button" onclick="location.href='/addProduct.html?sellerId=' + window.loggedInUserId">
-                <i class="fas fa-plus-circle"></i> Add New Product
-            </button>
+    <!-- Main Content Container -->
+    <div class="container mx-auto p-4 flex flex-col gap-6">
+        <!-- Seller Orders Table -->
+        <div class="table-container">
+            <h2>Balanço de Pedidos dos Seus Produtos</h2>
+            <div> 
+                <p class="no-data-message" id="noSellerOrdersMessage">Carregando pedidos...</p>
+                <table class="data-table hidden" id="sellerOrdersTable">
+                    <thead>
+                        <tr>
+                            <th>ID Pedido</th>
+                            <th>ID Consumidor</th>
+                            <th>Data/Hora</th>
+                            <th>Produtos</th>
+                            <th>Status</th>
+                            <th style="text-align: right;">Total (R$)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="sellerOrdersTableBody">
+                        <!-- Orders will be loaded here -->
+                    </tbody>
+                    <tfoot id="sellerOrdersTableFooter">
+                        <!-- Sum row will be loaded here -->
+                    </tfoot>
+                </table>
+            </div>
         </div>
 
-        <table class="product-table">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Title</th>
-                    <th>Price</th>
-                    <th>Description</th>
-                    <th>Brand</th>
-                    <th>Stock</th>
-                    <th>Tags</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Product rows will be inserted here by JavaScript -->
-            </tbody>
-        </table>
-
-        <div class="pagination-controls">
-            <button class="pagination-button" id="prevPageBtn" disabled>&laquo; Previous</button>
-            <div class="page-numbers" id="pageNumbers">
-                <!-- Page number buttons will be inserted here -->
+        <!-- Existing Products Table -->
+        <div class="table-container">
+            <h2>Seus Produtos</h2>
+            <button id="addProductButton" class="button mb-4">Adicionar Novo Produto</button>
+            <div>
+                <p class="no-data-message" id="noProductsMessage">Carregando produtos...</p>
+                <table class="data-table hidden" id="productsTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Título</th>
+                            <th>Preço</th>
+                            <th>Estoque</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="productsTableBody">
+                        <!-- Products will be loaded here -->
+                    </tbody>
+                </table>
             </div>
-            <button class="pagination-button" id="nextPageBtn">Next &raquo;</button>
         </div>
     </div>
 
-    <!-- Delete Confirmation Modal -->
-    <div id="confirmDeleteModalOverlay" class="confirm-modal-overlay hidden app-modal-overlay">
-        <div class="confirm-modal-content app-modal-content">
-            <h2 class="confirm-modal-title app-modal-title">Confirm Deletion</h2>
-            <p class="confirm-modal-message app-modal-message">Are you sure you want to delete product ID <span
-                    id="productIdToDelete" class="product-id-to-delete"></span>?</p>
-            <div class="confirm-modal-actions app-modal-actions">
-                <button id="confirmDeleteBtn" class="button confirm-delete-btn">Delete</button>
-                <button id="cancelDeleteBtn" class="button cancel-delete-btn">Cancel</button>
+    <!-- Custom Message Box for Success/Error -->
+    <div id="messageBoxOverlay" class="hidden">
+        <div class="app-modal-content">
+            <h2 id="messageBoxTitle" class="app-modal-title"></h2>
+            <p id="messageBoxMessage" class="app-modal-message"></p>
+            <div class="app-modal-actions">
+                <button id="messageBoxCloseBtn" class="button">OK</button>
             </div>
         </div>
     </div>
 
     <script>
-        // Global variables for pagination
-        let currentPage = 1;
-        const productsPerPage = 5; // Number of products to display per page
-        let allProducts = []; // To store all fetched products for pagination
+        // Custom message box functions (re-used from other pages)
+        const messageBoxOverlay = document.getElementById('messageBoxOverlay');
+        const messageBoxTitle = document.getElementById('messageBoxTitle');
+        const messageBoxMessage = document.getElementById('messageBoxMessage');
+        const messageBoxCloseBtn = document.getElementById('messageBoxCloseBtn');
 
-        // DOM elements for the delete confirmation modal
-        let confirmDeleteModalOverlay;
-        let productIdToDeleteSpan;
-        let confirmDeleteBtn;
-        let cancelDeleteBtn;
+        function showCustomMessageBox(title, message, isSuccess = true, showConfirm = false, onConfirm = null) {
+            messageBoxTitle.textContent = title;
+            messageBoxMessage.textContent = message;
+            messageBoxTitle.style.color = isSuccess ? '#00a650' : '#dc3545'; 
+            // Clear previous action buttons
+            const appModalActions = document.querySelector('.app-modal-actions');
+            appModalActions.innerHTML = '';
 
-        // DEBUGGING: Log session data immediately when this script starts
-        console.log("FRONTEND: manageProducts.html: Initial check - window.loggedInUserId:", window.loggedInUserId);
-        console.log("FRONTEND: manageProducts.html: Initial check - window.loggedInUserType:", window.loggedInUserType);
+            if (showConfirm) {
+                const confirmBtn = document.createElement('button');
+                confirmBtn.id = 'messageBoxConfirmBtn';
+                confirmBtn.className = 'button';
+                confirmBtn.textContent = 'Sim';
+                confirmBtn.style.backgroundColor = '#dc3545'; // Red for confirm
+                confirmBtn.addEventListener('click', () => {
+                    if (onConfirm) onConfirm();
+                    messageBoxOverlay.classList.add('hidden');
+                });
+                appModalActions.appendChild(confirmBtn);
 
-
-        document.addEventListener('DOMContentLoaded', () => {
-            // Check if user is logged in and is a seller
-            if (!window.loggedInUserId || window.loggedInUserType !== 'seller') {
-                console.error("FRONTEND: manageProducts.html: Access Denied - User is not a seller or not logged in.");
-                alert('Access Denied: You must be logged in as a seller to manage products.');
-                window.location.href = '/login.html'; // Redirect to login if not a seller
-                return;
+                const cancelBtn = document.createElement('button');
+                cancelBtn.id = 'messageBoxCancelBtn';
+                cancelBtn.className = 'button';
+                cancelBtn.textContent = 'Não';
+                cancelBtn.style.backgroundColor = '#6c757d'; // Grey for cancel
+                cancelBtn.addEventListener('click', () => {
+                    messageBoxOverlay.classList.add('hidden');
+                });
+                appModalActions.appendChild(cancelBtn);
             } else {
-                console.log("FRONTEND: manageProducts.html: Access Granted - User is a seller.");
-            }
-
-            // Initialize modal elements
-            confirmDeleteModalOverlay = document.getElementById('confirmDeleteModalOverlay');
-            productIdToDeleteSpan = document.getElementById('productIdToDelete');
-            confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
-            cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
-
-            // Event listeners for delete confirmation modal buttons
-            if (confirmDeleteBtn) {
-                confirmDeleteBtn.addEventListener('click', deleteProductConfirmed);
-            }
-            if (cancelDeleteBtn) {
-                cancelDeleteBtn.addEventListener('click', hideConfirmDeleteModal);
-            }
-
-            // Initial fetch of products for the logged-in seller
-            fetchProducts();
-
-            // Pagination button event listeners
-            document.getElementById('prevPageBtn').addEventListener('click', () => {
-                if (currentPage > 1) {
-                    currentPage--;
-                    displayProducts();
-                }
-            });
-
-            document.getElementById('nextPageBtn').addEventListener('click', () => {
-                const totalPages = Math.ceil(allProducts.length / productsPerPage);
-                if (currentPage < totalPages) {
-                    currentPage++;
-                    displayProducts();
-                }
-            });
-        });
-
-        // Function to fetch products for the logged-in seller
-        async function fetchProducts() {
-            try {
-                // Fetch products specifically for the logged-in seller
-                const response = await fetch(`/products/seller/${window.loggedInUserId}`); // Changed endpoint
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                allProducts = await response.json();
-                console.log("FRONTEND: manageProducts.html: Products fetched for seller:", allProducts);
-                displayProducts(); // Display products after fetching
-            } catch (error) {
-                console.error('FRONTEND: manageProducts.html: Error fetching products:', error);
-                alert('Failed to load products: ' + error.message);
-            }
-        }
-
-        function displayProducts() {
-            const tbody = document.querySelector('.product-table tbody');
-            tbody.innerHTML = ''; // Clear existing rows
-
-            const startIndex = (currentPage - 1) * productsPerPage;
-            const endIndex = startIndex + productsPerPage;
-            const productsToDisplay = allProducts.slice(startIndex, endIndex);
-
-            productsToDisplay.forEach(product => {
-                const row = tbody.insertRow();
-                row.insertCell().textContent = product.id;
-                row.insertCell().textContent = product.title;
-                row.insertCell().textContent = product.price.toFixed(2);
-                row.insertCell().textContent = product.description;
-                row.insertCell().textContent = product.brand;
-                row.insertCell().textContent = product.stock;
-                row.insertCell().textContent = product.tags ? product.tags.join(', ') : '';
-
-                const actionsCell = row.insertCell();
-                const editButton = document.createElement('button');
-                editButton.className = 'button'; // Use existing button style
-                editButton.innerHTML = '<i class="fas fa-edit"></i> Edit';
-                // Pass sellerId to editProduct.html
-                editButton.onclick = () => location.href = `/editProduct.html?id=${product.id}&sellerId=${window.loggedInUserId}`;
-                actionsCell.appendChild(editButton);
-
-                const deleteButton = document.createElement('button');
-                deleteButton.className = 'button delete-button'; // Use existing button style
-                deleteButton.innerHTML = '<i class="fas fa-trash-alt"></i> Delete';
-                deleteButton.onclick = () => showConfirmDeleteModal(product.id);
-                actionsCell.appendChild(deleteButton);
-            });
-
-            updatePaginationControls();
-        }
-
-        function updatePaginationControls() {
-            const totalPages = Math.ceil(allProducts.length / productsPerPage);
-            document.getElementById('prevPageBtn').disabled = currentPage === 1;
-            document.getElementById('nextPageBtn').disabled = currentPage === totalPages || allProducts.length === 0;
-
-            const pageNumbersContainer = document.getElementById('pageNumbers');
-            pageNumbersContainer.innerHTML = ''; // Clear existing page number buttons
-
-            // Display page numbers
-            for (let i = 1; i <= totalPages; i++) {
-                const pageButton = document.createElement('button');
-                pageButton.className = 'page-number-button';
-                if (i === currentPage) {
-                    pageButton.classList.add('active');
-                }
-                pageButton.textContent = i;
-                pageButton.addEventListener('click', () => {
-                    currentPage = i;
-                    displayProducts();
+                const okBtn = document.createElement('button');
+                okBtn.id = 'messageBoxCloseBtn';
+                okBtn.className = 'button';
+                okBtn.textContent = 'OK';
+                okBtn.style.backgroundColor = isSuccess ? '#3483fa' : '#6c757d';
+                okBtn.addEventListener('click', () => {
+                    messageBoxOverlay.classList.add('hidden');
                 });
-                pageNumbersContainer.appendChild(pageButton);
+                appModalActions.appendChild(okBtn);
             }
+
+            messageBoxOverlay.classList.remove('hidden');
         }
 
-        // --- Delete Confirmation Modal Functions ---
-        let currentProductIdToDelete = null;
+        document.addEventListener('DOMContentLoaded', async () => {
+            const loggedInUserId = sessionStorage.getItem('loggedInUserId');
+            const loggedInUserType = sessionStorage.getItem('loggedInUserType');
 
-        function showConfirmDeleteModal(productId) {
-            currentProductIdToDelete = productId;
-            productIdToDeleteSpan.textContent = productId;
-            confirmDeleteModalOverlay.classList.remove('hidden');
-        }
+            // --- DEPURANDO AQUI ---
+            console.log("DEBUG: manageProducts.html: DOMContentLoaded - loggedInUserId:", loggedInUserId);
+            console.log("DEBUG: manageProducts.html: DOMContentLoaded - loggedInUserType:", loggedInUserType);
 
-        function hideConfirmDeleteModal() {
-            confirmDeleteModalOverlay.classList.add('hidden');
-            currentProductIdToDelete = null;
-        }
+            const productsTableBody = document.getElementById('productsTableBody');
+            const productsTable = document.getElementById('productsTable');
+            const noProductsMessage = document.getElementById('noProductsMessage');
+            const addProductButton = document.getElementById('addProductButton');
 
-        async function deleteProductConfirmed() {
-            if (currentProductIdToDelete === null) return;
+            const sellerOrdersTableBody = document.getElementById('sellerOrdersTableBody');
+            const sellerOrdersTable = document.getElementById('sellerOrdersTable');
+            const sellerOrdersTableFooter = document.getElementById('sellerOrdersTableFooter');
+            const noSellerOrdersMessage = document.getElementById('noSellerOrdersMessage');
 
-            try {
-                const response = await fetch(`/products/${currentProductIdToDelete}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'X-User-Id': window.loggedInUserId // Send logged-in user ID for backend validation
+            // Esta é a validação que está disparando o erro
+            if (!loggedInUserId || loggedInUserType !== 'seller') {
+                console.error("ERROR: manageProducts.html: Acesso negado. loggedInUserId ou loggedInUserType inválidos.");
+                showCustomMessageBox('Acesso Negado', 'Você precisa estar logado como vendedor para gerenciar produtos e ver seus pedidos.', false, false, () => {
+                    window.location.href = '/login.html';
+                });
+                return;
+            }
+
+            // --- Fetch and Render Seller Orders ---
+            async function fetchAndRenderSellerOrders() {
+                sellerOrdersTableBody.innerHTML = ''; // Clear existing rows
+                sellerOrdersTableFooter.innerHTML = ''; // Clear existing footer
+                noSellerOrdersMessage.classList.remove('hidden');
+                sellerOrdersTable.classList.add('hidden');
+
+                try {
+                    console.log("DEBUG: manageProducts.html: Buscando pedidos do vendedor para ID:", loggedInUserId);
+                    const response = await fetch('/orders/seller', {
+                        method: 'GET',
+                        headers: {
+                            'X-User-Id': loggedInUserId
+                        }
+                    });
+
+                    if (response.status === 204) { // No Content
+                        noSellerOrdersMessage.textContent = 'Nenhum pedido encontrado para seus produtos.';
+                        return;
                     }
-                });
 
-                if (response.ok) {
-                    console.log(`FRONTEND: manageProducts.html: Product ${currentProductIdToDelete} deleted successfully.`);
-                    hideConfirmDeleteModal();
-                    fetchProducts(); // Re-fetch and display products after deletion
-                } else {
-                    const errorText = await response.text();
-                    let errorMessage = `Error: ${response.status} ${response.statusText}`;
+                    if (!response.ok) {
+                        const errorText = await response.text();
+                        console.error("ERROR: manageProducts.html: Falha ao carregar pedidos do vendedor. Status:", response.status, "Erro:", errorText);
+                        throw new Error(errorText || "Falha ao carregar pedidos do vendedor.");
+                    }
+
+                    const orders = await response.json();
+                    console.log("DEBUG: manageProducts.html: Pedidos do vendedor carregados:", orders);
+
+                    if (orders.length === 0) {
+                        noSellerOrdersMessage.textContent = 'Nenhum pedido encontrado para seus produtos.';
+                        return;
+                    }
+
+                    let grandTotal = 0;
+
+                    orders.forEach(order => {
+                        const row = sellerOrdersTableBody.insertRow();
+                        row.insertCell().textContent = order.orderId;
+                        row.insertCell().textContent = order.consumerId;
+                        
+                        // Format timestamp
+                        const timestamp = new Date(order.timestamp);
+                        const formattedTimestamp = timestamp.toLocaleString('pt-BR', { 
+                            year: 'numeric', month: '2-digit', day: '2-digit', 
+                            hour: '2-digit', minute: '2-digit', second: '2-digit' 
+                        });
+                        row.insertCell().textContent = formattedTimestamp;
+
+                        // Render products list
+                        const productsCell = row.insertCell();
+                        productsCell.className = 'product-list-cell'; // Add class for styling
+                        const productList = document.createElement('ul');
+                        if (order.sellerItems && order.sellerItems.length > 0) {
+                            order.sellerItems.forEach(item => {
+                                const listItem = document.createElement('li');
+                                listItem.textContent = `${item.title} (${item.quantity}x) - R$ ${item.priceAtPurchase.toFixed(2).replace('.', ',')}`;
+                                productList.appendChild(listItem);
+                            });
+                        } else {
+                            productList.textContent = 'N/A';
+                        }
+                        productsCell.appendChild(productList);
+
+                        row.insertCell().textContent = order.status;
+                        row.insertCell().textContent = `R$ ${order.total.toFixed(2).replace('.', ',')}`; // total já é o total do vendedor
+                        row.cells[5].style.textAlign = 'right'; // Align total to right
+
+                        grandTotal += order.total;
+                    });
+
+                    // Add sum row
+                    const sumRow = sellerOrdersTableFooter.insertRow();
+                    sumRow.innerHTML = `
+                        <td colspan="5" style="text-align: right;">Total Geral Recebido:</td>
+                        <td style="text-align: right;">R$ ${grandTotal.toFixed(2).replace('.', ',')}</td>
+                    `;
+
+                    noSellerOrdersMessage.classList.add('hidden');
+                    sellerOrdersTable.classList.remove('hidden');
+
+                } catch (error) {
+                    console.error("FRONTEND: manageProducts.html: Erro ao carregar pedidos do vendedor:", error);
+                    noSellerOrdersMessage.textContent = `Erro ao carregar pedidos: ${error.message}`;
+                    showCustomMessageBox('Erro', 'Não foi possível carregar os pedidos do vendedor.', false);
+                }
+            }
+
+
+            // --- Existing Product Listing Logic ---
+            async function fetchAndRenderProducts() {
+                productsTableBody.innerHTML = ''; // Clear existing rows
+                noProductsMessage.classList.remove('hidden');
+                productsTable.classList.add('hidden');
+
+                try {
+                    console.log("DEBUG: manageProducts.html: Buscando produtos do vendedor para ID:", loggedInUserId);
+                    const response = await fetch(`/products/seller/${loggedInUserId}`);
+                    if (!response.ok) {
+                        const errorText = await response.text();
+                        console.error("ERROR: manageProducts.html: Falha ao carregar produtos do vendedor. Status:", response.status, "Erro:", errorText);
+                        throw new Error(errorText || "Falha ao carregar produtos.");
+                    }
+                    const products = await response.json();
+                    console.log("DEBUG: manageProducts.html: Produtos do vendedor carregados:", products);
+
+                    if (products.length === 0) {
+                        noProductsMessage.textContent = 'Você não possui produtos cadastrados.';
+                        return;
+                    }
+
+                    products.forEach(product => {
+                        const row = productsTableBody.insertRow();
+                        row.insertCell().textContent = product.id;
+                        row.insertCell().textContent = product.title;
+                        row.insertCell().textContent = `R$ ${product.price.toFixed(2).replace('.', ',')}`;
+                        row.insertCell().textContent = product.stock;
+
+                        const actionsCell = row.insertCell();
+                        actionsCell.className = 'action-buttons';
+
+                        const editButton = document.createElement('button');
+                        editButton.textContent = 'Editar';
+                        editButton.addEventListener('click', () => editProduct(product.id));
+                        actionsCell.appendChild(editButton);
+
+                        const deleteButton = document.createElement('button');
+                        deleteButton.textContent = 'Excluir';
+                        deleteButton.className = 'delete-button';
+                        deleteButton.addEventListener('click', () => confirmDeleteProduct(product.id, product.title));
+                        actionsCell.appendChild(deleteButton);
+                    });
+
+                    noProductsMessage.classList.add('hidden');
+                    productsTable.classList.remove('hidden');
+
+                } catch (error) {
+                    console.error("FRONTEND: manageProducts.html: Erro ao carregar produtos:", error);
+                    noProductsMessage.textContent = `Erro ao carregar produtos: ${error.message}`;
+                    showCustomMessageBox('Erro', 'Não foi possível carregar seus produtos.', false);
+                }
+            }
+
+            function editProduct(productId) {
+                window.location.href = `/addProduct.html?id=${productId}`;
+            }
+
+            async function confirmDeleteProduct(productId, productName) {
+                showCustomMessageBox('Confirmar Exclusão', `Tem certeza que deseja excluir o produto "${productName}" (ID: ${productId})?`, false, true, async () => {
                     try {
-                        const errorJson = JSON.parse(errorText);
-                        errorMessage = `Error: ${errorJson.message || errorJson.error || JSON.stringify(errorJson)}`;
-                    } catch (e) {
-                        errorMessage = `Error: ${errorText}`;
+                        const response = await fetch(`/products/${productId}`, {
+                            method: 'DELETE',
+                            headers: {
+                                'X-User-Id': loggedInUserId
+                            }
+                        });
+
+                        if (response.ok) {
+                            showCustomMessageBox('Sucesso', `Produto "${productName}" excluído com sucesso!`, true);
+                            await fetchAndRenderProducts(); // Reload products after deletion
+                        } else {
+                            const errorText = await response.text();
+                            showCustomMessageBox('Erro', `Falha ao excluir produto: ${errorText}`, false);
+                        }
+                    } catch (error) {
+                        console.error('FRONTEND: manageProducts.html: Erro de rede ao excluir produto:', error);
+                        showCustomMessageBox('Erro de Conexão', 'Não foi possível conectar ao servidor para excluir o produto. Tente novamente.', false);
                     }
-                    console.error('FRONTEND: manageProducts.html: Failed to delete product. Server response:', errorText);
-                    alert('Failed to delete product: ' + errorMessage);
-                    hideConfirmDeleteModal();
-                }
-            } catch (error) {
-                console.error('FRONTEND: manageProducts.html: Network error during deletion:', error);
-                alert('Network error during deletion: ' + error.message);
-                hideConfirmDeleteModal();
+                });
             }
-        }
+
+            // --- Event Listeners ---
+            if (addProductButton) {
+                addProductButton.addEventListener('click', () => {
+                    window.location.href = '/addProduct.html';
+                });
+            }
+
+            // --- Initial Load ---
+            // Apenas carrega as tabelas se a validação inicial passar
+            if (loggedInUserId && loggedInUserType === 'seller') {
+                await fetchAndRenderSellerOrders(); // Load seller orders first
+                await fetchAndRenderProducts();     // Then load seller's products
+            }
+        });
     </script>
 </body>
-
 </html>

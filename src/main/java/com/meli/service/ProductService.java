@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -145,5 +146,47 @@ public class ProductService {
                 .mapToInt(Product::getId)
                 .max()
                 .orElse(0) + 1;
+    }
+
+    /**
+     * Busca produtos por termo de pesquisa (título, descrição, categoria, marca).
+     * @param searchTerm O termo de pesquisa.
+     * @return Uma lista de produtos que correspondem ao termo.
+     */
+    public List<Product> searchProducts(String searchTerm) {
+        if (searchTerm == null || searchTerm.trim().isEmpty()) {
+            System.out.println("DEBUG: ProductService.searchProducts - No search term provided. Returning all products.");
+            return getAllProducts(); // Retorna todos os produtos se o termo de busca for vazio
+        }
+
+        String normalizedSearchTerm = searchTerm.trim().toLowerCase();
+        List<Product> allProducts = new ArrayList<>(products); // Trabalha com uma cópia
+        List<Product> filteredProducts = new ArrayList<>();
+
+        for (Product product : allProducts) {
+            boolean matches = false;
+            // Busca por título
+            if (product.getTitle() != null && product.getTitle().toLowerCase().contains(normalizedSearchTerm)) {
+                matches = true;
+            }
+            // Busca por descrição
+            if (!matches && product.getDescription() != null && product.getDescription().toLowerCase().contains(normalizedSearchTerm)) {
+                matches = true;
+            }
+            // Busca por categoria (AGORA INCLUI CATEGORIA NA BUSCA)
+            if (!matches && product.getCategory() != null && product.getCategory().toLowerCase().contains(normalizedSearchTerm)) {
+                matches = true;
+            }
+            // Busca por marca
+            if (!matches && product.getBrand() != null && product.getBrand().toLowerCase().contains(normalizedSearchTerm)) {
+                matches = true;
+            }
+
+            if (matches) {
+                filteredProducts.add(product);
+            }
+        }
+        System.out.println("DEBUG: ProductService.searchProducts - Found " + filteredProducts.size() + " products for search term: '" + searchTerm + "'");
+        return filteredProducts;
     }
 }

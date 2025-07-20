@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pt"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Product.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Prototype</a> &gt; <a href="index.source.html" class="el_package">com.meli.model</a> &gt; <span class="el_source">Product.java</span></div><h1>Product.java</h1><pre class="source lang-java linenums">package com.meli.model;
 
-import java.util.List;
-// Removed Jackson annotations for custom serializer/deserializer as they are not needed for List&lt;String&gt; from JSON array
+import java.util.Objects;
 
 public class Product {
     private int id;
@@ -11,99 +10,126 @@ public class Product {
     private String imageUrl;
     private String brand;
     private Integer stock;
-    private List&lt;String&gt; tags; // Keep as List&lt;String&gt;
-
+    private String category;
     private int sellerId;
 
     // IMPORTANT: No-argument constructor is ESSENTIAL for Jackson deserialization
-<span class="nc" id="L19">    public Product() {</span>
-<span class="nc" id="L20">    }</span>
+<span class="nc" id="L17">    public Product() {</span>
+<span class="nc" id="L18">    }</span>
 
     // Parameterized constructor
-<span class="nc" id="L23">    public Product(int id, String title, Double price, String description, String imageUrl, String brand, Integer stock, List&lt;String&gt; tags, int sellerId) {</span>
-<span class="nc" id="L24">        this.id = id;</span>
-<span class="nc" id="L25">        this.title = title;</span>
-<span class="nc" id="L26">        this.price = price;</span>
-<span class="nc" id="L27">        this.description = description;</span>
-<span class="nc" id="L28">        this.imageUrl = imageUrl;</span>
-<span class="nc" id="L29">        this.brand = brand;</span>
-<span class="nc" id="L30">        this.stock = stock;</span>
-<span class="nc" id="L31">        this.tags = tags;</span>
-<span class="nc" id="L32">        this.sellerId = sellerId;</span>
-<span class="nc" id="L33">    }</span>
+<span class="nc" id="L21">    public Product(int id, String title, Double price, String description, String imageUrl, String brand, Integer stock, String category, int sellerId) {</span>
+<span class="nc" id="L22">        this.id = id;</span>
+<span class="nc" id="L23">        this.title = title;</span>
+<span class="nc" id="L24">        this.price = price;</span>
+<span class="nc" id="L25">        this.description = description;</span>
+<span class="nc" id="L26">        this.imageUrl = imageUrl;</span>
+<span class="nc" id="L27">        this.brand = brand;</span>
+<span class="nc" id="L28">        this.stock = stock;</span>
+<span class="nc" id="L29">        this.category = category; // Usando o novo campo category</span>
+<span class="nc" id="L30">        this.sellerId = sellerId;</span>
+<span class="nc" id="L31">    }</span>
 
     // Getters and Setters
 
     public int getId() {
-<span class="nc" id="L38">        return id;</span>
+<span class="nc" id="L36">        return id;</span>
     }
 
     public void setId(int id) {
-<span class="nc" id="L42">        this.id = id;</span>
-<span class="nc" id="L43">    }</span>
+<span class="nc" id="L40">        this.id = id;</span>
+<span class="nc" id="L41">    }</span>
 
     public String getTitle() {
-<span class="nc" id="L46">        return title;</span>
+<span class="nc" id="L44">        return title;</span>
     }
 
     public void setTitle(String title) {
-<span class="nc" id="L50">        this.title = title;</span>
-<span class="nc" id="L51">    }</span>
+<span class="nc" id="L48">        this.title = title;</span>
+<span class="nc" id="L49">    }</span>
 
     public Double getPrice() {
-<span class="nc" id="L54">        return price;</span>
+<span class="nc" id="L52">        return price;</span>
     }
 
-    public void setPrice(Double price) { // Corrected access modifier and return type
-<span class="nc" id="L58">        this.price = price;</span>
-<span class="nc" id="L59">    }</span>
+    public void setPrice(Double price) {
+<span class="nc" id="L56">        this.price = price;</span>
+<span class="nc" id="L57">    }</span>
 
     public String getDescription() {
-<span class="nc" id="L62">        return description;</span>
+<span class="nc" id="L60">        return description;</span>
     }
 
     public void setDescription(String description) {
-<span class="nc" id="L66">        this.description = description;</span>
-<span class="nc" id="L67">    }</span>
+<span class="nc" id="L64">        this.description = description;</span>
+<span class="nc" id="L65">    }</span>
 
     public String getImageUrl() {
-<span class="nc" id="L70">        return imageUrl;</span>
+<span class="nc" id="L68">        return imageUrl;</span>
     }
 
     public void setImageUrl(String imageUrl) {
-<span class="nc" id="L74">        this.imageUrl = imageUrl;</span>
-<span class="nc" id="L75">    }</span>
+<span class="nc" id="L72">        this.imageUrl = imageUrl;</span>
+<span class="nc" id="L73">    }</span>
 
     public String getBrand() {
-<span class="nc" id="L78">        return brand;</span>
+<span class="nc" id="L76">        return brand;</span>
     }
 
     public void setBrand(String brand) {
-<span class="nc" id="L82">        this.brand = brand;</span>
-<span class="nc" id="L83">    }</span>
+<span class="nc" id="L80">        this.brand = brand;</span>
+<span class="nc" id="L81">    }</span>
 
     public Integer getStock() {
-<span class="nc" id="L86">        return stock;</span>
+<span class="nc" id="L84">        return stock;</span>
     }
 
     public void setStock(Integer stock) {
-<span class="nc" id="L90">        this.stock = stock;</span>
-<span class="nc" id="L91">    }</span>
+<span class="nc" id="L88">        this.stock = stock;</span>
+<span class="nc" id="L89">    }</span>
 
-    public List&lt;String&gt; getTags() { // Keep as List&lt;String&gt;
-<span class="nc" id="L94">        return tags;</span>
+    public String getCategory() {
+<span class="nc" id="L92">        return category;</span>
     }
 
-    public void setTags(List&lt;String&gt; tags) { // Keep as List&lt;String&gt;
-<span class="nc" id="L98">        this.tags = tags;</span>
-<span class="nc" id="L99">    }</span>
+    public void setCategory(String category) {
+<span class="nc" id="L96">        this.category = category;</span>
+<span class="nc" id="L97">    }</span>
 
     public int getSellerId() {
-<span class="nc" id="L102">        return sellerId;</span>
+<span class="nc" id="L100">        return sellerId;</span>
     }
 
     public void setSellerId(int sellerId) {
-<span class="nc" id="L106">        this.sellerId = sellerId;</span>
-<span class="nc" id="L107">    }</span>
+<span class="nc" id="L104">        this.sellerId = sellerId;</span>
+<span class="nc" id="L105">    }</span>
+
+    @Override
+    public boolean equals(Object o) {
+<span class="nc bnc" id="L109" title="All 2 branches missed.">        if (this == o) return true;</span>
+<span class="nc bnc" id="L110" title="All 4 branches missed.">        if (o == null || getClass() != o.getClass()) return false;</span>
+<span class="nc" id="L111">        Product product = (Product) o;</span>
+<span class="nc bnc" id="L112" title="All 2 branches missed.">        return id == product.id;</span>
+    }
+
+    @Override
+    public int hashCode() {
+<span class="nc" id="L117">        return Objects.hash(id);</span>
+    }
+
+    @Override
+    public String toString() {
+<span class="nc" id="L122">        return &quot;Product{&quot; +</span>
+               &quot;id=&quot; + id +
+               &quot;, title='&quot; + title + '\'' +
+               &quot;, description='&quot; + description + '\'' +
+               &quot;, price=&quot; + price +
+               &quot;, stock=&quot; + stock +
+               &quot;, imageUrl='&quot; + imageUrl + '\'' +
+               &quot;, brand='&quot; + brand + '\'' +
+               &quot;, category='&quot; + category + '\'' + // AGORA É CATEGORY
+               &quot;, sellerId=&quot; + sellerId +
+               '}';
+    }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>
