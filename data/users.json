@@ -18,7 +18,6 @@
   "cpf" : "000.111.222-33",
   "password" : "senha",
   "address" : "bairro",
-  "walletBalance" : 0.0,
   "type" : "seller"
 }, {
   "id" : 3,
@@ -27,7 +26,6 @@
   "cpf" : "000.111.222-33",
   "password" : "senha",
   "address" : "rua",
-  "walletBalance" : 0.0,
   "type" : "seller"
 }, {
   "id" : 4,
@@ -46,7 +44,6 @@
   "cpf" : "555.666.888-7",
   "password" : "senha",
   "address" : "end",
-  "walletBalance" : 0.0,
   "type" : "seller"
 }, {
   "id" : 7,
@@ -75,7 +72,6 @@
   "cpf" : "113.333.555-56",
   "password" : "senha",
   "address" : "rua",
-  "walletBalance" : 0.0,
   "type" : "seller"
 }, {
   "id" : 10,
@@ -84,7 +80,6 @@
   "cpf" : "000.222.111-45",
   "password" : "senha",
   "address" : "rua",
-  "walletBalance" : 0.0,
   "type" : "seller"
 }, {
   "id" : 11,
@@ -93,7 +88,6 @@
   "cpf" : "123.456.789-00",
   "password" : "senha",
   "address" : "Endereço de envio",
-  "walletBalance" : 0.0,
   "type" : "seller"
 }, {
   "id" : 12,

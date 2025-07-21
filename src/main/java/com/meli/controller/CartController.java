@@ -8,6 +8,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -88,9 +90,13 @@ public class CartController {
     public ResponseEntity<?> getCart(@RequestHeader("X-User-Id") int loggedInConsumerId) {
         Optional<List<Map<String, Object>>> detailedCartItems = cartService.getDetailedCart(loggedInConsumerId);
 
-        if (detailedCartItems.isPresent()) {
-            return ResponseEntity.ok(detailedCartItems.get()); // Retorna a lista de itens detalhados do carrinho
+        if (detailedCartItems.isPresent() && !detailedCartItems.get().isEmpty()) { // Verifica se a lista não está vazia
+            // Retorna um objeto com a propriedade 'items' para corresponder ao frontend
+            Map<String, List<Map<String, Object>>> response = new HashMap<>();
+            response.put("items", detailedCartItems.get());
+            return ResponseEntity.ok(response); // Retorna a lista de itens detalhados do carrinho
         } else {
+            // MODIFICADO: Retorna 404 Not Found se o carrinho não for encontrado ou estiver vazio
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "Carrinho não encontrado ou vazio para o consumidor com ID " + loggedInConsumerId + "."));
         }
     }
