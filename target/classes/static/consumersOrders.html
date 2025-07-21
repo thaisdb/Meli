@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meus Pedidos</title>
+    <link rel="stylesheet" type="text/css" href="/css/page.css">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Link to the header.js script -->
+    <script src="header.js" defer></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+        }
+        .orders-container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .orders-container h2 {
+            font-size: 2em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+        .order-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            padding: 20px;
+            background-color: #f9f9f9;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+        }
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        .order-header h3 {
+            font-size: 1.4em;
+            color: #333;
+            margin: 0;
+        }
+        .order-header .status {
+            font-weight: bold;
+            padding: 5px 10px;
+            border-radius: 5px;
+            color: white;
+            font-size: 0.9em;
+        }
+        .status.PENDING { background-color: #ffc107; } /* Yellow */
+        .status.COMPLETED { background-color: #28a745; } /* Green */
+        .status.CANCELLED { background-color: #dc3545; } /* Red */
+        .order-details p {
+            margin: 5px 0;
+            color: #555;
+        }
+        .order-summary-items { /* Estilo para a contagem de itens */
+            font-size: 1em;
+            color: #555;
+            margin-top: 10px;
+        }
+        .order-products-list { /* Estilo para a lista de IDs de produtos */
+            margin-top: 15px;
+            border-top: 1px solid #eee;
+            padding-top: 15px;
+        }
+        .order-products-list h4 {
+            font-size: 1.1em;
+            color: #333;
+            margin-top: 0;
+            margin-bottom: 10px;
+        }
+        .order-product-entry {
+            display: flex; /* Para alinhar imagem e texto */
+            align-items: center;
+            margin-bottom: 5px;
+            color: #666;
+        }
+        .order-product-entry img {
+            width: 40px; /* Tamanho da imagem do produto */
+            height: 40px;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-right: 10px;
+        }
+        .no-orders-message {
+            text-align: center;
+            padding: 50px;
+            color: #666;
+            font-size: 1.2em;
+            font-style: italic;
+        }
+
+        /* Custom Message Box for Success/Error */
+        #messageBoxOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            margin: 0; 
+            padding: 0;
+        }
+        .app-modal-content {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            max-height: 90vh; 
+            overflow-y: auto; 
+        }
+        .app-modal-title {
+            font-size: 1.8em;
+            margin-bottom: 15px;
+        }
+        .app-modal-message {
+            font-size: 1.1em;
+            margin-bottom: 25px;
+            color: #666;
+        }
+        .app-modal-actions button {
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+            border: none;
+            color: white;
+            margin: 0 5px; /* Spacing between buttons */
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body data-title="Meus Pedidos" data-show-profile-icon="true">
+    <div id="header-placeholder"></div>
+
+    <div class="orders-container">
+        <h2>Meus Pedidos</h2>
+        <div id="ordersList">
+            <!-- Orders will be loaded here -->
+        </div>
+        <p id="noOrdersMessage" class="no-orders-message hidden">Você ainda não fez nenhum pedido.</p>
+    </div>
+
+    <!-- Custom Message Box for Success/Error -->
+    <div id="messageBoxOverlay" class="hidden">
+        <div class="app-modal-content">
+            <h2 id="messageBoxTitle" class="app-modal-title"></h2>
+            <p id="messageBoxMessage" class="app-modal-message"></p>
+            <div class="app-modal-actions">
+                <button id="messageBoxCloseBtn" class="button">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Custom message box functions (re-used from other pages)
+        const messageBoxOverlay = document.getElementById('messageBoxOverlay');
+        const messageBoxTitle = document.getElementById('messageBoxTitle');
+        const messageBoxMessage = document.getElementById('messageBoxMessage');
+        const messageBoxCloseBtn = document.getElementById('messageBoxCloseBtn');
+
+        function showCustomMessageBox(title, message, isSuccess = true, callback = null) {
+            messageBoxTitle.textContent = title;
+            messageBoxMessage.textContent = message;
+            messageBoxTitle.style.color = isSuccess ? '#00a650' : '#dc3545'; 
+            messageBoxCloseBtn.style.backgroundColor = isSuccess ? '#3483fa' : '#6c757d'; 
+
+            messageBoxOverlay.classList.remove('hidden');
+
+            if (callback) {
+                messageBoxCloseBtn.onclick = () => {
+                    messageBoxOverlay.classList.add('hidden');
+                    callback(); 
+                    messageBoxCloseBtn.onclick = null; 
+                };
+            } else {
+                messageBoxCloseBtn.onclick = () => {
+                    messageBoxOverlay.classList.add('hidden');
+                    messageBoxCloseBtn.onclick = null;
+                };
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const ordersList = document.getElementById('ordersList');
+            const noOrdersMessage = document.getElementById('noOrdersMessage');
+
+            const rawLoggedInUserId = sessionStorage.getItem('loggedInUserId');
+            const rawLoggedInUserType = sessionStorage.getItem('loggedInUserType');
+
+            const loggedInUserId = rawLoggedInUserId ? Number(rawLoggedInUserId.trim()) : null;
+            const loggedInUserType = rawLoggedInUserType ? rawLoggedInUserType.trim() : null;
+
+            if (loggedInUserId === null || isNaN(loggedInUserId) || loggedInUserType !== 'consumer') {
+                console.error("ERROR: consumerOrders.html: Acesso negado. loggedInUserId é nulo/NaN ou loggedInUserType não é 'consumer'.");
+                showCustomMessageBox('Acesso Negado', 'Você precisa estar logado como consumidor para ver seus pedidos.', false, () => {
+                    window.location.href = '/login.html';
+                });
+                return;
+            }
+
+            async function fetchAndRenderOrders(consumerId) {
+                ordersList.innerHTML = 'Carregando pedidos...';
+                noOrdersMessage.classList.add('hidden');
+
+                try {
+                    const response = await fetch(`/orders/consumer/${consumerId}`, {
+                        headers: {
+                            'X-User-Id': consumerId 
+                        }
+                    });
+
+                    if (!response.ok) {
+                        const errorText = await response.text();
+                        throw new Error(errorText || "Falha ao carregar pedidos.");
+                    }
+                    // O frontend agora espera uma lista de OrderSummaryDTOs com 'productsDetails' e 'itemCount'
+                    const orders = await response.json();
+                    console.log("FRONTEND: consumerOrders.html: Pedidos carregados:", orders);
+
+                    ordersList.innerHTML = ''; // Limpa a mensagem de carregamento
+
+                    if (orders.length === 0) {
+                        noOrdersMessage.classList.remove('hidden');
+                        return;
+                    }
+
+                    orders.forEach(order => {
+                        const orderCard = document.createElement('div');
+                        orderCard.className = 'order-card';
+
+                        // Tentar parsear a data de forma mais robusta
+                        let orderDate = 'Data Inválida';
+                        try {
+                            const dateObj = new Date(order.timestamp);
+                            if (!isNaN(dateObj.getTime())) { // Verifica se a data é válida
+                                orderDate = dateObj.toLocaleDateString('pt-BR', {
+                                    year: 'numeric', month: 'long', day: 'numeric',
+                                    hour: '2-digit', minute: '2-digit'
+                                });
+                            }
+                        } catch (e) {
+                            console.error("Erro ao parsear data:", order.timestamp, e);
+                        }
+
+                        let productsDetailsHtml = '';
+                        // NOVO LOG DE DEBUG: Verifique o conteúdo de order.productsDetails aqui
+                        console.log(`FRONTEND: consumerOrders.html: Processando pedido #${order.id}. productsDetails:`, order.productsDetails);
+
+                        // Itera sobre a nova lista productsDetails
+                        if (order.productsDetails && order.productsDetails.length > 0) {
+                            order.productsDetails.forEach(productDetail => {
+                                const imageUrl = productDetail.imageUrl || 'https://placehold.co/40x40/e0e0e0/333333?text=N/A';
+                                productsDetailsHtml += `
+                                    <div class="order-product-entry">
+                                        <img src="${imageUrl}" alt="${productDetail.title}" onerror="this.onerror=null;this.src='https://placehold.co/40x40/e0e0e0/333333?text=N/A';">
+                                        <span>${productDetail.title} (Qtd: ${productDetail.quantity})</span>
+                                    </div>
+                                `;
+                            });
+                        } else {
+                            productsDetailsHtml = '<p>Nenhum produto detalhado neste pedido.</p>';
+                        }
+
+                        orderCard.innerHTML = `
+                            <div class="order-header">
+                                <h3>Pedido #${order.id}</h3>
+                                <span class="status ${order.status}">${order.status}</span>
+                            </div>
+                            <div class="order-details">
+                                <p><strong>Data:</strong> ${orderDate}</p>
+                                <p><strong>Total:</strong> R$ ${order.totalAmount.toFixed(2).replace('.', ',')}</p>
+                                <p><strong>Endereço de Entrega:</strong> ${order.shippingAddress || 'Não informado'}</p>
+                                <p class="order-summary-items"><strong>Total de Itens:</strong> ${order.itemCount} produtos</p>
+                            </div>
+                            <div class="order-products-list">
+                                <h4>Detalhes dos Produtos:</h4>
+                                ${productsDetailsHtml}
+                            </div>
+                        `;
+                        ordersList.appendChild(orderCard);
+                    });
+
+                } catch (error) {
+                    console.error("FRONTEND: consumerOrders.html: Erro ao carregar pedidos:", error);
+                    ordersList.innerHTML = `<p>Falha ao carregar pedidos: ${error.message}</p>`;
+                }
+            }
+
+            fetchAndRenderOrders(loggedInUserId);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pt"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CartService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Prototype</a> &gt; <a href="index.source.html" class="el_package">com.meli.service</a> &gt; <span class="el_source">CartService.java</span></div><h1>CartService.java</h1><pre class="source lang-java linenums">package com.meli.service;
+
+import com.meli.model.Consumer;
+import com.meli.model.Product;
+import com.meli.model.User;
+import com.meli.repository.UserRepository;
+import com.meli.dto.BuyRequestDTO;
+
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+@Service
+public class CartService {
+
+    private final UserRepository userRepository;
+    private final ProductService productService;
+
+<span class="nc" id="L23">    public CartService(UserRepository userRepository, ProductService productService) {</span>
+<span class="nc" id="L24">        this.userRepository = userRepository;</span>
+<span class="nc" id="L25">        this.productService = productService;</span>
+<span class="nc" id="L26">    }</span>
+
+    /**
+     * Tenta obter um Consumer a partir de um ID de usuário.
+     * Utiliza userRepository.getById(userId) que retorna User ou null.
+     * @param userId ID do usuário.
+     * @return Optional de Consumer se o usuário for encontrado e for um Consumer, Optional.empty() caso contrário.
+     */
+    private Optional&lt;Consumer&gt; getConsumerById(int userId) {
+<span class="nc" id="L35">        User user = userRepository.getById(userId); // Retorna User ou null</span>
+<span class="nc bnc" id="L36" title="All 2 branches missed.">        if (user == null) {</span>
+<span class="nc" id="L37">            System.err.println(&quot;ERROR: CartService - getConsumerById: Usuário com ID &quot; + userId + &quot; não encontrado no repositório.&quot;);</span>
+<span class="nc" id="L38">            return Optional.empty();</span>
+        }
+<span class="nc bnc" id="L40" title="All 2 branches missed.">        if (!(user instanceof Consumer)) {</span>
+<span class="nc" id="L41">            System.err.println(&quot;ERROR: CartService - getConsumerById: Usuário com ID &quot; + userId + &quot; encontrado, mas não é do tipo Consumer. Tipo: &quot; + user.getClass().getSimpleName());</span>
+<span class="nc" id="L42">            return Optional.empty();</span>
+        }
+<span class="nc" id="L44">        return Optional.of((Consumer) user);</span>
+    }
+
+    /**
+     * Adiciona uma quantidade de um produto ao carrinho do consumidor.
+     * Utiliza o método addProductToCart do Consumer.
+     * @param consumerId ID do consumidor.
+     * @param productId ID do produto a ser adicionado.
+     * @param quantity Quantidade a ser adicionada ao produto no carrinho.
+     * @return Optional do Consumer atualizado se bem-sucedido, Optional.empty() caso contrário.
+     */
+    public Optional&lt;Consumer&gt; addProductToCart(int consumerId, int productId, int quantity) {
+<span class="nc" id="L56">        Optional&lt;Consumer&gt; optionalConsumer = getConsumerById(consumerId);</span>
+<span class="nc bnc" id="L57" title="All 2 branches missed.">        if (optionalConsumer.isEmpty()) {</span>
+<span class="nc" id="L58">            System.err.println(&quot;ERROR: CartService.addProductToCart: Falha ao obter consumidor com ID &quot; + consumerId + &quot;.&quot;);</span>
+<span class="nc" id="L59">            return Optional.empty();</span>
+        }
+
+<span class="nc" id="L62">        Consumer consumer = optionalConsumer.get();</span>
+<span class="nc" id="L63">        Product product = productService.getProductById(productId);</span>
+
+<span class="nc bnc" id="L65" title="All 2 branches missed.">        if (product == null) {</span>
+<span class="nc" id="L66">            System.err.println(&quot;ERROR: CartService.addProductToCart: Produto com ID &quot; + productId + &quot; não encontrado.&quot;);</span>
+<span class="nc" id="L67">            return Optional.empty();</span>
+        }
+
+        // Validação de estoque: Verificar se a adição da quantidade excede o estoque disponível
+<span class="nc" id="L71">        int currentQuantityInCart = consumer.getCart().getOrDefault(productId, 0);</span>
+<span class="nc bnc" id="L72" title="All 4 branches missed.">        if (product.getStock() == null || product.getStock() &lt; (currentQuantityInCart + quantity)) {</span>
+<span class="nc" id="L73">            System.err.println(&quot;ERROR: CartService.addProductToCart: Estoque insuficiente para o produto &quot; + product.getTitle() + &quot; (ID: &quot; + productId + &quot;). Disponível: &quot; + product.getStock() + &quot;, Solicitado (total): &quot; + (currentQuantityInCart + quantity) + &quot;.&quot;);</span>
+<span class="nc" id="L74">            return Optional.empty(); </span>
+        }
+
+<span class="nc" id="L77">        consumer.addProductToCart(productId, quantity);</span>
+<span class="nc" id="L78">        userRepository.save(consumer);</span>
+<span class="nc" id="L79">        System.out.println(&quot;DEBUG: CartService.addProductToCart: Adicionado &quot; + quantity + &quot; unidades do produto &quot; + product.getTitle() + &quot; (ID: &quot; + productId + &quot;) ao carrinho do consumidor &quot; + consumerId + &quot;. Nova quantidade total: &quot; + consumer.getCart().get(productId));</span>
+<span class="nc" id="L80">        return Optional.of(consumer);</span>
+    }
+
+    /**
+     * Define a quantidade de um produto no carrinho de um consumidor para um valor específico.
+     * @param consumerId ID do consumidor.
+     * @param productId ID do produto.
+     * @param newQuantity Nova quantidade total para o produto no carrinho.
+     * @return Optional do Consumer atualizado se bem-sucedido, Optional.empty() caso contrário.
+     */
+    public Optional&lt;Consumer&gt; setProductQuantityInCart(int consumerId, int productId, int newQuantity) {
+<span class="nc" id="L91">        Optional&lt;Consumer&gt; optionalConsumer = getConsumerById(consumerId);</span>
+<span class="nc bnc" id="L92" title="All 2 branches missed.">        if (optionalConsumer.isEmpty()) {</span>
+<span class="nc" id="L93">            System.err.println(&quot;ERROR: CartService.setProductQuantityInCart: Falha ao obter consumidor com ID &quot; + consumerId + &quot;.&quot;);</span>
+<span class="nc" id="L94">            return Optional.empty();</span>
+        }
+
+<span class="nc" id="L97">        Consumer consumer = optionalConsumer.get();</span>
+<span class="nc" id="L98">        Product product = productService.getProductById(productId);</span>
+
+<span class="nc bnc" id="L100" title="All 2 branches missed.">        if (product == null) {</span>
+<span class="nc" id="L101">            System.err.println(&quot;ERROR: CartService.setProductQuantityInCart: Produto com ID &quot; + productId + &quot; não encontrado.&quot;);</span>
+<span class="nc" id="L102">            return Optional.empty();</span>
+        }
+
+<span class="nc bnc" id="L105" title="All 2 branches missed.">        if (newQuantity &lt;= 0) {</span>
+<span class="nc" id="L106">            consumer.removeProductFromCart(productId);</span>
+<span class="nc" id="L107">            System.out.println(&quot;DEBUG: CartService.setProductQuantityInCart: Produto &quot; + productId + &quot; removido do carrinho do consumidor &quot; + consumerId + &quot; (quantidade definida para 0).&quot;);</span>
+        } else {
+<span class="nc bnc" id="L109" title="All 4 branches missed.">            if (product.getStock() == null || product.getStock() &lt; newQuantity) {</span>
+<span class="nc" id="L110">                System.err.println(&quot;ERROR: CartService.setProductQuantityInCart: Estoque insuficiente para o produto &quot; + product.getTitle() + &quot; (ID: &quot; + productId + &quot;). Disponível: &quot; + product.getStock() + &quot;, Solicitado (total): &quot; + newQuantity + &quot;.&quot;);</span>
+<span class="nc" id="L111">                return Optional.empty(); </span>
+            }
+<span class="nc" id="L113">            consumer.getCart().put(productId, newQuantity);</span>
+<span class="nc" id="L114">            System.out.println(&quot;DEBUG: CartService.setProductQuantityInCart: Quantidade do produto &quot; + product.getTitle() + &quot; (ID: &quot; + productId + &quot;) definida para &quot; + newQuantity + &quot; no carrinho do consumidor &quot; + consumerId);</span>
+        }
+        
+<span class="nc" id="L117">        userRepository.save(consumer);</span>
+<span class="nc" id="L118">        return Optional.of(consumer);</span>
+    }
+
+    /**
+     * Remove um produto do carrinho de um consumidor.
+     * Utiliza o método removeProductFromCart do Consumer.
+     * @param consumerId ID do consumidor.
+     * @param productId ID do produto a ser removido.
+     * @return Optional do Consumer atualizado se bem-sucedido, Optional.empty() caso contrário.
+     */
+    public Optional&lt;Consumer&gt; removeProductFromCart(int consumerId, int productId) {
+<span class="nc" id="L129">        Optional&lt;Consumer&gt; optionalConsumer = getConsumerById(consumerId);</span>
+<span class="nc bnc" id="L130" title="All 2 branches missed.">        if (optionalConsumer.isEmpty()) {</span>
+<span class="nc" id="L131">            System.err.println(&quot;ERROR: CartService.removeProductFromCart: Falha ao obter consumidor com ID &quot; + consumerId + &quot;.&quot;);</span>
+<span class="nc" id="L132">            return Optional.empty();</span>
+        }
+
+<span class="nc" id="L135">        Consumer consumer = optionalConsumer.get();</span>
+<span class="nc" id="L136">        consumer.removeProductFromCart(productId);</span>
+<span class="nc" id="L137">        userRepository.save(consumer);</span>
+<span class="nc" id="L138">        System.out.println(&quot;DEBUG: CartService.removeProductFromCart: Produto com ID &quot; + productId + &quot; removido do carrinho do consumidor &quot; + consumerId);</span>
+<span class="nc" id="L139">        return Optional.of(consumer);</span>
+    }
+
+    /**
+     * Obtém o carrinho de um consumidor, incluindo detalhes completos dos produtos.
+     * @param consumerId ID do consumidor.
+     * @return Optional de uma lista de mapas (detalhes do produto + quantidade no carrinho) se encontrado, Optional.empty() caso contrário.
+     */
+    public Optional&lt;List&lt;Map&lt;String, Object&gt;&gt;&gt; getDetailedCart(int consumerId) {
+<span class="nc" id="L148">        Optional&lt;Consumer&gt; optionalConsumer = getConsumerById(consumerId);</span>
+<span class="nc bnc" id="L149" title="All 2 branches missed.">        if (optionalConsumer.isEmpty()) {</span>
+<span class="nc" id="L150">            System.err.println(&quot;ERROR: CartService.getDetailedCart: Falha ao obter consumidor com ID &quot; + consumerId + &quot;.&quot;);</span>
+<span class="nc" id="L151">            return Optional.empty();</span>
+        }
+
+<span class="nc" id="L154">        Consumer consumer = optionalConsumer.get();</span>
+<span class="nc" id="L155">        Map&lt;Integer, Integer&gt; cartProducts = consumer.getCart();</span>
+<span class="nc" id="L156">        List&lt;Map&lt;String, Object&gt;&gt; detailedCartItems = new ArrayList&lt;&gt;();</span>
+
+        // Usar um iterador para permitir remoção segura durante a iteração
+<span class="nc" id="L159">        cartProducts.entrySet().removeIf(entry -&gt; {</span>
+<span class="nc" id="L160">            Integer productId = entry.getKey();</span>
+<span class="nc" id="L161">            Integer quantityInCart = entry.getValue();</span>
+<span class="nc" id="L162">            Product product = productService.getProductById(productId);</span>
+
+<span class="nc bnc" id="L164" title="All 2 branches missed.">            if (product != null) {</span>
+<span class="nc" id="L165">                Map&lt;String, Object&gt; itemDetails = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L166">                itemDetails.put(&quot;id&quot;, product.getId());</span>
+<span class="nc" id="L167">                itemDetails.put(&quot;title&quot;, product.getTitle());</span>
+<span class="nc" id="L168">                itemDetails.put(&quot;imageUrl&quot;, product.getImageUrl());</span>
+<span class="nc" id="L169">                itemDetails.put(&quot;price&quot;, product.getPrice());</span>
+<span class="nc" id="L170">                itemDetails.put(&quot;stock&quot;, product.getStock());</span>
+<span class="nc" id="L171">                itemDetails.put(&quot;quantity&quot;, quantityInCart);</span>
+<span class="nc" id="L172">                detailedCartItems.add(itemDetails);</span>
+<span class="nc" id="L173">                return false; // Não remover</span>
+            } else {
+<span class="nc" id="L175">                System.err.println(&quot;WARN: CartService.getDetailedCart: Produto com ID &quot; + productId + &quot; no carrinho do consumidor &quot; + consumerId + &quot; não encontrado no ProductService. Removendo do carrinho.&quot;);</span>
+<span class="nc" id="L176">                return true; // Remover este item inválido</span>
+            }
+        });
+<span class="nc" id="L179">        userRepository.save(consumer);</span>
+<span class="nc" id="L180">        return Optional.of(detailedCartItems);</span>
+    }
+
+    /**
+     * Limpa todos os produtos do carrinho de um consumidor.
+     * @param consumerId ID do consumidor.
+     * @return Optional do Consumer atualizado se bem-sucedido, Optional.empty() caso contrário.
+     */
+    public Optional&lt;Consumer&gt; clearCart(int consumerId) {
+<span class="nc" id="L189">        Optional&lt;Consumer&gt; optionalConsumer = getConsumerById(consumerId);</span>
+<span class="nc bnc" id="L190" title="All 2 branches missed.">        if (optionalConsumer.isEmpty()) {</span>
+<span class="nc" id="L191">            System.err.println(&quot;ERROR: CartService.clearCart: Falha ao obter consumidor com ID &quot; + consumerId + &quot;.&quot;);</span>
+<span class="nc" id="L192">            return Optional.empty();</span>
+        }
+
+<span class="nc" id="L195">        Consumer consumer = optionalConsumer.get();</span>
+<span class="nc" id="L196">        consumer.getCart().clear();</span>
+<span class="nc" id="L197">        userRepository.save(consumer);</span>
+<span class="nc" id="L198">        System.out.println(&quot;DEBUG: CartService.clearCart: Carrinho do consumidor &quot; + consumerId + &quot; limpo.&quot;);</span>
+<span class="nc" id="L199">        return Optional.of(consumer);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

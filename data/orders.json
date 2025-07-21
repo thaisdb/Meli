@@ -240,4 +240,33 @@
   "paymentMethod" : "CREDITO",
   "status" : "COMPLETED",
   "timestamp" : 1753037810.447219400
+}, {
+  "id" : 17,
+  "consumerId" : 13,
+  "sellerId" : 2,
+  "products" : {
+    "2" : 1,
+    "5" : 1
+  },
+  "shippingAddress" : null,
+  "sendersAddress" : null,
+  "total" : 5250.0,
+  "shippingCost" : 0.0,
+  "paymentMethod" : "CREDITO",
+  "status" : "COMPLETED",
+  "timestamp" : 1753106280.542507700
+}, {
+  "id" : 18,
+  "consumerId" : 13,
+  "sellerId" : 2,
+  "products" : {
+    "2" : 2
+  },
+  "shippingAddress" : null,
+  "sendersAddress" : null,
+  "total" : 10000.0,
+  "shippingCost" : 0.0,
+  "paymentMethod" : "CREDITO",
+  "status" : "COMPLETED",
+  "timestamp" : 1753106388.728229300
 } ]

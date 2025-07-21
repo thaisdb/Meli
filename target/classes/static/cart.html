@@ -380,7 +380,7 @@
 
                     if (response.ok) {
                         const data = await response.json();
-                        // CORREÇÃO AQUI: Verifica se 'data' é um objeto com 'items' ou se é uma lista direta
+                        // Verifica se 'data' é um objeto com 'items' ou se é uma lista direta
                         if (data && typeof data === 'object' && data.items !== undefined) {
                             cartItems = data.items;
                         } else if (Array.isArray(data)) {
@@ -393,12 +393,16 @@
                         
                         console.log("DEBUG: cart.html: Itens do carrinho carregados do backend:", JSON.stringify(cartItems, null, 2));
                         renderCartItems();
-                        // Reset coupon state on cart reload
-                        couponCodeInput.value = '';
-                        appliedDiscountValue = 0;
-                        couponMessage.textContent = '';
                         updateSummaryAndShipping();
-                    } else {
+                    } else if (response.status === 404) { // Lida com status 404
+                        const errorData = await response.json();
+                        const errorMessage = errorData.message || 'Carrinho não encontrado ou vazio.';
+                        cartProductList.innerHTML = `<p class="text-center text-gray-500 py-8">${errorMessage}</p>`;
+                        cartItems = []; // Garante que a lista de itens está vazia no frontend
+                        updateSummaryAndShipping(); // Atualiza o resumo para 0
+                        showCustomMessageBox('Carrinho', errorMessage, false); // Exibe a mensagem de erro
+                    }
+                    else {
                         const errorData = await response.json();
                         const errorMessage = errorData.message || 'Erro desconhecido ao carregar o carrinho.';
                         showCustomMessageBox('Erro ao Carregar Carrinho', errorMessage, false);
@@ -535,8 +539,8 @@
                         return;
                     }
                     if (!couponCode) {
+                        appliedDiscountValue = 0; // Reset discount if field is empty
                         couponMessage.textContent = ''; // Clear message if field is empty
-                        appliedDiscountValue = 0; // Reset discount
                         updateSummaryAndShipping(); // Update summary
                         return;
                     }
@@ -642,6 +646,10 @@
                     if (response.ok) {
                         showCustomMessageBox('Carrinho', responseData.message || 'Carrinho esvaziado!', true);
                         await fetchCartItems(); // Recarrega o carrinho (deve estar vazio)
+                        // Reset coupon state after clearing cart
+                        couponCodeInput.value = '';
+                        appliedDiscountValue = 0;
+                        couponMessage.textContent = '';
                     } else {
                         const errorMessage = responseData.message || 'Erro desconhecido ao esvaziar carrinho.';
                         showCustomMessageBox('Erro no Carrinho', errorMessage, false);
@@ -714,9 +722,8 @@
                     return;
                 }
 
-                // Primeiro, obtenha os itens mais recentes do carrinho do backend
-                // Isso garante que estamos comprando o estado mais atualizado do carrinho
-                await fetchCartItems();
+                // Chame fetchCartItems() para garantir que cartItems esteja atualizado
+                await fetchCartItems(); 
 
                 const itemsToPurchase = [];
                 // Itera sobre os itens ATUALIZADOS no `cartItems` (que veio do backend)
@@ -756,16 +763,12 @@
                         const order = await response.json();
                         // Message should include the final order total
                         const finalOrderTotal = order.total.toFixed(2).replace('.', ',');
-                        showCustomMessageBox('Compra Realizada!', `Seu pedido #${order.id} foi realizado com sucesso! Total: R$ ${finalOrderTotal}`, true, false, async () => {
-                            // After successful purchase, clear the cart in the backend
-                            await clearUserCart();
-                            // Reset coupon input and message
-                            couponCodeInput.value = '';
-                            appliedDiscountValue = 0;
-                            couponMessage.textContent = '';
-                            window.location.href = '/consumerOrders.html'; // Redirect to orders page
-                        });
+                        showCustomMessageBox('Compra Realizada!', `Seu pedido #${order.id} foi realizado com sucesso! Total: R$ ${finalOrderTotal}`, true, false); // Removed onConfirm here
                         console.log("DEBUG: cart.html: Pedido criado:", order);
+
+                        // Agora, chame clearUserCart() e redirecione APÓS a mensagem de sucesso ser exibida
+                        await clearUserCart(); 
+                        window.location.href = '/consumerOrders.html'; // Redirect to orders page
 
                     } else {
                         console.log("DEBUG: cart.html: Resposta não OK. Status:", response.status);
