@@ -24,6 +24,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+/*
+ * Contém a lógica de negócio para a criação e gerenciamento de pedidos.
+ * Ele orquestra as operações necessárias para transformar os itens do carrinho em um pedido final
+ */
 @Service
 public class OrderService {
 

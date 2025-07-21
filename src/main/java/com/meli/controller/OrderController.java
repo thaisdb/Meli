@@ -15,6 +15,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+/*
+ * Controlador REST lida com as requisições HTTP relacionadas às operações de pedidos.
+ * Ele atua como a interface entre o frontend e a lógica de negócio do OrderService
+ */
 @RestController
 @RequestMapping("/orders")
 public class OrderController {
@@ -70,9 +74,8 @@ public class OrderController {
         return ResponseEntity.ok(sellerOrders);
     }
 
-        /**
-     * NOVO ENDPOINT: Cria um novo pedido de forma simplificada, sem aplicar desconto.
-     * Mapeia para POST /orders/simple-purchase
+    /**
+     * NOVO ENDPOINT: Cria um novo pedido
      *
      * @param userId O ID do usuário logado (consumerId).
      * @param items A lista de BuyRequestDTO representando os itens e suas quantidades.

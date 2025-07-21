@@ -109,7 +109,8 @@
   "password" : "senha",
   "address" : "endereço",
   "cart" : {
-    "2" : 1
+    "2" : 1,
+    "5" : 1
   },
   "preferredPaymentMethod" : "CREDITO",
   "type" : "consumer"

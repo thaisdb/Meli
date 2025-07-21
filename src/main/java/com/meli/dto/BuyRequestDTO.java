@@ -2,19 +2,22 @@
 package com.meli.dto;
 
 /*
- * Data Transfer Object used to carry data between processes
- * Data -> Backend
- * Controler -> Service layer
- * Shaped for the resquest, it helps decouple data model from external APIs
+ * Contêiner para dados que são transferidos entre o frontend e o backend,
+ * especificamente para representar um item que um consumidor deseja comprar.
+ * Ele desacopla o modelo de dados interno (Product) da estrutura de requisição externa.
  */
 public class BuyRequestDTO {
     private Integer id;
     private Integer quantity;
 
-    // Construtor sem argumentos para Jackson
     public BuyRequestDTO() {
     }
 
+    /*
+     * Armazena o id do produto e a quantidade desejada respectiva
+     * @param Id do produto
+     * @param quantidade
+     */
     public BuyRequestDTO(Integer id, Integer quantity) {
         this.id = id;
         this.quantity = quantity;
