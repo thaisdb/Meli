@@ -1,23 +1,29 @@
 GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
-Prototype,com.meli.repository,OrderRepository,310,0,20,0,67,0,17,0,7,0
-Prototype,com.meli.repository,OrderRepository.new TypeReference() {...},6,0,0,0,1,0,1,0,1,0
-Prototype,com.meli.repository,UserRepository.new TypeReference() {...},3,0,0,0,1,0,1,0,1,0
-Prototype,com.meli.repository,ProductRepository.new TypeReference() {...},6,0,0,0,1,0,1,0,1,0
-Prototype,com.meli.repository,ProductRepository,508,0,40,0,107,0,31,0,11,0
-Prototype,com.meli.repository,UserRepository,128,0,8,0,28,0,16,0,12,0
 Prototype,com.meli.dto,UserRequestDTO,45,0,0,0,13,0,13,0,13,0
+Prototype,com.meli.dto,OrderProductDetailDTO,125,0,14,0,24,0,20,0,13,0
 Prototype,com.meli.dto,BuyRequestDTO,26,0,0,0,12,0,6,0,6,0
 Prototype,com.meli.dto,LoginRequestDTO,26,0,0,0,12,0,6,0,6,0
+Prototype,com.meli.dto,OrderSummaryDTO,180,0,8,0,43,0,31,0,27,0
+Prototype,com.meli.dto,SellerOrderDTO,63,0,0,0,26,0,13,0,13,0
 Prototype,com.meli,PrototypeApplication,17,0,0,0,5,0,3,0,3,0
+Prototype,com.meli.repository,UserRepository.new TypeReference() {...},3,0,0,0,1,0,1,0,1,0
+Prototype,com.meli.repository,ProductRepository.new TypeReference() {...},6,0,0,0,1,0,1,0,1,0
+Prototype,com.meli.repository,OrderRepository,341,0,24,0,73,0,21,0,9,0
+Prototype,com.meli.repository,OrderRepository.new TypeReference() {...},6,0,0,0,1,0,1,0,1,0
+Prototype,com.meli.repository,ProductRepository,508,0,40,0,107,0,31,0,11,0
+Prototype,com.meli.repository,UserRepository,192,0,22,0,50,0,23,0,12,0
 Prototype,com.meli.model,PaymentMethod,27,0,0,0,5,0,1,0,1,0
-Prototype,com.meli.model,Consumer,66,0,0,0,17,0,9,0,9,0
-Prototype,com.meli.model,Product,96,0,0,0,40,0,20,0,20,0
-Prototype,com.meli.model,User,63,0,0,0,27,0,14,0,14,0
-Prototype,com.meli.model,Seller,87,0,2,0,21,0,11,0,10,0
-Prototype,com.meli.model,Orders,78,0,0,0,32,0,21,0,21,0
+Prototype,com.meli.model,Product,152,0,8,0,46,0,27,0,23,0
+Prototype,com.meli.model,Order,126,0,0,0,49,0,24,0,24,0
 Prototype,com.meli.model,OrderStatus,57,0,0,0,10,0,1,0,1,0
-Prototype,com.meli.controller,ProductController,337,0,38,0,78,0,28,0,9,0
+Prototype,com.meli.model,Consumer,66,0,0,0,17,0,9,0,9,0
+Prototype,com.meli.model,User,63,0,0,0,27,0,14,0,14,0
+Prototype,com.meli.model,Seller,74,0,2,0,17,0,9,0,8,0
+Prototype,com.meli.controller,ProductController,602,0,98,0,132,0,59,0,10,0
+Prototype,com.meli.controller,OrderController,137,0,4,0,33,0,9,0,7,0
+Prototype,com.meli.controller,CartController,185,0,22,0,29,0,17,0,6,0
 Prototype,com.meli.controller,UserController,233,0,60,0,50,0,38,0,8,0
-Prototype,com.meli.service,OrderService,195,0,16,0,50,0,12,0,4,0
-Prototype,com.meli.service,ProductService,393,0,28,0,86,0,27,0,13,0
-Prototype,com.meli.service,UserService,416,0,38,0,100,0,34,0,15,0
+Prototype,com.meli.service,OrderService,540,0,38,0,121,0,27,0,8,0
+Prototype,com.meli.service,ProductService,496,0,58,0,107,0,43,0,14,0
+Prototype,com.meli.service,UserService,237,0,26,0,59,0,22,0,9,0
+Prototype,com.meli.service,CartService,383,0,30,0,91,0,23,0,8,0

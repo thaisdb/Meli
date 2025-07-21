@@ -10,6 +10,15 @@
     <!-- Link to the header.js script -->
     <script src="header.js" defer></script>
     <style>
+        /* Adicionado para garantir que o body e html não tenham margens/padding que interfiram no fixed positioning */
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%; /* Garante que o html e body ocupem a altura total do viewport */
+            width: 100%;
+            overflow-x: hidden; /* Evita scroll horizontal indesejado */
+        }
+
         /* Adicione ou ajuste estilos conforme necessário para o layout do seu produto */
         .product-detail {
             display: flex;
@@ -177,6 +186,9 @@
             justify-content: center;
             align-items: center;
             z-index: 1000;
+            /* Garante que o body/html não interfira com o posicionamento fixo */
+            margin: 0; 
+            padding: 0;
         }
         .app-modal-content {
             background-color: #fff;
@@ -186,6 +198,9 @@
             text-align: center;
             max-width: 400px;
             width: 90%;
+            /* Adicionado para garantir que o modal não seja muito grande em telas pequenas */
+            max-height: 90vh; 
+            overflow-y: auto; /* Adiciona scroll se o conteúdo for muito grande */
         }
         .app-modal-title {
             font-size: 1.8em;
@@ -321,7 +336,7 @@
                                     <input type="number" id="quantityInput" value="1" min="1" max="${product.stock}" readonly/>
                                     <button id="increaseQuantity">+</button>
                                 </div>
-                                <button class="button buy-button" id="buy-button" disabled>Comprar</button>
+                                <button class="button buy-button" id="buy-button" disabled>Comprar com 1 click</button>
                                 <button class="button light-blue-button" id="addToCartButton">Adicionar ao carrinho</button>
                             </div>
                             <p id="buy-message" style="margin-top: 10px; text-align: center;"></p>
@@ -446,41 +461,46 @@
                 }
             }
 
+            // ATUALIZADO: Função para adicionar produto ao carrinho no backend
             async function handleAddToCart(product) {
                 if (!loggedInUserId) { 
                     showCustomMessageBox('Aviso', 'Você precisa estar logado para adicionar produtos ao carrinho.', false);
                     return;
                 }
 
-                let cartItems = JSON.parse(sessionStorage.getItem('cartItems')) || [];
-                console.log("DEBUG: detailProduct.html: Cart items BEFORE adding:", JSON.stringify(cartItems, null, 2));
-
-                const existingItemIndex = cartItems.findIndex(item => item.id === product.id);
                 const quantityInput = document.getElementById('quantityInput'); 
                 const quantityToAdd = parseInt(quantityInput ? quantityInput.value : 1) || 1;
 
-                if (existingItemIndex > -1) {
-                    cartItems[existingItemIndex].quantity = (cartItems[existingItemIndex].quantity || 0) + quantityToAdd;
-                    console.log(`DEBUG: detailProduct.html: Updated quantity for product ${product.id} to ${cartItems[existingItemIndex].quantity}.`);
-                } else {
-                    cartItems.push({
-                        id: product.id,
-                        title: product.title,
-                        imageUrl: product.imageUrl,
-                        price: product.price,
-                        stock: product.stock,
-                        quantity: quantityToAdd,
-                        isFull: true,
-                        isPreSelected: true
-                    });
-                    console.log(`DEBUG: detailProduct.html: Added new product ${product.id} with quantity ${quantityToAdd}.`);
+                if (quantityToAdd <= 0) {
+                    showCustomMessageBox('Erro', 'A quantidade deve ser pelo menos 1 para adicionar ao carrinho.', false);
+                    return;
                 }
 
-                sessionStorage.setItem('cartItems', JSON.stringify(cartItems));
-                console.log("DEBUG: detailProduct.html: Cart items AFTER adding and saving:", JSON.stringify(cartItems, null, 2));
+                try {
+                    const response = await fetch('/cart/add', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-User-Id': loggedInUserId 
+                        },
+                        body: JSON.stringify({ id: product.id, quantity: quantityToAdd })
+                    });
 
-                showCustomMessageBox('Carrinho', 'Produto adicionado ao carrinho!', true);
-                window.location.href = '/cart.html'; 
+                    const responseData = await response.json();
+
+                    if (response.ok) {
+                        showCustomMessageBox('Carrinho', responseData.message || 'Produto adicionado ao carrinho!', true);
+                        console.log("DEBUG: detailProduct.html: Produto adicionado ao carrinho no backend:", responseData.cart);
+                        window.location.href = '/cart.html'; // Redireciona para o carrinho
+                    } else {
+                        const errorMessage = responseData.message || 'Erro desconhecido ao adicionar ao carrinho.';
+                        showCustomMessageBox('Erro no Carrinho', errorMessage, false);
+                        console.error("FRONTEND: detailProduct.html: Falha ao adicionar ao carrinho:", errorMessage);
+                    }
+                } catch (error) {
+                    console.error('FRONTEND: detailProduct.html: Erro de rede ao adicionar ao carrinho:', error);
+                    showCustomMessageBox('Erro de Conexão', 'Não foi possível conectar ao servidor para adicionar ao carrinho. Tente novamente.', false);
+                }
             }
 
             await loadAndRenderProductDetails();

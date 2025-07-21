@@ -12,7 +12,7 @@
     
     <div class="login-container">
         <h2>Log In</h2>
-        <form id="loginForm"> <!-- Added ID for JavaScript handling -->
+        <form id="loginForm">
             <div class="form-group">
                 <label for="email">Email:</label>
                 <input type="email" id="email" name="email" required>
@@ -99,10 +99,11 @@
                             const user = await response.json(); // Assuming backend returns the User object
                             console.log("FRONTEND: login.html: Login successful. User data:", user);
 
-                            // Store user ID and type in sessionStorage for persistence
+                            // Store user ID, type, AND NAME in sessionStorage for persistence
                             sessionStorage.setItem('loggedInUserId', user.id);
                             sessionStorage.setItem('loggedInUserType', user.type);
-                            console.log(`User ${user.id} (${user.type}) logged in and session stored.`);
+                            sessionStorage.setItem('loggedInUserName', user.name); // NOVO: Salvar o nome do usuário
+                            console.log(`User ${user.id} (${user.type}, Name: ${user.name}) logged in and session stored.`);
 
                             // Determine user type and redirect directly without a success modal
                             if (user.type === 'seller') {

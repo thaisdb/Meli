@@ -1,13 +1,16 @@
 [ {
-  "id" : 1,
+  "id" : 12,
   "name" : "consu",
   "email" : "consu@email",
   "cpf" : "000.111.222-33",
   "password" : "senha",
   "address" : "rua",
-  "cart" : { },
-  "type" : "consumer",
-  "preferredPaymentMethod" : "PIX"
+  "cart" : {
+    "2" : 1,
+    "8" : 2
+  },
+  "preferredPaymentMethod" : "PIX",
+  "type" : "consumer"
 }, {
   "id" : 2,
   "name" : "vend",
@@ -15,7 +18,6 @@
   "cpf" : "000.111.222-33",
   "password" : "senha",
   "address" : "bairro",
-  "walletBalance" : 0.0,
   "type" : "seller"
 }, {
   "id" : 3,
@@ -24,7 +26,6 @@
   "cpf" : "000.111.222-33",
   "password" : "senha",
   "address" : "rua",
-  "walletBalance" : 0.0,
   "type" : "seller"
 }, {
   "id" : 4,
@@ -34,8 +35,8 @@
   "password" : "senha",
   "address" : "end",
   "cart" : { },
-  "type" : "consumer",
-  "preferredPaymentMethod" : "PIX"
+  "preferredPaymentMethod" : "PIX",
+  "type" : "consumer"
 }, {
   "id" : 5,
   "name" : "novo vend",
@@ -43,7 +44,6 @@
   "cpf" : "555.666.888-7",
   "password" : "senha",
   "address" : "end",
-  "walletBalance" : 0.0,
   "type" : "seller"
 }, {
   "id" : 7,
@@ -53,8 +53,8 @@
   "password" : "senha",
   "address" : "rua",
   "cart" : { },
-  "type" : "consumer",
-  "preferredPaymentMethod" : "PIX"
+  "preferredPaymentMethod" : "PIX",
+  "type" : "consumer"
 }, {
   "id" : 8,
   "name" : "consu6",
@@ -63,8 +63,8 @@
   "password" : "senha",
   "address" : "rua",
   "cart" : { },
-  "type" : "consumer",
-  "preferredPaymentMethod" : "PIX"
+  "preferredPaymentMethod" : "PIX",
+  "type" : "consumer"
 }, {
   "id" : 9,
   "name" : "vend2",
@@ -72,7 +72,6 @@
   "cpf" : "113.333.555-56",
   "password" : "senha",
   "address" : "rua",
-  "walletBalance" : 0.0,
   "type" : "seller"
 }, {
   "id" : 10,
@@ -81,7 +80,6 @@
   "cpf" : "000.222.111-45",
   "password" : "senha",
   "address" : "rua",
-  "walletBalance" : 0.0,
   "type" : "seller"
 }, {
   "id" : 11,
@@ -90,6 +88,30 @@
   "cpf" : "123.456.789-00",
   "password" : "senha",
   "address" : "Endereço de envio",
-  "walletBalance" : 0.0,
   "type" : "seller"
+}, {
+  "id" : 12,
+  "name" : "consu",
+  "email" : "consu@email",
+  "cpf" : "000.111.222-33",
+  "password" : "senha",
+  "address" : "rua",
+  "cart" : {
+    "2" : 1
+  },
+  "preferredPaymentMethod" : "PIX",
+  "type" : "consumer"
+}, {
+  "id" : 13,
+  "name" : "consumer",
+  "email" : "consumer@email",
+  "cpf" : "123.456.789-00",
+  "password" : "senha",
+  "address" : "endereço",
+  "cart" : {
+    "2" : 1,
+    "5" : 1
+  },
+  "preferredPaymentMethod" : "CREDITO",
+  "type" : "consumer"
 } ]

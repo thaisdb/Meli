@@ -1,7 +1,6 @@
 package com.meli.model;
 
-import java.util.List;
-// Removed Jackson annotations for custom serializer/deserializer as they are not needed for List<String> from JSON array
+import java.util.Objects;
 
 public class Product {
     private int id;
@@ -11,8 +10,7 @@ public class Product {
     private String imageUrl;
     private String brand;
     private Integer stock;
-    private List<String> tags; // Keep as List<String>
-
+    private String category;
     private int sellerId;
 
     // IMPORTANT: No-argument constructor is ESSENTIAL for Jackson deserialization
@@ -20,7 +18,7 @@ public class Product {
     }
 
     // Parameterized constructor
-    public Product(int id, String title, Double price, String description, String imageUrl, String brand, Integer stock, List<String> tags, int sellerId) {
+    public Product(int id, String title, Double price, String description, String imageUrl, String brand, Integer stock, String category, int sellerId) {
         this.id = id;
         this.title = title;
         this.price = price;
@@ -28,7 +26,7 @@ public class Product {
         this.imageUrl = imageUrl;
         this.brand = brand;
         this.stock = stock;
-        this.tags = tags;
+        this.category = category; // Usando o novo campo category
         this.sellerId = sellerId;
     }
 
@@ -54,7 +52,7 @@ public class Product {
         return price;
     }
 
-    public void setPrice(Double price) { // Corrected access modifier and return type
+    public void setPrice(Double price) {
         this.price = price;
     }
 
@@ -90,12 +88,12 @@ public class Product {
         this.stock = stock;
     }
 
-    public List<String> getTags() { // Keep as List<String>
-        return tags;
+    public String getCategory() {
+        return category;
     }
 
-    public void setTags(List<String> tags) { // Keep as List<String>
-        this.tags = tags;
+    public void setCategory(String category) {
+        this.category = category;
     }
 
     public int getSellerId() {
@@ -104,5 +102,33 @@ public class Product {
 
     public void setSellerId(int sellerId) {
         this.sellerId = sellerId;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Product product = (Product) o;
+        return id == product.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
+    @Override
+    public String toString() {
+        return "Product{" +
+               "id=" + id +
+               ", title='" + title + '\'' +
+               ", description='" + description + '\'' +
+               ", price=" + price +
+               ", stock=" + stock +
+               ", imageUrl='" + imageUrl + '\'' +
+               ", brand='" + brand + '\'' +
+               ", category='" + category + '\'' + // AGORA É CATEGORY
+               ", sellerId=" + sellerId +
+               '}';
     }
 }
