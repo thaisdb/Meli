@@ -2,39 +2,42 @@
 package com.meli.dto;
 
 /*
- * Data Transfer Object used to carry data between processes
- * Data -&gt; Backend
- * Controler -&gt; Service layer
- * Shaped for the resquest, it helps decouple data model from external APIs
+ * Contêiner para dados que são transferidos entre o frontend e o backend,
+ * especificamente para representar um item que um consumidor deseja comprar.
+ * Ele desacopla o modelo de dados interno (Product) da estrutura de requisição externa.
  */
 public class BuyRequestDTO {
     private Integer id;
     private Integer quantity;
 
-    // Construtor sem argumentos para Jackson
-<span class="nc" id="L15">    public BuyRequestDTO() {</span>
-<span class="nc" id="L16">    }</span>
+<span class="nc" id="L13">    public BuyRequestDTO() {</span>
+<span class="nc" id="L14">    }</span>
 
-<span class="nc" id="L18">    public BuyRequestDTO(Integer id, Integer quantity) {</span>
-<span class="nc" id="L19">        this.id = id;</span>
-<span class="nc" id="L20">        this.quantity = quantity;</span>
-<span class="nc" id="L21">    }</span>
+    /*
+     * Armazena o id do produto e a quantidade desejada respectiva
+     * @param Id do produto
+     * @param quantidade
+     */
+<span class="nc" id="L21">    public BuyRequestDTO(Integer id, Integer quantity) {</span>
+<span class="nc" id="L22">        this.id = id;</span>
+<span class="nc" id="L23">        this.quantity = quantity;</span>
+<span class="nc" id="L24">    }</span>
 
     // Getters e Setters
     public Integer getId() {
-<span class="nc" id="L25">        return id;</span>
+<span class="nc" id="L28">        return id;</span>
     }
 
     public void setId(Integer id) {
-<span class="nc" id="L29">        this.id = id;</span>
-<span class="nc" id="L30">    }</span>
+<span class="nc" id="L32">        this.id = id;</span>
+<span class="nc" id="L33">    }</span>
 
     public Integer getQuantity() {
-<span class="nc" id="L33">        return quantity;</span>
+<span class="nc" id="L36">        return quantity;</span>
     }
 
     public void setQuantity(Integer quantity) {
-<span class="nc" id="L37">        this.quantity = quantity;</span>
-<span class="nc" id="L38">    }</span>
+<span class="nc" id="L40">        this.quantity = quantity;</span>
+<span class="nc" id="L41">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

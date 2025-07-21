@@ -108,10 +108,7 @@
   "cpf" : "123.456.789-00",
   "password" : "senha",
   "address" : "endereço",
-  "cart" : {
-    "2" : 1,
-    "5" : 1
-  },
+  "cart" : { },
   "preferredPaymentMethod" : "CREDITO",
   "type" : "consumer"
 } ]

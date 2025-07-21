@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pt"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>OrderRepository.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Prototype</a> &gt; <a href="index.source.html" class="el_package">com.meli.repository</a> &gt; <span class="el_source">OrderRepository.java</span></div><h1>OrderRepository.java</h1><pre class="source lang-java linenums">package com.meli.repository;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule; // IMPORTANTE: Adicionar esta importação
+import com.meli.model.Order;
+import org.springframework.stereotype.Repository;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
+
+@Repository
+public class OrderRepository {
+
+<span class="nc" id="L22">    private final File ORDER_FILE = new File(&quot;data/orders.json&quot;);</span>
+<span class="nc" id="L23">    private final ObjectMapper objectMapper = new ObjectMapper();</span>
+    private List&lt;Order&gt; orders;
+    private final AtomicInteger idCounter;
+
+<span class="nc" id="L27">    public OrderRepository() {</span>
+<span class="nc" id="L28">        objectMapper.enable(SerializationFeature.INDENT_OUTPUT);</span>
+        // ADIÇÃO CRÍTICA: Registra o módulo para lidar com tipos de data/hora do Java 8+
+<span class="nc" id="L30">        objectMapper.registerModule(new JavaTimeModule()); </span>
+        // Se você já usa objectMapper.findAndRegisterModules() em algum lugar,
+        // esta linha pode ser redundante, mas é a forma explícita de garantir.
+
+<span class="nc" id="L34">        idCounter = new AtomicInteger(0);</span>
+
+<span class="nc" id="L36">        System.out.println(&quot;BACKEND: OrderRepository: --- Initializing Repository ---&quot;);</span>
+<span class="nc bnc" id="L37" title="All 2 branches missed.">        if (!ORDER_FILE.getParentFile().exists()) {</span>
+<span class="nc" id="L38">            ORDER_FILE.getParentFile().mkdirs();</span>
+<span class="nc" id="L39">            System.out.println(&quot;BACKEND: OrderRepository: Created data directory: &quot; + ORDER_FILE.getParentFile().getAbsolutePath());</span>
+        }
+<span class="nc" id="L41">        orders = loadOrders();</span>
+<span class="nc bnc" id="L42" title="All 4 branches missed.">        if (orders.isEmpty() &amp;&amp; !ORDER_FILE.exists()) {</span>
+<span class="nc" id="L43">            System.out.println(&quot;BACKEND: OrderRepository: orders list is empty and file does not exist. Saving empty list to create file.&quot;);</span>
+<span class="nc" id="L44">            saveOrders();</span>
+<span class="nc" id="L45">            System.out.println(&quot;BACKEND: OrderRepository: Initialized empty orders.json file.&quot;);</span>
+<span class="nc bnc" id="L46" title="All 2 branches missed.">        } else if (!orders.isEmpty()) {</span>
+<span class="nc" id="L47">            orders.stream().mapToInt(Order::getId).max().ifPresent(idCounter::set);</span>
+<span class="nc" id="L48">            idCounter.incrementAndGet(); </span>
+<span class="nc" id="L49">            System.out.println(&quot;BACKEND: OrderRepository: Loaded &quot; + orders.size() + &quot; orders. Next ID will be: &quot; + idCounter.get());</span>
+        }
+<span class="nc" id="L51">        System.out.println(&quot;BACKEND: OrderRepository: --- Initialization complete. In-memory orders count: &quot; + orders.size() + &quot; ---&quot;);</span>
+<span class="nc" id="L52">    }</span>
+
+    private List&lt;Order&gt; loadOrders() {
+<span class="nc" id="L55">        System.out.println(&quot;BACKEND: OrderRepository: Attempting to load orders from: &quot; + ORDER_FILE.getAbsolutePath());</span>
+        try {
+<span class="nc bnc" id="L57" title="All 2 branches missed.">            if (ORDER_FILE.exists()) {</span>
+<span class="nc" id="L58">                String fileContent = new String(Files.readAllBytes(Paths.get(ORDER_FILE.getAbsolutePath())));</span>
+<span class="nc bnc" id="L59" title="All 4 branches missed.">                if (fileContent.trim().isEmpty() || fileContent.trim().equals(&quot;[]&quot;)) {</span>
+<span class="nc" id="L60">                    System.out.println(&quot;BACKEND: OrderRepository: orders.json is empty or contains only an empty array. Returning empty list.&quot;);</span>
+<span class="nc" id="L61">                    return new ArrayList&lt;&gt;();</span>
+                }
+<span class="nc" id="L63">                List&lt;Order&gt; loadedOrders = objectMapper.readValue(fileContent, new TypeReference&lt;List&lt;Order&gt;&gt;() {});</span>
+<span class="nc" id="L64">                System.out.println(&quot;BACKEND: OrderRepository: Successfully deserialized &quot; + loadedOrders.size() + &quot; orders from file.&quot;);</span>
+<span class="nc" id="L65">                return loadedOrders;</span>
+            } else {
+<span class="nc" id="L67">                System.out.println(&quot;BACKEND: OrderRepository: orders.json does not exist. Returning an empty list.&quot;);</span>
+            }
+<span class="nc" id="L69">        } catch (IOException e) {</span>
+<span class="nc" id="L70">            System.err.println(&quot;BACKEND: OrderRepository: ERROR loading orders from JSON file: &quot; + e.getMessage());</span>
+<span class="nc" id="L71">            e.printStackTrace();</span>
+<span class="nc" id="L72">        }</span>
+<span class="nc" id="L73">        return new ArrayList&lt;&gt;();</span>
+    }
+
+    private synchronized void saveOrders() {
+<span class="nc" id="L77">        System.out.println(&quot;BACKEND: OrderRepository: Attempting to save &quot; + orders.size() + &quot; orders to: &quot; + ORDER_FILE.getAbsolutePath());</span>
+        try {
+<span class="nc" id="L79">            objectMapper.writeValue(ORDER_FILE, orders);</span>
+<span class="nc" id="L80">            System.out.println(&quot;BACKEND: OrderRepository: Order saved successfully. Total orders: &quot; + orders.size());</span>
+<span class="nc" id="L81">        } catch (IOException e) {</span>
+<span class="nc" id="L82">            System.err.println(&quot;BACKEND: OrderRepository: ERROR saving orders to JSON file: &quot; + e.getMessage());</span>
+<span class="nc" id="L83">            e.printStackTrace();</span>
+<span class="nc" id="L84">        }</span>
+<span class="nc" id="L85">    }</span>
+
+    public Order save(Order order) {
+<span class="nc bnc" id="L88" title="All 2 branches missed.">        if (order.getId() == 0) { </span>
+<span class="nc" id="L89">            order.setId(idCounter.getAndIncrement());</span>
+<span class="nc" id="L90">            orders.add(order);</span>
+<span class="nc" id="L91">            System.out.println(&quot;BACKEND: OrderRepository.save(): Assigned new ID &quot; + order.getId() + &quot; to new order.&quot;);</span>
+        } else { 
+<span class="nc" id="L93">            Optional&lt;Order&gt; existingOrderOpt = getById(order.getId());</span>
+<span class="nc bnc" id="L94" title="All 2 branches missed.">            if (existingOrderOpt.isPresent()) {</span>
+<span class="nc" id="L95">                Order existingOrder = existingOrderOpt.get();</span>
+<span class="nc" id="L96">                existingOrder.setConsumerId(order.getConsumerId());</span>
+<span class="nc" id="L97">                existingOrder.setSellerId(order.getSellerId());</span>
+<span class="nc" id="L98">                existingOrder.setProducts(order.getProducts());</span>
+<span class="nc" id="L99">                existingOrder.setShippingAddress(order.getShippingAddress());</span>
+<span class="nc" id="L100">                existingOrder.setSendersAddress(order.getSendersAddress());</span>
+<span class="nc" id="L101">                existingOrder.setTotal(order.getTotal());</span>
+<span class="nc" id="L102">                existingOrder.setShippingCost(order.getShippingCost());</span>
+<span class="nc" id="L103">                existingOrder.setPaymentMethod(order.getPaymentMethod());</span>
+<span class="nc" id="L104">                existingOrder.setStatus(order.getStatus());</span>
+<span class="nc" id="L105">                existingOrder.setTimestamp(order.getTimestamp());</span>
+<span class="nc" id="L106">                System.out.println(&quot;BACKEND: OrderRepository.save(): Updated order ID &quot; + order.getId() + &quot;.&quot;);</span>
+<span class="nc" id="L107">            } else {</span>
+<span class="nc" id="L108">                System.err.println(&quot;BACKEND: OrderRepository.save(): Attempted to update non-existent order with ID: &quot; + order.getId());</span>
+<span class="nc" id="L109">                return null;</span>
+            }
+        }
+<span class="nc" id="L112">        saveOrders();</span>
+<span class="nc" id="L113">        return order;</span>
+    }
+
+    public Optional&lt;Order&gt; getById(int id) {
+<span class="nc bnc" id="L117" title="All 2 branches missed.">        return orders.stream().filter(o -&gt; o.getId() == id).findFirst();</span>
+    }
+
+    public List&lt;Order&gt; getAll() {
+<span class="nc" id="L121">        return new ArrayList&lt;&gt;(orders);</span>
+    }
+    // Adicione o método deleteById se ele existia antes e foi removido
+    public boolean deleteById(int id) {
+<span class="nc bnc" id="L125" title="All 2 branches missed.">        boolean removed = orders.removeIf(o -&gt; o.getId() == id);</span>
+<span class="nc bnc" id="L126" title="All 2 branches missed.">        if (removed) {</span>
+<span class="nc" id="L127">            saveOrders();</span>
+        }
+<span class="nc" id="L129">        return removed;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>
